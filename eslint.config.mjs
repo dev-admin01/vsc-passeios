@@ -14,7 +14,7 @@ export default [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
 
   {
-    ignores: ["node_modules", "dist", "**/*.d.ts"],
+    ignores: ["node_modules", "dist", "**/*.d.ts", ".next/*"],
 
     rules: {
       "no-console": "off",
