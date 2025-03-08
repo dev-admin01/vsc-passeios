@@ -55,3 +55,29 @@ export class ServiceError extends Error {
     };
   }
 }
+
+export class MethodNotAllowedError extends Error {
+  public statusCode: number;
+  public action: string;
+  public cause?: unknown;
+
+  constructor({ cause, message }: CustomErrorProps = {}) {
+    super(message || "Método não permitido para esse endpoint.");
+
+    this.name = "MethodNotAllowedError";
+    this.cause = cause;
+    this.action =
+      "Verifique se o método HTTP enviado é valido para este endpoint.";
+    this.statusCode = 405;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      cause: this.cause,
+      message: this.message,
+      action: this.action,
+      status_code: this.statusCode,
+    };
+  }
+}

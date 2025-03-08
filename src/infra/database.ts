@@ -1,5 +1,5 @@
 import { Client, QueryConfig } from "pg";
-import { ServiceError } from "./erros";
+import { ServiceError } from "./errors";
 
 async function query(queryInput: string | QueryConfig) {
   let client;

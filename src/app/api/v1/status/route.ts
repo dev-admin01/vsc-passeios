@@ -39,13 +39,3 @@ export async function GET() {
     { status: 200 }
   );
 }
-
-// export async function POST(request: NextRequest) {
-//   // If you need the request body:
-//   const body = await request.json();
-
-//   return NextResponse.json({
-//     message: "POST: Hello from the App Router!",
-//     received: body,
-//   });
-// }

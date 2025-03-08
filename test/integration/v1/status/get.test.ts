@@ -1,3 +1,11 @@
+import orchestrator from "../orchestrator";
+
+beforeAll(async () => {
+  await orchestrator.waitForAllServices();
+  await orchestrator.clearDatabase();
+  await orchestrator.runPendingMigrations();
+});
+
 test("GET to /api/v1/status sould return 200", async () => {
   const response = await fetch("http://localhost:3000/api/v1/status");
 

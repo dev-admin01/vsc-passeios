@@ -13,12 +13,13 @@
     "migrations:create": "node-pg-migrate -m src/infra/migrations create",
     "migrations:up": "node-pg-migrate -m src/infra/migrations --envPath .env.development up",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watchAll --runInBand --verbose"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.2",
     "@types/jest": "29.5.14",
+    "async-retry": "^1.3.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "16.4.7",
@@ -41,6 +42,7 @@
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.2.0",
+    "@types/async-retry": "^1.4.9",
     "@types/node": "20",
     "@types/node-pg-migrate": "2.3.1",
     "@types/pg": "8.11.11",
