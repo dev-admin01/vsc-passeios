@@ -10,6 +10,9 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import axios from "axios";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
 export default function LoginPage() {
   async function handleLogin(formData: FormData) {
@@ -28,11 +31,33 @@ export default function LoginPage() {
         password,
       });
 
-      console.log(response.data);
-    } catch (error) {
-      console.log(error);
-      return;
+      if (!response.data.token) {
+        return;
+      }
+
+      const expressTime = 60 * 60 * 24 * 7;
+
+      const cookieStore = await cookies();
+
+      cookieStore.set("vsc-session", response.data.token, {
+        maxAge: expressTime,
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+      });
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        // Se a API retornou um erro "tratado" (por exemplo, 400), você pode ler o corpo de resposta:
+        console.log(error.response?.data);
+
+        // Se você quiser, pode exibir alguma mensagem de erro na tela:
+        // setError(error.response?.data.message);
+      } else {
+        // Caso não seja um AxiosError, pode tratar de outra forma
+        console.log(error);
+      }
     }
+
+    redirect("/dashboard");
 
     // Router.push("/dashboard") ou algo assim
   }
