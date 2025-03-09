@@ -1,5 +1,6 @@
 export interface CustomErrorProps {
   cause?: unknown;
+  action?: unknown | string;
   statusCode?: number;
   message?: string;
 }
@@ -75,6 +76,33 @@ export class MethodNotAllowedError extends Error {
     return {
       name: this.name,
       cause: this.cause,
+      message: this.message,
+      action: this.action,
+      status_code: this.statusCode,
+    };
+  }
+}
+
+export class ValidationError extends Error {
+  public statusCode: number;
+  public action?: string;
+  public cause?: unknown;
+
+  constructor({ cause, message, action }: CustomErrorProps) {
+    super(message || "Um erro de validação ocorreu.");
+
+    this.cause = cause;
+    this.name = "ValidationError";
+    this.action =
+      typeof action === "string" ? action : "Ajuste os dados enviados.";
+    this.statusCode = 400;
+
+    // Object.setPrototypeOf(this, ValidationError.prototype);
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
       message: this.message,
       action: this.action,
       status_code: this.statusCode,
