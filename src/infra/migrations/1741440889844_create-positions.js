@@ -4,11 +4,10 @@
 exports.shorthands = undefined;
 
 exports.up = (pgm) => {
-  pgm.createTable("position", {
+  pgm.createTable("positions", {
     id_position: {
-      type: "uuid",
+      type: "serial",
       primaryKey: true,
-      default: pgm.func("gen_random_uuid()"),
     },
     description: {
       type: "varchar(512)",
@@ -23,6 +22,15 @@ exports.up = (pgm) => {
       default: pgm.func("now()"),
     },
   });
+
+  pgm.sql(`
+    INSERT INTO positions (description, created_at, updated_at)
+    VALUES
+      ('manager', now(), now()),
+      ('Admin', now(), now()),
+      ('seller', now(), now()),
+      ('operator', now(), now());
+  `);
 };
 
 exports.down = false;

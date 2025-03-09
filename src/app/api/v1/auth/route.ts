@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import user from "@/models/user";
+
+import auth from "@/models/auth";
 import { ValidationError } from "@/infra/errors";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const newUser = await user.create(body);
-    return NextResponse.json(newUser, { status: 201 });
+    const authorization = await auth.singIn(body);
+    return NextResponse.json(authorization, { status: 200 });
   } catch (error: any) {
     if (error instanceof ValidationError) {
       return NextResponse.json(error.toJSON(), { status: error.statusCode });
