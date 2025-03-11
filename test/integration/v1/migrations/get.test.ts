@@ -6,7 +6,7 @@ beforeAll(async () => {
 });
 
 describe("GET to /api/v1/migrations sould return 200", () => {
-  test("Anonymous users", async () => {
+  test("Logged user", async () => {
     const response = await fetch("http://localhost:3000/api/v1/migrations");
 
     expect(response.status).toBe(200);

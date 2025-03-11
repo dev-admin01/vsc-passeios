@@ -3,16 +3,11 @@ import { api } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import axios from "axios";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import Image from "next/image";
 
 export default function LoginPage() {
   async function handleLogin(formData: FormData) {
@@ -58,16 +53,19 @@ export default function LoginPage() {
     }
 
     redirect("/dashboard");
-
-    // Router.push("/dashboard") ou algo assim
   }
 
   return (
     <div className="flex h-screen items-center justify-center">
       <Card className="w-full max-w-sm mx-5">
         <CardHeader>
-          <CardTitle>Login</CardTitle>
-          <CardDescription>Entre na sua conta</CardDescription>
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={100}
+            height={100}
+            className="mx-auto"
+          />
         </CardHeader>
 
         <CardContent>
