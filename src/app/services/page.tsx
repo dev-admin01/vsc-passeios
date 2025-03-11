@@ -42,6 +42,8 @@ export default function ServicesPage() {
       setPage((prev) => prev + 1);
     }
   }
+  setTotalPages(1);
+
   console.log("page:", data);
 
   return (
