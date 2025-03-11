@@ -1,8 +1,10 @@
 "use client";
 import useSWR from "swr";
 // import { api } from "@/services/api";
+
 import { getCookieclient } from "@/lib/cookieClient";
 import { Services } from "@/types/service.types";
+
 
 const fetchServices = async (
   page: number,
@@ -17,6 +19,7 @@ const fetchServices = async (
       headers: {
         Authorization: `Bearer ${token}`,
       },
+
     }
   );
 

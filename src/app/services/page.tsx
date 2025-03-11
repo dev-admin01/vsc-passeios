@@ -43,6 +43,7 @@ export default function ServicesPage() {
     }
   }
   setTotalPages(1);
+
   console.log("page:", data);
 
   return (
