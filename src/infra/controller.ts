@@ -14,6 +14,7 @@ function onErrorHandler(error: any, response: NextApiResponse) {
   if (error instanceof ValidationError) {
     return response.status(error.statusCode).json(error);
   }
+
   const publicErrorObject = new InternalServerError({
     statusCode: error.statusCode,
     cause: error,

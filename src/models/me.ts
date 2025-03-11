@@ -1,5 +1,5 @@
 import database from "@/infra/database";
-import { ValidationError } from "@/infra/errors";
+import { InvalidTokenError } from "@/infra/errors";
 
 async function DetailUser(id_user: string) {
   const user = await findUser(id_user);
@@ -17,15 +17,15 @@ async function DetailUser(id_user: string) {
       values: [id_user],
     });
     if (results.rowCount! < 1) {
-      throw new ValidationError({
-        message: "O email informado já está sendo utilizado.",
-        action: "utilize outro email para realizar o cadastro.",
+      throw new InvalidTokenError({
+        message: "Token de verificação inválido.",
+        action:
+          "Efetue o processo de autenticação para acessar as rotas privadas.",
       });
     }
 
     return results.rows[0];
   }
-  console.log(user);
   return user;
 }
 
