@@ -5,7 +5,9 @@ import { ValidationError } from "@/infra/errors";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
     const newUser = await user.create(body);
+
     return NextResponse.json(newUser, { status: 201 });
   } catch (error: any) {
     if (error instanceof ValidationError) {

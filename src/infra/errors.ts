@@ -109,3 +109,30 @@ export class ValidationError extends Error {
     };
   }
 }
+
+export class InvalidTokenError extends Error {
+  public statusCode: number;
+  public action?: string;
+  public cause?: unknown;
+
+  constructor({ cause, message, action }: CustomErrorProps) {
+    super(message || "Um erro de validação do token ocorreu.");
+
+    this.cause = cause;
+    this.name = "InvalidTokenError";
+    this.action =
+      typeof action === "string" ? action : "Ajuste os dados enviados.";
+    this.statusCode = 400;
+
+    // Object.setPrototypeOf(this, ValidationError.prototype);
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.statusCode,
+    };
+  }
+}

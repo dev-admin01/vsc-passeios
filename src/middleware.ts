@@ -2,17 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getCookieServer } from "@/lib/cookieServer";
 import { jwtVerify } from "jose";
-import { api } from "./services/api";
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-
+  console.log(pathname);
   // MIDDLEWARES PARA API
   if (pathname.includes("/api")) {
     if (
       pathname.startsWith("/_next") ||
       pathname === "/api/v1/users" ||
       pathname === "/api/v1/auth" ||
+      pathname === "/api/v1/migrations" ||
       pathname === "/api/v1/status"
     ) {
       return NextResponse.next();
@@ -50,11 +50,12 @@ export async function middleware(req: NextRequest) {
   if (
     pathname.startsWith("/_next") ||
     pathname === "/" ||
-    pathname === "/status"
+    pathname === "/status" ||
+    pathname === "/logo.png"
   ) {
     return NextResponse.next();
   }
-
+  console.log(pathname);
   const token = await getCookieServer();
 
   if (!token) {
@@ -73,15 +74,15 @@ export async function middleware(req: NextRequest) {
 async function validateToken(token: string) {
   if (!token) return false;
 
-  try {
-    await api.get("/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  const response = await fetch(`http://localhost:3000/api/v1/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (response.status === 200) {
     return true;
-  } catch (err) {
-    console.log(err);
-    return false;
   }
+
+  return false;
 }
