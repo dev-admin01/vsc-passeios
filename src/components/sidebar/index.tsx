@@ -1,10 +1,10 @@
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Home,
   LogOut,
-  Package,
   PanelBottom,
   Sailboat,
   Settings,
@@ -16,7 +16,7 @@ import {
   Tooltip,
   TooltipProvider,
   TooltipTrigger,
-} from "../tooltip";
+} from "../ui/tooltip";
 
 export function Sidebar() {
   return (
@@ -26,9 +26,15 @@ export function Sidebar() {
           <TooltipProvider>
             <Link
               href="/dashboard"
-              className="flex h-9 w-9 shrink-0 items-center justify-center bg-primary text-primary-foreground rounded-full"
+              className="flex h-9 w-9 shrink-0 items-center justify-center  text-primary-foreground rounded-full"
             >
-              <Package className="h-4 w-4" />
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                width={100} // adjust the width as needed
+                height={100} // adjust the height as needed
+                className="mx-auto"
+              />
               <span className="sr-only">Dashboard avatar</span>
             </Link>
             <Tooltip>
@@ -58,7 +64,7 @@ export function Sidebar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="/servicos"
+                  href="/services"
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <Sailboat className="h-4 w-4" />
@@ -112,10 +118,16 @@ export function Sidebar() {
               <nav className="grid gap-6 text-lg font-medium">
                 <Link
                   href={"#"}
-                  className="flex h-10 w-10 bg-primary rounded-full text-lg items-center justify-center text-primary-foreground md:text-base gap-2"
+                  className="m-3 flex h-15 w-15 rounded-full text-lg items-center justify-center text-primary-foreground md:text-base gap-2"
                   prefetch={false}
                 >
-                  <Package className="h-5 w-5 transi" />
+                  <Image
+                    src="/logo.png"
+                    alt="Logo"
+                    width={100}
+                    height={100}
+                    className="mx-auto"
+                  />
                   <span className="sr-only">Logo do projeto</span>
                 </Link>
 

@@ -18,7 +18,7 @@ describe("POST to /api/v1/status", () => {
         body: JSON.stringify({
           name: "user teste",
           email: "teste@teste.com",
-          password: "senhateste",
+          password: "123123",
           id_position: "1",
           ddi: "55",
           ddd: "11",
@@ -55,7 +55,7 @@ describe("POST to /api/v1/status", () => {
         body: JSON.stringify({
           name: "user teste",
           email: "teste1@teste.com",
-          password: "senhateste",
+          password: "123123",
           id_position: "1",
           ddi: "55",
           ddd: "11",
@@ -73,7 +73,7 @@ describe("POST to /api/v1/status", () => {
         body: JSON.stringify({
           name: "user teste",
           email: "Teste1@teste.com",
-          password: "senhateste",
+          password: "123123",
           id_position: "1",
           ddi: "55",
           ddd: "11",
