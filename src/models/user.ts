@@ -5,7 +5,6 @@ import { hash } from "bcrypt";
 
 async function create(userInputValue: createUserInput) {
   await validadeUniqueEmail(userInputValue.email);
-
   const passwordHash = await hashPassword(userInputValue.password);
   userInputValue.password = passwordHash;
 
@@ -47,7 +46,6 @@ async function create(userInputValue: createUserInput) {
                 ;`,
       values: [email],
     });
-
     if (results.rowCount! > 0) {
       throw new ValidationError({
         message: "O email informado já está sendo utilizado.",
