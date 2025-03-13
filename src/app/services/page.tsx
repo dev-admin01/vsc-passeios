@@ -21,7 +21,9 @@ export default function ServicesPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
+
   // const [totalPages, setTotalPages] = useState(1);
+
 
   // Passando os parâmetros para o hook
   const { data, isLoading, error } = useServices(page, limit, search);
@@ -42,6 +44,8 @@ export default function ServicesPage() {
   //     setPage((prev) => prev + 1);
   //   }
   // }
+
+
 
   return (
     <div className="sm:ml-15 p-5 space-y-6">
@@ -103,12 +107,7 @@ export default function ServicesPage() {
         <Button onClick={previousPage} disabled={page === 1}>
           Anterior
         </Button>
-        {/* <span>
-          Página {page} de {totalPages}
-        </span>
-        <Button onClick={nextPage} disabled={page === totalPages}>
-          Próxima
-        </Button> */}
+
       </div>
     </div>
   );
