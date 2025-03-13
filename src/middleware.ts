@@ -10,11 +10,12 @@ export async function middleware(req: NextRequest) {
   if (pathname.includes("/api")) {
     if (
       pathname.startsWith("/_next") ||
-      pathname === "/api/v1/users" ||
-      pathname === "/api/v1/auth" ||
-      pathname === "/api/v1/migrations" ||
-      pathname === "/api/v1/status"
+      pathname.startsWith("/api/v1/users") ||
+      pathname.startsWith("/api/v1/auth") ||
+      pathname.startsWith("/api/v1/migrations") ||
+      pathname.startsWith("/api/v1/status")
     ) {
+      console.log("api sem jwt");
       return NextResponse.next();
     }
 
