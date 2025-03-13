@@ -5,7 +5,6 @@ import useSWR from "swr";
 import { getCookieclient } from "@/lib/cookieClient";
 import { Services } from "@/types/service.types";
 
-
 const fetchServices = async (
   page: number,
   limit: number,
@@ -19,7 +18,6 @@ const fetchServices = async (
       headers: {
         Authorization: `Bearer ${token}`,
       },
-
     }
   );
 
