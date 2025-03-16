@@ -14,13 +14,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
   const token = await getCookieServer();
-  console.log("token middleware:", token);
   if (!token) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
   const isValid = await validateToken(token);
-  console.log("valido:", isValid);
 
   if (!isValid) {
     return NextResponse.redirect(new URL("/", req.url));
