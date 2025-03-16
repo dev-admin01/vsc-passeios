@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Sidebar } from "@/components/sidebar";
 
 import { ChartOverview } from "@/components/chart/index";
 import { Brain, Clock10, DollarSign, ShoppingBagIcon } from "lucide-react";
@@ -12,6 +13,7 @@ import { Brain, Clock10, DollarSign, ShoppingBagIcon } from "lucide-react";
 export default function Dashboard() {
   return (
     <main className="sm:ml-14 p-4">
+      <Sidebar />
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Card>
           <CardHeader>

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { api } from "./services/api";
 
 import { getCookieServer } from "@/lib/cookieServer";
 
@@ -30,7 +31,7 @@ export async function middleware(req: NextRequest) {
 async function validateToken(token: string) {
   if (!token) return false;
 
-  const response = await fetch(`http://localhost:3000/api/me`, {
+  const response = await api.get("/me", {
     headers: {
       Authorization: `Bearer ${token}`,
     },

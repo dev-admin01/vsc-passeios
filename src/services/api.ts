@@ -1,12 +1,6 @@
 import axios from "axios";
 
-const baseURL = (() => {
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}/api`;
-  }
-
-  return process.env.BASE_URL;
-})();
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const api = axios.create({
   baseURL,
