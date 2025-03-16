@@ -54,6 +54,7 @@ export default function ServicesPage() {
   // ----- Modal de criação -----
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
+
   function openCreateModal() {
     setIsCreateModalOpen(true);
   }
