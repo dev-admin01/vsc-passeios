@@ -1,4 +1,5 @@
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
@@ -111,7 +112,9 @@ export function Sidebar() {
             <SheetTrigger asChild>
               <Button size="icon" variant="outline" className="sm:hidden">
                 <PanelBottom className="w-5 h-5" />
-                <span className="sr-only">Abrir / fechar menu</span>
+                <VisuallyHidden>
+                  <span className="sr-only">Abrir / fechar menu</span>
+                </VisuallyHidden>
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="p-4sm:max-w-x">
