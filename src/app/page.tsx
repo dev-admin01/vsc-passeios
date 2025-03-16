@@ -26,15 +26,14 @@ export default function LoginPage() {
         password,
       });
 
-      if (!response.data.token) {
+      if (!response.data.user.token) {
         return;
       }
 
       const expressTime = 60 * 60 * 24 * 7;
 
       const cookieStore = await cookies();
-
-      cookieStore.set("vsc-session", response.data.token, {
+      cookieStore.set("vsc-session", response.data.user.token, {
         maxAge: expressTime,
         httpOnly: false,
         secure: process.env.NODE_ENV === "production",
