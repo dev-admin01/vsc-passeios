@@ -1,61 +1,49 @@
-import { api } from "@/services/api";
+"use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import axios from "axios";
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import Image from "next/image";
+import { useAuth } from "./hooks/useAuth";
 
 export default function LoginPage() {
-  async function handleLogin(formData: FormData) {
-    "use server";
+  const { login } = useAuth();
+  const [statusCode, setStatusCode] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
+  async function handleLogin(formData: FormData) {
     const email = formData.get("email");
     const password = formData.get("password");
 
-    if (email === "" || password === "") {
+    if (
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      email === "" ||
+      password === ""
+    ) {
       return;
     }
 
-    try {
-      const response = await api.post("/auth", {
-        email,
-        password,
-      });
+    setIsLoading(true);
+    const result = await login(email, password);
+    setIsLoading(false);
 
-      if (!response.data.user.token) {
-        return;
-      }
-
-      const expressTime = 60 * 60 * 24 * 7;
-
-      const cookieStore = await cookies();
-      cookieStore.set("vsc-session", response.data.user.token, {
-        maxAge: expressTime,
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-      });
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        // Se a API retornou um erro "tratado" (por exemplo, 400), você pode ler o corpo de resposta:
-        console.log(error.response?.data);
-
-        // Se você quiser, pode exibir alguma mensagem de erro na tela:
-        // setError(error.response?.data.message);
-      } else {
-        // Caso não seja um AxiosError, pode tratar de outra forma
-        console.log(error);
-      }
+    if (result) {
+      setStatusCode(result.statusCode);
     }
-
-    redirect("/dashboard");
   }
 
+  // Função para lidar com o evento de submit
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Impede o recarregamento da página
+    const formData = new FormData(e.currentTarget);
+    await handleLogin(formData);
+  };
+
   return (
-    <div className="flex h-screen items-center justify-center">
+    <div className="flex h-screen items-center justify-center bg-sky-100">
       <Card className="w-full max-w-sm mx-5">
         <CardHeader>
           <Image
@@ -68,7 +56,11 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent>
-          <form action={handleLogin} className="grid gap-4">
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            {statusCode === 400 && (
+              <span className="text-red-500">Usuário ou senha invalidados</span>
+            )}
+
             <div className="grid gap-1">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -89,7 +81,16 @@ export default function LoginPage() {
               />
             </div>
 
-            <Button type="submit">Entrar</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <span className="animate-spin inline-block w-4 h-4 border-2 border-t-2 border-white rounded-full"></span>
+                  Entrando...
+                </span>
+              ) : (
+                "Entrar"
+              )}
+            </Button>
           </form>
         </CardContent>
       </Card>

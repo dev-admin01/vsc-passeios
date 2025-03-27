@@ -1,8 +1,8 @@
 export interface Services {
-  id_service?: string;
-  description: string;
-  type: number;
-  price: number;
+  id_service?: number;
+  description?: string;
+  type?: number;
+  price?: number;
   observation?: string;
   created_at?: string;
   updated_ate?: string;

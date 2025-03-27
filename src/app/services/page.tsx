@@ -4,7 +4,6 @@ import { useState, useEffect, FormEvent } from "react";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -15,22 +14,21 @@ import { Input } from "@/components/ui/input";
 import { Sidebar } from "@/components/sidebar";
 
 // Hooks existentes
-import { useServices } from "@/app/hooks/useServices";
-import { useCreateService } from "@/app/hooks/useCreateService";
+import { useServices } from "@/app/hooks/service/useServices";
+import { useCreateService } from "@/app/hooks/service/useCreateService";
 
 // Novos hooks (edição / deleção / get único)
-import { useDeleteService } from "@/app/hooks/useDeleteService";
-import { useUpdateService } from "@/app/hooks/useUpdateService";
-import { useGetService } from "@/app/hooks/useGetService";
+import { useDeleteService } from "@/app/hooks/service/useDeleteService";
+import { useUpdateService } from "@/app/hooks/service/useUpdateService";
+import { useGetService } from "@/app/hooks/service/useGetService";
 
 // Ícones do lucide-react (instale via npm i lucide-react)
 import { Edit, Trash2 } from "lucide-react";
 
+import { CreateServicePayload } from "@/types/service.types";
+
 // (Opcional) componente de criação que você já tem
-import {
-  CreateServiceModal,
-  CreateServicePayload,
-} from "@/components/createServiceModal";
+import { CreateServiceModal } from "@/components/createServiceModal";
 interface ServiceData {
   id_service: number;
   description: string;
@@ -53,7 +51,6 @@ export default function ServicesPage() {
 
   // ----- Modal de criação -----
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
 
   function openCreateModal() {
     setIsCreateModalOpen(true);
@@ -164,9 +161,9 @@ export default function ServicesPage() {
   }
 
   return (
-    <div className="sm:ml-14 p-4">
+    <div className="sm:ml-17 p-4 min-h-screen bg-sky-100">
       <Sidebar />
-      <h1 className="text-2xl font-bold">Services</h1>
+      <h1 className="text-2xl font-bold">Passeios</h1>
 
       {/* Busca + Criar */}
       <div className="flex items-center gap-2 mb-4">
@@ -175,20 +172,20 @@ export default function ServicesPage() {
           placeholder="Buscar descrição..."
           value={search}
           onChange={handleSearchChange}
+          className="bg-amber-50"
         />
-        <Button onClick={openCreateModal}>Criar Novo Serviço</Button>
+        <Button onClick={openCreateModal}>Novo Passeio</Button>
       </div>
 
       {/* Tabela de serviços */}
       <Table>
-        <TableCaption>Lista de Serviços</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>ID</TableHead>
             <TableHead>Descrição</TableHead>
             <TableHead>Preço</TableHead>
             <TableHead>Observação</TableHead>
-            <TableHead>Ações</TableHead> {/* Nova coluna */}
+            <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -197,23 +194,25 @@ export default function ServicesPage() {
               <TableCell colSpan={5}>Carregando...</TableCell>
             </TableRow>
           )}
-
           {error && (
             <TableRow>
-              <TableCell colSpan={5}>Erro ao carregar os serviços.</TableCell>
+              <TableCell colSpan={5}>Erro ao carregar os passeios.</TableCell>
             </TableRow>
           )}
-
           {!isLoading && !error && data?.services?.length
             ? data.services.map((item) => (
                 <TableRow key={item.id_service}>
                   <TableCell>{item.id_service}</TableCell>
                   <TableCell>{item.description}</TableCell>
-                  <TableCell>{item.price}</TableCell>
+                  <TableCell>
+                    {Number(item.price).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </TableCell>
                   <TableCell>{item.observation}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      {/* Botão de Edição */}
                       <Button
                         variant="ghost"
                         onClick={() => openEditModal(item.id_service)}
@@ -221,8 +220,6 @@ export default function ServicesPage() {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-
-                      {/* Botão de Exclusão */}
                       <Button
                         variant="ghost"
                         onClick={() => openDeleteModal(item.id_service)}
@@ -237,13 +234,11 @@ export default function ServicesPage() {
             : !isLoading &&
               !error && (
                 <TableRow>
-                  <TableCell colSpan={5}>Nenhum serviço encontrado.</TableCell>
+                  <TableCell colSpan={5}>Nenhum passeio encontrado.</TableCell>
                 </TableRow>
               )}
         </TableBody>
       </Table>
-
-      {/* Paginação */}
       {data && (
         <div className="flex items-center justify-center gap-4 mt-4">
           <Button onClick={previousPage} disabled={page <= 1}>
@@ -275,7 +270,7 @@ export default function ServicesPage() {
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
           <div className="bg-white p-4 rounded shadow-md max-w-md w-full">
             <h3 className="text-lg font-bold mb-2">Confirmar Exclusão</h3>
-            <p>Tem certeza que deseja excluir este serviço?</p>
+            <p>Tem certeza que deseja excluir este Passeio?</p>
             <div className="mt-4 flex justify-end gap-2">
               <Button variant="outline" onClick={closeDeleteModal}>
                 Cancelar
@@ -296,7 +291,7 @@ export default function ServicesPage() {
       {isEditModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
           <div className="bg-white p-4 rounded shadow-md max-w-md w-full">
-            <h3 className="text-lg font-bold mb-2">Editar Serviço</h3>
+            <h3 className="text-lg font-bold mb-2">Editar Passeio</h3>
             <form
               onSubmit={handleUpdateService}
               className="flex flex-col gap-2"
