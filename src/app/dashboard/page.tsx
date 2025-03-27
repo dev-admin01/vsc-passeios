@@ -12,10 +12,10 @@ import { Brain, Clock10, DollarSign, ShoppingBagIcon } from "lucide-react";
 
 export default function Dashboard() {
   return (
-    <main className="sm:ml-14 p-4">
+    <main className="sm:ml-17 min-h-screen  p-4 bg-sky-100">
       <Sidebar />
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-sky-200">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
@@ -29,7 +29,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>10 Orçamentos</CardContent>
         </Card>
-        <Card>
+        <Card className="bg-sky-200">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
@@ -43,7 +43,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>5 Orçamentos</CardContent>
         </Card>
-        <Card>
+        <Card className="bg-sky-200">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
@@ -57,19 +57,19 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>18 Orçamentos</CardContent>
         </Card>
-        <Card>
+        <Card className="bg-sky-200">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
-                Pensando
+                Operador
               </CardTitle>
               <Brain className="ml-auto w-5 h-5" />
             </div>
             <CardDescription className="text-sm">
-              completar 4 cards
+              Aguardando operador
             </CardDescription>
           </CardHeader>
-          <CardContent>18 Orçamentos</CardContent>
+          <CardContent>3 Orçamentos</CardContent>
         </Card>
       </section>
 

@@ -3,14 +3,15 @@
 import { useState, FormEvent } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-// Tipo usado na criação
-export interface CreateServicePayload {
-  description: string;
-  type: string;
-  price: string;
-  observation: string;
-}
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CreateServicePayload } from "@/types/service.types";
+// import CurrencyInputField from "@/components/inputPrice";
 
 interface CreateServiceModalProps {
   isOpen: boolean;
@@ -71,12 +72,15 @@ export function CreateServiceModal({
           </div>
           <div>
             <label className="font-semibold">Tipo:</label>
-            <Input
-              type="text"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              required
-            />
+            <Select value={type} onValueChange={(val) => setType(val)} required>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">Não Exige CNH</SelectItem>
+                <SelectItem value="1">Exige CNH</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <label className="font-semibold">Preço:</label>
@@ -86,6 +90,7 @@ export function CreateServiceModal({
               onChange={(e) => setPrice(e.target.value)}
               required
             />
+            {/* <CurrencyInputField value={price} onNumericValueChange={setPrice} /> */}
           </div>
           <div>
             <label className="font-semibold">Observação:</label>

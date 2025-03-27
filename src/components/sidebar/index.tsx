@@ -22,19 +22,19 @@ import {
 export function Sidebar() {
   return (
     <div className="flex w-full flex-col bg-muted/40">
-      <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 border-r bg-background sm:flex sm:flex-col">
+      <aside className="fixed inset-y-0 left-0 z-10 hidden w-17 border-r sm:flex sm:flex-col bg-blue-800">
         <nav className="flex flex-col items-center gap-4 px-2 py-5">
           <TooltipProvider>
             <Link
               href="/dashboard"
-              className="flex h-9 w-9 shrink-0 items-center justify-center  text-primary-foreground rounded-full"
+              className="flex h-14 w-14 shrink-0 items-center justify-center  text-primary-foreground rounded-full"
             >
               <Image
                 src="/logo.png"
                 alt="Logo"
                 width={100} // adjust the width as needed
                 height={100} // adjust the height as needed
-                className="mx-auto"
+                className="mx-auto "
               />
               <span className="sr-only">Dashboard avatar</span>
             </Link>
@@ -44,7 +44,7 @@ export function Sidebar() {
                   href="/dashboard"
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  <Home className="h-4 w-4" />
+                  <Home className="h-7 w-7 text-white" />
                   <span className="sr-only">incio</span>
                 </Link>
               </TooltipTrigger>
@@ -53,10 +53,10 @@ export function Sidebar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="#"
+                  href="/orders"
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  <ShoppingBag className="h-4 w-4" />
+                  <ShoppingBag className="h-7 w-7 text-white" />
                   <span className="sr-only">Orçamentos</span>
                 </Link>
               </TooltipTrigger>
@@ -68,11 +68,11 @@ export function Sidebar() {
                   href="/services"
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  <Sailboat className="h-4 w-4" />
-                  <span className="sr-only">Serviços</span>
+                  <Sailboat className="h-7 w-7 text-white" />
+                  <span className="sr-only">Passeios</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">Serviços</TooltipContent>
+              <TooltipContent side="right">Passeios</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -80,7 +80,7 @@ export function Sidebar() {
                   href="#"
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  <Settings className="h-4 w-4" />
+                  <Settings className="h-7 w-7 text-white" />
                   <span className="sr-only">Configurações</span>
                 </Link>
               </TooltipTrigger>
@@ -96,7 +96,7 @@ export function Sidebar() {
                   href="#"
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  <LogOut className="h-4 w-4 text-red-500" />
+                  <LogOut className="h-7 w-7 text-red-500" />
                   <span className="sr-only">Sair</span>
                 </Link>
               </TooltipTrigger>
@@ -106,8 +106,8 @@ export function Sidebar() {
         </nav>
       </aside>
 
-      <div className="sm:hiden flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-        <header className="stick top-0 z-30 flex h-14 items-center px-4 border-b bg-background gap-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+      <div className="sm:hiden flex flex-col sm:gap-4 sm:py-4 sm:pl-14  bg-sky-100">
+        <header className="stick top-0 z-30 flex h-14 items-center px-4 border-b gap-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 mb-4 bg-sky-300 rounded-2xl">
           <Sheet>
             <SheetTrigger asChild>
               <Button size="icon" variant="outline" className="sm:hidden">
@@ -157,7 +157,7 @@ export function Sidebar() {
                   prefetch={false}
                 >
                   <Sailboat className="h-5 w-5 transition-all" />
-                  Serviços
+                  Passeios
                 </Link>
                 <Link
                   href={"#"}
