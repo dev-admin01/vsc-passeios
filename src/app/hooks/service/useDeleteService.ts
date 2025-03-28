@@ -8,7 +8,7 @@ export const useDeleteService = () => {
   const deleteService = useCallback(async (id: number) => {
     const token = await getCookieclient();
     // Chama DELETE /services/:id
-    const response = await api.delete(`/services/${id}`, {
+    const response = await api.delete(`/api/services/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;

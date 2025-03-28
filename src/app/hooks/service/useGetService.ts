@@ -8,7 +8,7 @@ export const useGetService = () => {
   const getService = useCallback(async (id: number) => {
     const token = await getCookieclient();
     // Chama GET /services/:id
-    const response = await api.get(`/services/${id}`, {
+    const response = await api.get(`/api/services/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

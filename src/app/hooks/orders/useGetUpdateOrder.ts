@@ -18,7 +18,7 @@ async function fetchOrder(url: string) {
 export function useSingleOrder(id_order: string | null) {
   // Se id_order for null, não faz requisição (SWR retorna null)
   const { data, error, isLoading } = useSWR(
-    id_order ? `/orders/${id_order}` : null,
+    id_order ? `/api/orders/${id_order}` : null,
     fetchOrder
   );
 

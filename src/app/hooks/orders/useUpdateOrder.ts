@@ -26,7 +26,7 @@ export interface UpdateOrderPayload {
 export const useUpdateOrder = () => {
   const updateOrder = async (id: string, payload: UpdateOrderPayload) => {
     const token = await getCookieclient();
-    const response = await api.put(`/orders/${id}`, payload, {
+    const response = await api.put(`/api/orders/${id}`, payload, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;

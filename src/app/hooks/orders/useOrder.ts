@@ -7,7 +7,7 @@ import { OrdersResponse } from "@/types/orders.type";
 
 const fetchOrders = async (page: number, perpage: number, search: string) => {
   const token = await getCookieclient();
-  const response = await api.get<OrdersResponse>("/orders", {
+  const response = await api.get<OrdersResponse>("/api/orders", {
     params: { page, perpage, search },
     headers: { Authorization: `Bearer ${token}` },
   });

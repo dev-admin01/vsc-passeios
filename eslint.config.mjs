@@ -25,6 +25,16 @@ export default [
       "node/no-unsupported-features/es-syntax": "off",
       "no-undef": "off",
       "@typescript-eslint/no-explicit-any": "off",
+      "jsx-a11y/alt-text": [
+        2,
+        {
+          elements: ["object", "area", 'input[type="image"]'],
+
+          object: ["Object"],
+          area: ["Area"],
+          'input[type="image"]': ["InputImage"],
+        },
+      ],
     },
   },
 ];

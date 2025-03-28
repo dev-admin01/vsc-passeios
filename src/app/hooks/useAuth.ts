@@ -18,7 +18,7 @@ export function useAuth() {
     password: string
   ): Promise<AuthResp | undefined> => {
     try {
-      const response = await api.post("/auth", { email, password });
+      const response = await api.post("/api/auth", { email, password });
 
       if (!response.data.user.token) {
         return { statusCode: 400 };

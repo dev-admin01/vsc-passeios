@@ -8,7 +8,7 @@ export const useSelectServices = () => {
   const selectServices = useCallback(async () => {
     try {
       const token = await getCookieclient();
-      const response = await api.get("/services", {
+      const response = await api.get("/api/services", {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data.services;
