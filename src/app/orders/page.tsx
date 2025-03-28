@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Edit, Trash2, FileArchive } from "lucide-react";
+import { Edit, Trash2, FileArchive, Send } from "lucide-react";
 
 import { useOrders } from "@/app/hooks/orders/useOrder";
 import { useDeleteOrder } from "@/app/hooks/orders/useDeleteOrder";
@@ -25,12 +25,6 @@ import {
 import { EditOrderModal } from "@/components/editOrderModal";
 import { DeleteOrderModal } from "@/components/deleteOrderModal";
 import { CreateOrderModal } from "@/components/createOrderModal";
-
-import { useGeneratePDF } from "../hooks/orders/useGeneratePDF";
-
-// Import da API do React-PDF
-import { pdf } from "@react-pdf/renderer";
-import OrderPDF from "@/components/pdf";
 
 export default function OrdersPage() {
   const [page, setPage] = useState(1);
@@ -50,9 +44,6 @@ export default function OrdersPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  // Hook para buscar dados da ordem
-  const { fetchOrderForPDF } = useGeneratePDF();
 
   function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
     setSearch(e.target.value);
@@ -106,35 +97,22 @@ export default function OrdersPage() {
 
   // FUNÇÃO: buscar dados e abrir PDF em nova aba
   async function generatePDFInNewTab(id_order: string) {
-    try {
-      // 1) Buscar dados da ordem
-      const response = await fetchOrderForPDF(id_order);
-      if (!response?.order) {
-        alert("Ordem não encontrada");
-        return;
-      }
-      const orderData = response.order;
-
-      // 2) Criar componente Document em memória
-      const doc = <OrderPDF order={orderData} />;
-      // 3) Converter doc em Blob
-      const blob = await pdf(doc).toBlob();
-      // 4) Gerar URL temporário e abrir em nova aba
-      const fileURL = URL.createObjectURL(blob);
-      window.open(fileURL, "_blank");
-    } catch (err) {
-      console.error("Erro ao gerar PDF:", err);
-      alert("Falha ao gerar PDF");
-    }
+    // Em vez de ReactPDF.renderToStream, vamos abrir a rota do PDF
+    window.open(`/orders/pdf/${id_order}`, "_blank");
   }
 
-  async function handleSendEmail() {
+  async function handleSendEmail(id: string) {
+    const idData = {
+      id_order: id,
+    };
+    console.log("idDAta", idData);
     try {
-      const response = await fetch("/api/send", {
+      const response = await fetch(`/api/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify(idData),
         // Caso precise enviar dados adicionais, adicione um body aqui:
         // body: JSON.stringify({ chave: "valor" }),
       });
@@ -228,6 +206,13 @@ export default function OrdersPage() {
                       >
                         <FileArchive className="h-4 w-4" />
                       </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSendEmail(order.id_order)}
+                        title="Enviar orçamento"
+                      >
+                        <Send className="h-4 w-4" />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -255,10 +240,6 @@ export default function OrdersPage() {
           </Button>
         </div>
       )}
-
-      <div>
-        <Button onClick={handleSendEmail}>EMAIL</Button>
-      </div>
 
       {/* Modals */}
       <EditOrderModal
