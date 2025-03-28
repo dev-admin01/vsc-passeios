@@ -1,297 +1,431 @@
-/* eslint-disable jsx-a11y/alt-text */
+// "use client";
+
+// import React, { useEffect, useState } from "react";
+// import dynamic from "next/dynamic";
+
+// // Import dinâmico para o PDFViewer do @react-pdf/renderer, sem SSR
+// const PDFViewer = dynamic(
+//   () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
+//   { ssr: false }
+// );
+
+// // Import dinâmico para o OrderPDF, sem SSR
+// const OrderPDF = dynamic(() => import("@/components/pdf"), {
+//   ssr: false,
+// });
+
+// // Tipo dos dados fictícios
+// interface MyOrderData {
+//   id_user: string;
+//   order_number: string;
+//   pre_name: string;
+//   pre_email: string;
+//   pre_ddi: string;
+//   pre_ddd: string;
+//   pre_phone: string;
+//   price: number;
+//   orders_service: {
+//     id_order_service: number;
+//     id_service: number;
+//     discount: number;
+//     price: number;
+//     suggested_date: string;
+//     service: { description: string };
+//   }[];
+// }
+
+// export default function PDFPage() {
+//   const [orderData, setOrderData] = useState<MyOrderData | null>(null);
+
+//   // Exemplo de "dados fictícios"
+//   useEffect(() => {
+//     setOrderData({
+//       id_user: "1",
+//       order_number: "12345",
+//       pre_name: "joão da silva",
+//       pre_email: "joao@example.com",
+//       pre_ddi: "55",
+//       pre_ddd: "11",
+//       pre_phone: "999999999",
+//       price: 150.0,
+//       orders_service: [
+//         {
+//           id_order_service: 1,
+//           id_service: 1,
+//           discount: 0,
+//           price: 150.0,
+//           suggested_date: "2025-03-27T00:00:00.000Z",
+//           service: {
+//             description: "Passeio turístico",
+//           },
+//         },
+//       ],
+//     });
+//   }, []);
+
+//   // Se ainda estiver carregando dados...
+//   if (!orderData) {
+//     return <div>Carregando dados do orçamento...</div>;
+//   }
+
+//   return (
+//     <div style={{ width: "100%", height: "100vh" }}>
+//       {/* Aqui exibimos o PDF dentro do PDFViewer */}
+//       <PDFViewer style={{ width: "100%", height: "100vh" }}>
+//         <OrderPDF order={orderData} />
+//       </PDFViewer>
+//     </div>
+//   );
+// }
+
 "use client";
-import React from "react";
+
+import { useState, useEffect, FormEvent } from "react";
 import {
-  PDFViewer,
-  Document,
-  Page,
-  Text,
-  StyleSheet,
-  View,
-  Image,
-} from "@react-pdf/renderer";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Sidebar } from "@/components/sidebar";
 
-//
-// 1. Tipos e interfaces
-//
-interface OrderReceiptPDFProps {
-  id_order?: string;
-  id_user: string;
-  order_number?: string;
-  id_costumer?: string | null | undefined;
-  pre_name?: string;
-  pre_email?: string;
-  pre_ddi?: string;
-  pre_ddd?: string;
-  pre_phone?: string;
-  price?: number;
-  orders_service: {
-    id_order_service: number;
-    id_service: number;
-    discount: number;
-    price: number;
-    suggested_date: string;
-    service: {
-      description: string;
-    };
-  }[];
+// Hooks existentes
+import { useServices } from "@/app/hooks/service/useServices";
+import { useCreateService } from "@/app/hooks/service/useCreateService";
+
+// Novos hooks (edição / deleção / get único)
+import { useDeleteService } from "@/app/hooks/service/useDeleteService";
+import { useUpdateService } from "@/app/hooks/service/useUpdateService";
+import { useGetService } from "@/app/hooks/service/useGetService";
+
+// Ícones do lucide-react (instale via npm i lucide-react)
+import { Edit, Trash2 } from "lucide-react";
+
+import { CreateServicePayload } from "@/types/service.types";
+
+// (Opcional) componente de criação que você já tem
+import { CreateServiceModal } from "@/components/createServiceModal";
+interface ServiceData {
+  id_service: number;
+  description: string;
+  type: string;
+  price: string;
+  observation: string;
+  // etc
 }
 
-interface OrderPDFProps {
-  order: OrderReceiptPDFProps;
-}
+export default function ServicesPage() {
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [search, setSearch] = useState("");
 
-//
-// 2. Estilos do PDF
-//
-const styles = StyleSheet.create({
-  page: {
-    padding: 30,
-    fontSize: 11,
-    lineHeight: 1.4,
-    fontFamily: "Times-Roman",
-  },
-  borda: {
-    height: 20,
-    backgroundColor: "#0180ff",
-    marginBottom: 30,
-  },
-  headerContainer: {
-    marginBottom: 30,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  companyTitle: {
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  header: {
-    fontSize: 14,
-    marginBottom: 20,
-    textAlign: "center",
-    color: "gray",
-  },
-  section: {
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 18,
-    marginBottom: 8,
-  },
-  text: {
-    fontSize: 12,
-    marginBottom: 4,
-  },
-  image: {
-    height: 80,
-    width: 80,
-  },
-  line: {
-    backgroundColor: "black",
-    height: 2,
-    marginVertical: 5,
-  },
-  title2: {
-    fontSize: 18,
-    fontWeight: "bold",
-    margin: 5,
-  },
-  servicesContainer: {
-    marginTop: 5,
-  },
-  serviceRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 3,
-  },
-  serviceDescription: {
-    fontSize: 10,
-    flex: 1,
-  },
-  servicePrice: {
-    fontSize: 10,
-    width: 80,
-    textAlign: "right",
-  },
-  serviceDiscount: {
-    fontSize: 10,
-    width: 80,
-    textAlign: "right",
-  },
-  serviceDate: {
-    fontSize: 10,
-    width: 100,
-    textAlign: "center",
-  },
-  total: {
-    fontSize: 22,
-    textAlign: "right",
-    fontWeight: "bold",
-    margin: 5,
-  },
-  footer: {
-    position: "absolute",
-    bottom: 30,
-    left: 30,
-    right: 30,
-    textAlign: "center",
-  },
-});
+  const { data, isLoading, error, mutate } = useServices(page, limit, search);
+  const { createService } = useCreateService();
+  const { deleteService } = useDeleteService();
+  const { getService } = useGetService();
+  const { updateService } = useUpdateService();
 
-//
-// 3. Funções utilitárias
-//
-function toTitleCase(str: string) {
-  return str.replace(
-    /\w\S*/g,
-    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-  );
-}
+  // ----- Modal de criação -----
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-function formatPhone(phone: string) {
-  if (!phone) return "";
-  if (phone.length <= 4) return phone;
-  return phone.slice(0, phone.length - 4) + "-" + phone.slice(phone.length - 4);
-}
+  function openCreateModal() {
+    setIsCreateModalOpen(true);
+  }
+  function closeCreateModal() {
+    setIsCreateModalOpen(false);
+  }
+  async function handleCreateService(payload: CreateServicePayload) {
+    await createService(payload);
+    mutate(); // Recarrega a lista
+  }
 
-//
-// 4. Componente que gera o PDF
-//
-function OrderPDF({ order }: OrderPDFProps) {
-  return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        {/* Barra azul no topo */}
-        <View style={styles.borda} />
-
-        {/* Cabeçalho com dados da empresa + logo */}
-        <View style={styles.headerContainer}>
-          <View>
-            <Text style={styles.companyTitle}>Viajando San Andrés</Text>
-            <Text>CNPJ 41.174.011/0001-75</Text>
-            <Text>Cadastur 41.174.011/0001-75</Text>
-            <Text>Rua Rogério Giorgi, 29 - São Paulo - SP</Text>
-          </View>
-          <View>
-            {/* Ajuste o caminho da imagem conforme sua pasta public */}
-            <Image style={styles.image} src="/logo.png" />
-          </View>
-        </View>
-
-        {/* Título e dados do orçamento */}
-        <Text style={styles.title}>Dados do Orçamento</Text>
-        <Text style={styles.text}>Orçamento: {order.order_number}</Text>
-        <Text style={styles.text}>
-          {order.pre_name ? toTitleCase(order.pre_name) : ""}
-        </Text>
-        <Text style={styles.text}>Email: {order.pre_email}</Text>
-        <Text style={styles.text}>
-          Telefone: +{order.pre_ddi} {order.pre_ddd}{" "}
-          {formatPhone(order.pre_phone ?? "")}
-        </Text>
-
-        <View style={styles.line} />
-
-        {/* Seção de serviços */}
-        <Text style={styles.title2}>Passeios</Text>
-        <View style={styles.line} />
-
-        <View style={styles.servicesContainer}>
-          <View style={styles.serviceRow}>
-            <Text style={styles.serviceDescription}>Descrição</Text>
-            <Text style={styles.servicePrice}>Preço</Text>
-            <Text style={styles.serviceDiscount}>Desconto</Text>
-            <Text style={styles.serviceDate}>Data sugerida</Text>
-          </View>
-
-          {order.orders_service.map((service, index) => (
-            <View key={index} style={styles.serviceRow}>
-              <Text style={styles.serviceDescription}>
-                {service.service.description}
-              </Text>
-              <Text style={styles.servicePrice}>
-                {Number(service.price).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </Text>
-              <Text style={styles.serviceDiscount}>
-                {Number(service.discount).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </Text>
-              <Text style={styles.serviceDate}>
-                {new Date(service.suggested_date).toLocaleDateString("pt-BR")}
-              </Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Rodapé com total e nova barra azul */}
-        <View style={styles.footer}>
-          <View style={styles.line} />
-          <Text style={styles.total}>
-            Total:{" "}
-            {order.price
-              ? Number(order.price).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })
-              : "R$ 0,00"}
-          </Text>
-          <View style={styles.line} />
-          <View style={styles.borda} />
-        </View>
-      </Page>
-    </Document>
-  );
-}
-
-//
-// 5. Componente da página em si
-//
-export default function PDFPage() {
-  const [orderData, setOrderData] = React.useState<OrderReceiptPDFProps | null>(
+  // ----- Modal de exclusão -----
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [serviceIdToDelete, setServiceIdToDelete] = useState<number | null>(
     null
   );
 
-  // Dados fictícios só para exemplo.
-  // Substitua por sua chamada de API ou dados reais.
-  React.useEffect(() => {
-    setOrderData({
-      id_user: "1",
-      order_number: "12345",
-      pre_name: "joão da silva",
-      pre_email: "joao@example.com",
-      pre_ddi: "55",
-      pre_ddd: "11",
-      pre_phone: "999999999",
-      price: 150.0,
-      orders_service: [
-        {
-          id_order_service: 1,
-          id_service: 1,
-          discount: 0,
-          price: 150.0,
-          suggested_date: "2025-03-27T00:00:00.000Z",
-          service: {
-            description: "Passeio turístico",
-          },
-        },
-      ],
-    });
-  }, []);
+  function openDeleteModal(id: number) {
+    setServiceIdToDelete(id);
+    setIsDeleteModalOpen(true);
+  }
+  function closeDeleteModal() {
+    setIsDeleteModalOpen(false);
+    setServiceIdToDelete(null);
+  }
+  async function handleConfirmDelete() {
+    if (serviceIdToDelete) {
+      await deleteService(serviceIdToDelete);
+      mutate(); // Atualiza a lista após exclusão
+    }
+    closeDeleteModal();
+  }
 
-  if (!orderData) {
-    return <div>Carregando dados do orçamento...</div>;
+  // ----- Modal de edição -----
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editServiceId, setEditServiceId] = useState<number | null>(null);
+
+  // Campos do formulário de edição
+  const [description, setDescription] = useState("");
+  const [type, setType] = useState("0");
+  const [price, setPrice] = useState("");
+  const [observation, setObservation] = useState("");
+
+  function openEditModal(id: number) {
+    setEditServiceId(id);
+    setIsEditModalOpen(true);
+  }
+  function closeEditModal() {
+    setIsEditModalOpen(false);
+    setEditServiceId(null);
+    // limpamos os campos do form
+    setDescription("");
+    setType("0");
+    setPrice("");
+    setObservation("");
+  }
+
+  // Quando abrir o modal de edição, carregamos as infos do serviço
+  useEffect(() => {
+    if (isEditModalOpen && editServiceId) {
+      (async () => {
+        try {
+          const serviceData: ServiceData = await getService(editServiceId);
+          setDescription(serviceData.description);
+          setType(serviceData.type);
+          setPrice(serviceData.price);
+          setObservation(serviceData.observation);
+        } catch (err) {
+          console.error("Erro ao buscar serviço:", err);
+        }
+      })();
+    }
+  }, [editServiceId, isEditModalOpen, getService]);
+
+  async function handleUpdateService(e: FormEvent) {
+    e.preventDefault();
+    if (!editServiceId) return;
+
+    const payload = {
+      description,
+      type,
+      price,
+      observation,
+    };
+
+    try {
+      await updateService(editServiceId, payload);
+      mutate(); // Recarrega a lista após edição
+      closeEditModal();
+    } catch (err) {
+      console.error("Erro ao atualizar serviço:", err);
+    }
+  }
+
+  // Paginação + Busca
+  function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setSearch(e.target.value);
+    setPage(1);
+  }
+  function previousPage() {
+    if (page > 1) setPage((prev) => prev - 1);
+  }
+  function nextPage() {
+    if (data && page < data.lastPage) {
+      setPage((prev) => prev + 1);
+    }
   }
 
   return (
-    <div style={{ width: "100%", height: "100vh" }}>
-      <PDFViewer width="100%" height="100%">
-        <OrderPDF order={orderData} />
-      </PDFViewer>
+    <div className="sm:ml-17 p-4 min-h-screen bg-sky-100">
+      <Sidebar />
+      <h1 className="text-2xl font-bold">Passeios</h1>
+
+      {/* Busca + Criar */}
+      <div className="flex items-center gap-2 mb-4">
+        <Input
+          type="text"
+          placeholder="Buscar descrição..."
+          value={search}
+          onChange={handleSearchChange}
+          className="bg-amber-50"
+        />
+        <Button onClick={openCreateModal}>Novo Passeio</Button>
+      </div>
+
+      {/* Tabela de serviços */}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Descrição</TableHead>
+            <TableHead>Preço</TableHead>
+            <TableHead>Observação</TableHead>
+            <TableHead>Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isLoading && (
+            <TableRow>
+              <TableCell colSpan={5}>Carregando...</TableCell>
+            </TableRow>
+          )}
+          {error && (
+            <TableRow>
+              <TableCell colSpan={5}>Erro ao carregar os passeios.</TableCell>
+            </TableRow>
+          )}
+          {!isLoading && !error && data?.services?.length
+            ? data.services.map((item) => (
+                <TableRow key={item.id_service}>
+                  <TableCell>{item.id_service}</TableCell>
+                  <TableCell>{item.description}</TableCell>
+                  <TableCell>
+                    {Number(item.price).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </TableCell>
+                  <TableCell>{item.observation}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        onClick={() => openEditModal(item.id_service)}
+                        title="Editar"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => openDeleteModal(item.id_service)}
+                        title="Excluir"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            : !isLoading &&
+              !error && (
+                <TableRow>
+                  <TableCell colSpan={5}>Nenhum passeio encontrado.</TableCell>
+                </TableRow>
+              )}
+        </TableBody>
+      </Table>
+      {data && (
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <Button onClick={previousPage} disabled={page <= 1}>
+            Anterior
+          </Button>
+          <span>
+            Página {data.page} de {data.lastPage}
+          </span>
+          <Button onClick={nextPage} disabled={page >= data.lastPage}>
+            Próxima
+          </Button>
+        </div>
+      )}
+
+      {/*
+        MODAL DE CRIAÇÃO
+        (Aqui usando o seu componente <CreateServiceModal>)
+      */}
+      <CreateServiceModal
+        isOpen={isCreateModalOpen}
+        onClose={closeCreateModal}
+        onCreate={handleCreateService}
+      />
+
+      {/*
+        MODAL DE EXCLUSÃO (confirmação simples)
+      */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white p-4 rounded shadow-md max-w-md w-full">
+            <h3 className="text-lg font-bold mb-2">Confirmar Exclusão</h3>
+            <p>Tem certeza que deseja excluir este Passeio?</p>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button variant="outline" onClick={closeDeleteModal}>
+                Cancelar
+              </Button>
+              <Button variant="destructive" onClick={handleConfirmDelete}>
+                Excluir
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/*
+        MODAL DE EDIÇÃO
+        - Ao abrir, faz GET /services/:id e preenche os campos
+        - Ao salvar, faz PUT /services/:id
+      */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white p-4 rounded shadow-md max-w-md w-full">
+            <h3 className="text-lg font-bold mb-2">Editar Passeio</h3>
+            <form
+              onSubmit={handleUpdateService}
+              className="flex flex-col gap-2"
+            >
+              <div>
+                <label className="font-semibold">Descrição:</label>
+                <Input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold">Tipo:</label>
+                <Input
+                  type="text"
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold">Preço:</label>
+                <Input
+                  type="text"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold">Observação:</label>
+                <Input
+                  type="text"
+                  value={observation}
+                  onChange={(e) => setObservation(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="mt-4 flex justify-end gap-2">
+                <Button variant="outline" onClick={closeEditModal}>
+                  Cancelar
+                </Button>
+                <Button type="submit">Salvar</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
