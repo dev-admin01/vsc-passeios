@@ -20,12 +20,20 @@ export const sendOrder = ({
   id_order,
   previewText = "TESTE RESEND TTESTANDO ENVIOU COM LINK",
 }: VercelInviteUserEmailProps) => {
-  let url;
+  let urlDoc;
+  let urlPDF;
+
+  const docPath = "orderdocumentation";
+  const pdfPath = "orders/pdf";
+
   if (process.env.NODE_ENV === "production") {
-    const baseUrl = "https://vscpasseios.com.br/orderdocumentation";
-    url = `${baseUrl}/${id_order}`;
+    const baseUrl = "https://vscpasseios.com.br";
+    urlDoc = `${baseUrl}/${docPath}/${id_order}`;
+    urlPDF = `${baseUrl}/${pdfPath}/${id_order}`;
   } else {
-    url = `http://localhost:3001/orderdocumentation/${id_order}`;
+    const baseUrl = "http://localhost:3001";
+    urlDoc = `${baseUrl}/${docPath}/${id_order}`;
+    urlPDF = `${baseUrl}/${pdfPath}/${id_order}`;
   }
 
   return (
@@ -39,7 +47,8 @@ export const sendOrder = ({
               Join <strong>VSC PASSEIOS</strong>
             </Heading>
             <Text className="text-lg ">{previewText}</Text>
-            <Link href={`${url}`}>Resumo orçamento LINK</Link>
+            <Link href={`${urlDoc}`}>LINK PARA DOCUMENTOS</Link>
+            <Link href={`${urlPDF}`}>VER PDF</Link>
           </Container>
         </Body>
       </Tailwind>
