@@ -21,7 +21,7 @@ export const sendOrder = ({
   previewText = "TESTE RESEND TTESTANDO ENVIOU COM LINK",
 }: VercelInviteUserEmailProps) => {
   let url;
-  if (process.env.ENVIREMENT === "Production") {
+  if (process.env.NODE_ENV === "production") {
     const baseUrl = "https://vscpasseios.com.br/orderdocumentation";
     url = `${baseUrl}/${id_order}`;
   } else {
