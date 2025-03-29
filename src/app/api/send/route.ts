@@ -16,12 +16,18 @@ export async function POST(req: NextRequest) {
 
     const response = await fetch(`${baseUrl}/api/orders/${id_order}`, {});
     const orderData = await response.json();
-    console.log("order:", orderData);
+
+    const order = orderData.order;  
+
+    let emailTo = order.pre_email;
+    if (order.costumer) {
+      emailTo = order.costumer.email;
+    }
 
     const { data, error } = await resend.emails.send({
       from: "VSC passeios <no-reply@vscpasseios.com.br>",
-      to: ["bruno.lima1504@gmail.com"],
-      subject: "Testando envio de orçamento com no-reply",
+      to: emailTo,
+      subject: `Orçamentos de passeios Nº ${order.order_number}`,
       react: sendOrder({ id_order }),
     });
 
