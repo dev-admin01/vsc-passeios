@@ -60,7 +60,7 @@ export default function PdfDocument({ order }: OrderPDFProps) {
           <View>
             <Image
               style={styles.image}
-              src={`${process.env.NEXT_PUBLIC_BASE_URL}/logo.png`}
+              src={`${process.env.NEXT_PUBLIC_LOCAL_BASE_URL}/logo.png`}
             />
           </View>
         </View>
