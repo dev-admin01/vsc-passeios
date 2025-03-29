@@ -16,13 +16,14 @@ export async function POST(req: NextRequest) {
 
     const response = await fetch(`${baseUrl}/api/orders/${id_order}`, {});
     const orderData = await response.json();
-    const order = orderData.order;
-    console.log("order2:", order);
+
+    const order = orderData.order;  
 
     let emailTo = order.pre_email;
     if (order.costumer) {
       emailTo = order.costumer.email;
     }
+
     const { data, error } = await resend.emails.send({
       from: "VSC passeios <no-reply@vscpasseios.com.br>",
       to: emailTo,

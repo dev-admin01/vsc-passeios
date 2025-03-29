@@ -49,6 +49,7 @@ export const sendOrder = ({
               src={`${baseUrl}/logo.png`}
               width="90"
               height="90"
+
               alt="Vercel"
               className="my-0 mx-auto"
             />
@@ -64,11 +65,13 @@ export const sendOrder = ({
             <Text className="text-lg ">{previewText}</Text>
             <Link href={`${urlDoc}`}>LINK PARA DOCUMENTOS</Link>
 
+
             <br />
             <br />
             <Link href={`${urlPDF}`}>VER PDF</Link>
             <br />
             <br />
+
             <Link href={"#"}>GUIAS</Link>
 
             <Text>
@@ -85,6 +88,7 @@ export const sendOrder = ({
               <br /> [Nome da Empresa]
               <br /> [Telefone / E-mail para contato]
             </Text>
+
           </Container>
         </Body>
       </Tailwind>
