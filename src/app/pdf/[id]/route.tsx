@@ -16,11 +16,9 @@ export async function GET(
 
   const { id } = await params;
 
-  console.log(`${baseUrl}/api/orders/${id}`);
-
   const response = await fetch(`${baseUrl}/api/orders/${id}`, {});
   if (!response.ok) {
-    return new NextResponse("Erro ao buscar dados.", { status: 404 });
+    return new NextResponse("Erro ao buscar dados.", { status: 500 });
   }
   const orderData = await response.json();
   console.log("order:", orderData);
