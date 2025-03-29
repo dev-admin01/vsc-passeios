@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { renderToStream } from "@react-pdf/renderer";
-import PdfDocument from "@/components/pdf/testePdf";
+import OrderPDF from "@/components/pdf/orderPdf";
 
 type NodeReadableWithDestroy = NodeJS.ReadableStream & {
   destroy?: () => void;
@@ -24,7 +24,7 @@ export async function GET(
   console.log("order:", orderData);
 
   // Passe os dados que precisar para o componente do PDF
-  const docElement = <PdfDocument order={orderData.order} />;
+  const docElement = <OrderPDF order={orderData.order} />;
 
   const nodeStream = (await renderToStream(
     docElement

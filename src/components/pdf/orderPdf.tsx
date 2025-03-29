@@ -37,15 +37,15 @@ function toTitleCase(str: string) {
     (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
   );
 }
-// function formatPhone(phone: string) {
-//   if (!phone) return "";
-//   if (phone.length <= 4) return phone;
-//   const tel =
-//     phone.slice(0, phone.length - 4) + "-" + phone.slice(phone.length - 4);
-//   return tel || "";
-// }
+function formatPhone(phone: string) {
+  if (!phone) return "";
+  if (phone.length <= 4) return phone;
+  const tel =
+    phone.slice(0, phone.length - 4) + "-" + phone.slice(phone.length - 4);
+  return tel || "";
+}
 
-export default function PdfDocument({ order }: OrderPDFProps) {
+export default function OrderPDF({ order }: OrderPDFProps) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -72,10 +72,10 @@ export default function PdfDocument({ order }: OrderPDFProps) {
           {order.pre_name ? toTitleCase(order.pre_name) : ""}
         </Text>
         <Text style={styles.text}>Email: {order.pre_email}</Text>
-        {/* <Text style={styles.text}>
+        <Text style={styles.text}>
           Telefone: +{order.pre_ddi} {order.pre_ddd}{" "}
-          {formatPhone(order.pre_phone)}
-        </Text> */}
+          {formatPhone(order.pre_phone || "")}
+        </Text>
 
         <View style={styles.line}></View>
         <Text style={styles.title2}>Passeios</Text>
