@@ -8,7 +8,7 @@ export const useGeneratePDF = () => {
   // Busca a ordem completa (incluindo items) para gerar PDF
   const fetchOrderForPDF = async (id: string) => {
     const token = await getCookieclient();
-    const response = await api.get(`/orders/${id}`, {
+    const response = await api.get(`/api/orders/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data; // Ex.: { order: {...}, status_code: 200 }

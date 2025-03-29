@@ -24,7 +24,7 @@ export const sendOrder = ({
   let urlPDF;
 
   const docPath = "orderdocumentation";
-  const pdfPath = "orders/pdf";
+  const pdfPath = "pdf";
 
   if (process.env.NODE_ENV === "production") {
     const baseUrl = "https://vscpasseios.com.br";

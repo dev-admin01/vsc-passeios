@@ -6,7 +6,7 @@ export const useDeleteOrder = () => {
   const deleteOrder = async (id: string) => {
     const token = await getCookieclient();
     console.log(id);
-    const response = await api.delete(`/orders/${id}`, {
+    const response = await api.delete(`/api/orders/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;

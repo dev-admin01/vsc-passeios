@@ -1,32 +1,36 @@
 // app/pdf/[id_order]/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
-import { Document, Page, Text, renderToStream } from "@react-pdf/renderer";
+import { renderToStream } from "@react-pdf/renderer";
+import PdfDocument from "@/components/pdf/testePdf";
 
 type NodeReadableWithDestroy = NodeJS.ReadableStream & {
   destroy?: () => void;
 };
 
-export type paramsType = Promise<{ id: string }>;
-
 export async function GET(
-  req: NextRequest,
-  props: {
-    params: paramsType;
-  }
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  console.log("params", props.params);
-  const { id } = await props.params;
-  console.log("Gerando PDF para o pedido", id);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-  const doc = (
-    <Document>
-      <Page>
-        <Text>Olá, pedido de ID: {id}</Text>
-      </Page>
-    </Document>
-  );
+  const { id } = await params;
 
-  const nodeStream = (await renderToStream(doc)) as NodeReadableWithDestroy;
+  console.log(`${baseUrl}/order/${id}`);
+
+  const response = await fetch(`${baseUrl}/api/orders/${id}`, {});
+  if (!response.ok) {
+    return new NextResponse("Erro ao buscar dados.", { status: 404 });
+  }
+  const orderData = await response.json();
+  console.log("order:", orderData);
+
+  // Passe os dados que precisar para o componente do PDF
+  const docElement = <PdfDocument order={orderData.order} />;
+
+  const nodeStream = (await renderToStream(
+    docElement
+  )) as NodeReadableWithDestroy;
 
   const webStream = new ReadableStream({
     async start(controller) {
@@ -36,12 +40,10 @@ export async function GET(
       controller.close();
     },
     cancel() {
-      // Se a stream tiver "destroy", chamamos.
       nodeStream.destroy?.();
     },
   });
 
-  // 3) Retorna o PDF usando o Web ReadableStream
   return new NextResponse(webStream, {
     headers: {
       "Content-Type": "application/pdf",

@@ -16,7 +16,7 @@ export const useUpdateService = () => {
     async (id: number, data: UpdateServicePayload) => {
       const token = await getCookieclient();
       // Chama PUT /services/:id
-      const response = await api.put(`/services/${id}`, data, {
+      const response = await api.put(`/api/services/${id}`, data, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;

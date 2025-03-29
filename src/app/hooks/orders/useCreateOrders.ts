@@ -28,7 +28,7 @@ export const useCreateOrder = () => {
   const createOrder = useCallback(async (orderData: CreateOrderPayload) => {
     console.log("hooke", orderData);
     const token = await getCookieclient();
-    const response = await api.post("/orders", orderData, {
+    const response = await api.post("/api/orders", orderData, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;

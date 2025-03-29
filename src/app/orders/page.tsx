@@ -97,8 +97,9 @@ export default function OrdersPage() {
 
   // FUNÇÃO: buscar dados e abrir PDF em nova aba
   async function generatePDFInNewTab(id_order: string) {
-    // Em vez de ReactPDF.renderToStream, vamos abrir a rota do PDF
-    window.open(`/orders/pdf/${id_order}`, "_blank");
+    const id = id_order;
+    console.log(id);
+    window.open(`/pdf/${id}`, "_blank");
   }
 
   async function handleSendEmail(id: string) {

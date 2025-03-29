@@ -16,7 +16,7 @@ const fetchServices = async (page: number, perpage: number, search: string) => {
 
   // Fazer a requisição para /services
   // Passando query params e Bearer Token
-  const response = await api.get<ServicesResponse>("/services", {
+  const response = await api.get<ServicesResponse>("/api/services", {
     params: {
       page,
       perpage,

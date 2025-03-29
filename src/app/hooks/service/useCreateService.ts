@@ -16,7 +16,7 @@ export const useCreateService = () => {
   const createService = useCallback(
     async (serviceData: CreateServicePayload) => {
       const token = await getCookieclient();
-      const response = await api.post("/services", serviceData, {
+      const response = await api.post("/api/services", serviceData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
