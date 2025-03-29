@@ -8,6 +8,7 @@ import {
   Tailwind,
   Text,
   Link,
+  Img,
 } from "@react-email/components";
 import * as React from "react";
 
@@ -22,16 +23,17 @@ export const sendOrder = ({
 }: VercelInviteUserEmailProps) => {
   let urlDoc;
   let urlPDF;
+  let baseUrl;
 
   const docPath = "orderdocumentation";
   const pdfPath = "pdf";
 
   if (process.env.NODE_ENV === "production") {
-    const baseUrl = "https://vscpasseios.com.br";
+    baseUrl = "https://vscpasseios.com.br";
     urlDoc = `${baseUrl}/${docPath}/${id_order}`;
     urlPDF = `${baseUrl}/${pdfPath}/${id_order}`;
   } else {
-    const baseUrl = "http://localhost:3001";
+    baseUrl = "http://localhost:3001";
     urlDoc = `${baseUrl}/${docPath}/${id_order}`;
     urlPDF = `${baseUrl}/${pdfPath}/${id_order}`;
   }
@@ -43,12 +45,46 @@ export const sendOrder = ({
       <Tailwind>
         <Body className="bg-white my-auto mx-auto font-sans px-2">
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
+            <Img
+              src={`${baseUrl}/logo.png`}
+              width="90"
+              height="90"
+              alt="Vercel"
+              className="my-0 mx-auto"
+            />
             <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-              Join <strong>VSC PASSEIOS</strong>
+              <strong>Viajando San Andrés</strong>
             </Heading>
+            <Text>
+              Olá, [Nome do Cliente]! Que alegria poder ajudar você a planejar
+              sua próxima aventura! Preparamos tudo com muito carinho e atenção
+              para tornar esse processo o mais simples e inspirador possível.
+              Confira abaixo os links que preparamos para você:
+            </Text>
             <Text className="text-lg ">{previewText}</Text>
             <Link href={`${urlDoc}`}>LINK PARA DOCUMENTOS</Link>
+
+            <br />
+            <br />
             <Link href={`${urlPDF}`}>VER PDF</Link>
+            <br />
+            <br />
+            <Link href={"#"}>GUIAS</Link>
+
+            <Text>
+              Estamos super animados para fazer parte dessa jornada e ajudar a
+              transformar seus sonhos em realidade. Se surgir qualquer dúvida ou
+              se precisar de mais informações, estarei à disposição para ajudar
+              no que for preciso. Um grande abraço e vamos juntos rumo a essa
+              incrível viagem! Atenciosamente,
+            </Text>
+            <Text>
+              [Seu Nome]
+              <br />
+              [Seu Cargo]
+              <br /> [Nome da Empresa]
+              <br /> [Telefone / E-mail para contato]
+            </Text>
           </Container>
         </Body>
       </Tailwind>
