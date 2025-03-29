@@ -6,11 +6,14 @@ import { getCookieServer } from "@/lib/cookieServer";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  console.log("pathname:", pathname);
+
   if (
     pathname.startsWith("/_next") ||
     pathname === "/" ||
     pathname === "/status" ||
-    pathname === "/logo.png"
+    pathname === "/logo.png" ||
+    pathname.startsWith("/orderdocumentation")
   ) {
     return NextResponse.next();
   }
