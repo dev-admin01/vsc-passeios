@@ -23,7 +23,8 @@ export async function POST(req: NextRequest) {
       pre_email: orderData.order.pre_email,
       costumer: orderData.order.cosutmer,
     };
-= orderData.order;  
+
+    //nao alterei nada
 
     let emailTo = order.pre_email;
     if (order.costumer) {

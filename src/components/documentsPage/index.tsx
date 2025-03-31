@@ -69,6 +69,9 @@ export default function ClientOrderDocumentation({
     reader.readAsDataURL(file);
   };
 
+  console.log(costumer);
+
+
   // Atualiza os estados com os dados carregados
   useEffect(() => {
     if (data?.order) {
