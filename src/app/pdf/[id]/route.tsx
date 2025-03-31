@@ -21,7 +21,6 @@ export async function GET(
     return new NextResponse("Erro ao buscar dados.", { status: 500 });
   }
   const orderData = await response.json();
-  console.log("order:", orderData);
 
   // Passe os dados que precisar para o componente do PDF
   const docElement = <OrderPDF order={orderData.order} />;

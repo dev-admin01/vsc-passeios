@@ -8,28 +8,7 @@ import {
   Image,
 } from "@react-pdf/renderer";
 
-interface OrderPDFProps {
-  order: {
-    id_user: string;
-    order_number?: string;
-    pre_name?: string;
-    pre_email?: string;
-    pre_ddi?: string;
-    pre_ddd?: string;
-    pre_phone?: string;
-    price?: number;
-    orders_service: {
-      id_order_service: number;
-      id_service: number;
-      discount: number;
-      price: number;
-      suggested_date: string;
-      service: {
-        description: string;
-      };
-    }[];
-  };
-}
+import { OrderPDFProps } from "@/types/orders.type";
 
 function toTitleCase(str: string) {
   return str.replace(

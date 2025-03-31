@@ -1,4 +1,3 @@
-// app/orders/page/OrdersPage.tsx
 "use client";
 
 import { useState } from "react";
@@ -12,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Edit, Trash2, FileArchive, Send } from "lucide-react";
+import { Edit, Trash2, FileArchive, Send, FileSearch2 } from "lucide-react";
 
 import { useOrders } from "@/app/hooks/orders/useOrder";
 import { useDeleteOrder } from "@/app/hooks/orders/useDeleteOrder";
@@ -21,6 +20,7 @@ import {
   useUpdateOrder,
   UpdateOrderPayload,
 } from "@/app/hooks/orders/useUpdateOrder";
+import { useUpdateStatus } from "../hooks/orders/useUpdateStatus";
 
 import { EditOrderModal } from "@/components/editOrderModal";
 import { DeleteOrderModal } from "@/components/deleteOrderModal";
@@ -35,6 +35,7 @@ export default function OrdersPage() {
   const { deleteOrder } = useDeleteOrder();
   const { updateOrder } = useUpdateOrder();
   const { createOrder } = useCreateOrder();
+  const { updateStatus } = useUpdateStatus();
 
   // Modals
   const [editOrderId, setEditOrderId] = useState<string | null>(null);
@@ -106,7 +107,6 @@ export default function OrdersPage() {
     const idData = {
       id_order: id,
     };
-    console.log("idDAta", idData);
     try {
       const response = await fetch(`/api/send`, {
         method: "POST",
@@ -114,17 +114,17 @@ export default function OrdersPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(idData),
-        // Caso precise enviar dados adicionais, adicione um body aqui:
-        // body: JSON.stringify({ chave: "valor" }),
       });
+      await response.json();
 
-      const data = await response.json();
-      console.log("Resposta da API:", data);
-      // Aqui você pode adicionar feedback para o usuário, por exemplo:
-      // alert("Email enviado com sucesso!");
+      const statusData = {
+        id_order: id,
+        id_status_order: 2,
+      };
+
+      updateStatus(statusData);
     } catch (error) {
       console.error("Erro ao enviar o email:", error);
-      // Opcional: exibir mensagem de erro para o usuário
     }
   }
 
@@ -178,7 +178,13 @@ export default function OrdersPage() {
                     {order.costumer ? order.costumer.nome : order.pre_name}
                   </TableCell>
                   <TableCell>{order.user?.name || "N/A"}</TableCell>
-                  <TableCell>{order.price}</TableCell>
+                  <TableCell>
+                    {Number(order.price).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </TableCell>
+
                   <TableCell>
                     {new Date(order.created_at).toLocaleString()}
                   </TableCell>
@@ -192,27 +198,39 @@ export default function OrdersPage() {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
+
+                      <Button
+                        variant="ghost"
+                        onClick={() => generatePDFInNewTab(order.id_order)}
+                        title="Exibir PDF"
+                      >
+                        <FileArchive className="h-4 w-4" />
+                      </Button>
+                      {order.status.id_status_order === 1 && (
+                        <Button
+                          variant="ghost"
+                          onClick={() => handleSendEmail(order.id_order)}
+                          title="Enviar orçamento"
+                        >
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {order.status.id_status_order === 3 && (
+                        <Button
+                          variant="ghost"
+                          onClick={() => alert("Vizualiar docs!")}
+                          title="Analisar documentos"
+                        >
+                          <FileSearch2 className="h-4 w-4" />
+                        </Button>
+                      )}
+
                       <Button
                         variant="ghost"
                         onClick={() => openDeleteModal(order.id_order)}
                         title="Excluir"
                       >
                         <Trash2 className="h-4 w-4" />
-                      </Button>
-                      {/* Botão para gerar e abrir PDF em nova guia */}
-                      <Button
-                        variant="ghost"
-                        onClick={() => generatePDFInNewTab(order.id_order)}
-                        title="PDF em Nova Aba"
-                      >
-                        <FileArchive className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleSendEmail(order.id_order)}
-                        title="Enviar orçamento"
-                      >
-                        <Send className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
