@@ -4,7 +4,6 @@ import {
   Head,
   Heading,
   Html,
-  Preview,
   Tailwind,
   Text,
   Link,
@@ -12,19 +11,17 @@ import {
 } from "@react-email/components";
 import * as React from "react";
 
-interface VercelInviteUserEmailProps {
-  id_order?: string;
-  previewText?: string;
-}
+import { EmailOrderProps } from "@/types/orders.type";
 
 export const sendOrder = ({
   id_order,
-  previewText = "TESTE RESEND TTESTANDO ENVIOU COM LINK",
-}: VercelInviteUserEmailProps) => {
+  order_number,
+  pre_name,
+  costumer,
+}: EmailOrderProps) => {
   let urlDoc;
   let urlPDF;
   let baseUrl;
-
   const docPath = "orderdocumentation";
   const pdfPath = "pdf";
 
@@ -38,10 +35,21 @@ export const sendOrder = ({
     urlPDF = `${baseUrl}/${pdfPath}/${id_order}`;
   }
 
+  let name = pre_name;
+  if (costumer) {
+    name = costumer?.nome || "";
+  }
+
+  function toTitleCase(str: string) {
+    return str.replace(
+      /\w\S*/g,
+      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    );
+  }
+
   return (
     <Html>
       <Head />
-      <Preview>{previewText}</Preview>
       <Tailwind>
         <Body className="bg-white my-auto mx-auto font-sans px-2">
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
@@ -57,22 +65,22 @@ export const sendOrder = ({
               <strong>Viajando San Andrés</strong>
             </Heading>
             <Text>
-              Olá, [Nome do Cliente]! Que alegria poder ajudar você a planejar
-              sua próxima aventura! Preparamos tudo com muito carinho e atenção
-              para tornar esse processo o mais simples e inspirador possível.
-              Confira abaixo os links que preparamos para você:
+              Olá, {name ? toTitleCase(name) : ""}! Que alegria poder ajudar
+              você a planejar sua próxima aventura! Preparamos tudo com muito
+              carinho e atenção para tornar esse processo o mais simples e
+              inspirador possível. Confira abaixo os links que preparamos para
+              você:
             </Text>
-            <Text className="text-lg ">{previewText}</Text>
-            <Link href={`${urlDoc}`}>LINK PARA DOCUMENTOS</Link>
+            <Link href={`${urlDoc}`}>Anexar comprovante</Link>
 
 
             <br />
             <br />
-            <Link href={`${urlPDF}`}>VER PDF</Link>
+            <Link href={`${urlPDF}`}>PDF {order_number}</Link>
             <br />
             <br />
+            <Link href={"#"}>Informativos</Link>
 
-            <Link href={"#"}>GUIAS</Link>
 
             <Text>
               Estamos super animados para fazer parte dessa jornada e ajudar a
@@ -81,13 +89,7 @@ export const sendOrder = ({
               no que for preciso. Um grande abraço e vamos juntos rumo a essa
               incrível viagem! Atenciosamente,
             </Text>
-            <Text>
-              [Seu Nome]
-              <br />
-              [Seu Cargo]
-              <br /> [Nome da Empresa]
-              <br /> [Telefone / E-mail para contato]
-            </Text>
+            <Text>Não responda esse e-mail</Text>
 
           </Container>
         </Body>
