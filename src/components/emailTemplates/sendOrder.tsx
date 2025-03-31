@@ -57,6 +57,7 @@ export const sendOrder = ({
               src={`${baseUrl}/logo.png`}
               width="90"
               height="90"
+
               alt="Vercel"
               className="my-0 mx-auto"
             />
@@ -72,12 +73,14 @@ export const sendOrder = ({
             </Text>
             <Link href={`${urlDoc}`}>Anexar comprovante</Link>
 
+
             <br />
             <br />
             <Link href={`${urlPDF}`}>PDF {order_number}</Link>
             <br />
             <br />
             <Link href={"#"}>Informativos</Link>
+
 
             <Text>
               Estamos super animados para fazer parte dessa jornada e ajudar a
@@ -87,6 +90,7 @@ export const sendOrder = ({
               incrível viagem! Atenciosamente,
             </Text>
             <Text>Não responda esse e-mail</Text>
+
           </Container>
         </Body>
       </Tailwind>

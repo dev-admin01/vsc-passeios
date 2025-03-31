@@ -23,11 +23,13 @@ export async function POST(req: NextRequest) {
       pre_email: orderData.order.pre_email,
       costumer: orderData.order.cosutmer,
     };
+= orderData.order;  
 
     let emailTo = order.pre_email;
     if (order.costumer) {
       emailTo = order.costumer.email;
     }
+
     const { data, error } = await resend.emails.send({
       from: "VSC passeios <no-reply@vscpasseios.com.br>",
       to: emailTo,
