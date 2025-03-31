@@ -93,49 +93,61 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
     <div className="space-y-4">
       {selectedServices.map((service, index) => (
         <div key={index} className="flex gap-2 items-center">
-          <select
-            className="border p-2 rounded"
-            value={service.id_service || ""}
-            onChange={(e) => handleServiceSelect(index, e.target.value)}
-          >
-            <option value="">Selecione um serviço</option>
-            {availableServices.map((s) => (
-              <option key={s.id_service} value={s.id_service}>
-                {s.description}
-              </option>
-            ))}
-          </select>
-          <Input
-            type="number"
-            placeholder="Preço"
-            value={service.price !== undefined ? service.price : ""}
-            onChange={(e) =>
-              handleChange(index, "price", Number(e.target.value))
-            }
-          />
-          <Input
-            type="number"
-            placeholder="Desconto"
-            value={service.discount !== undefined ? service.discount : ""}
-            onChange={(e) =>
-              handleChange(index, "discount", Number(e.target.value))
-            }
-          />
-          <Input
-            type="datetime-local"
-            placeholder="Data sugerida"
-            value={service.suggestedDate || ""}
-            onChange={(e) =>
-              handleChange(index, "suggestedDate", e.target.value)
-            }
-          />
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={() => removeServiceRow(index)}
-          >
-            Remover
-          </Button>
+          <div>
+            <label className="font-semibold">Serviços:</label>
+            <select
+              className="border p-2 rounded w-full"
+              value={service.id_service || ""}
+              onChange={(e) => handleServiceSelect(index, e.target.value)}
+            >
+              <option value="">Selecione um serviço</option>
+              {availableServices.map((s) => (
+                <option key={s.id_service} value={s.id_service}>
+                  {s.description}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="font-semibold">Preço (R$):</label>
+            <Input
+              type="number"
+              value={service.price !== undefined ? service.price : ""}
+              onChange={(e) =>
+                handleChange(index, "price", Number(e.target.value))
+              }
+            />
+          </div>
+          <div>
+            <label className="font-semibold">Desconto (R$)</label>
+            <Input
+              type="number"
+              value={service.discount !== undefined ? service.discount : ""}
+              onChange={(e) =>
+                handleChange(index, "discount", Number(e.target.value))
+              }
+            />
+          </div>
+          <div>
+            <label className="font-semibold">Data sugerida</label>
+            <Input
+              type="datetime-local"
+              placeholder="Data sugerida"
+              value={service.suggestedDate || ""}
+              onChange={(e) =>
+                handleChange(index, "suggestedDate", e.target.value)
+              }
+            />
+          </div>
+          <div className="pt-6">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => removeServiceRow(index)}
+            >
+              Remover
+            </Button>
+          </div>
         </div>
       ))}
       <Button type="button" onClick={addServiceRow}>

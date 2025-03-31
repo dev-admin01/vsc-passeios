@@ -141,7 +141,6 @@ export function CreateOrderModal({
 
           {/* Componente para seleção de serviços */}
           <div className="w-full p-2">
-            <label className="font-semibold">Serviços:</label>
             <ServicesSelector onChange={setServices} />
           </div>
 
