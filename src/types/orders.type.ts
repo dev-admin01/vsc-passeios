@@ -5,7 +5,7 @@ export interface Order {
   price: number;
   created_at: string;
   user: { name: string };
-  status?: { description: string } | null;
+  status?: { description: string; id_status_order: number } | null;
   order_documentation?: OrderDocumentation[];
   pre_name: string;
   pre_email: string;
@@ -13,6 +13,37 @@ export interface Order {
   pre_ddd: string;
   pre_ddi: string;
   costumer: Costumer;
+}
+
+export interface OrderPDFProps {
+  order: {
+    id_user: string;
+    order_number?: string;
+    pre_name?: string;
+    pre_email?: string;
+    pre_ddi?: string;
+    pre_ddd?: string;
+    pre_phone?: string;
+    price?: number;
+    orders_service: {
+      id_order_service: number;
+      id_service: number;
+      discount: number;
+      price: number;
+      suggested_date: string;
+      service: {
+        description: string;
+      };
+    }[];
+  };
+}
+
+export interface EmailOrderProps {
+  id_order: string;
+  order_number: string;
+  pre_name?: string;
+  pre_email?: string;
+  costumer?: Costumer | undefined;
 }
 
 export interface OrdersResponse {

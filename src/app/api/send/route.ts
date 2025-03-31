@@ -16,9 +16,14 @@ export async function POST(req: NextRequest) {
 
     const response = await fetch(`${baseUrl}/api/orders/${id_order}`, {});
     const orderData = await response.json();
-    const order = orderData.order;
-    console.log("order2:", order);
-
+    const order = {
+      id_order: orderData.order.id_order,
+      order_number: orderData.order.order_number,
+      pre_name: orderData.order.pre_name,
+      pre_email: orderData.order.pre_email,
+      costumer: orderData.order.cosutmer,
+    };
+    //nao alterei nada
     let emailTo = order.pre_email;
     if (order.costumer) {
       emailTo = order.costumer.email;
@@ -27,7 +32,7 @@ export async function POST(req: NextRequest) {
       from: "VSC passeios <no-reply@vscpasseios.com.br>",
       to: emailTo,
       subject: `Orçamentos de passeios Nº ${order.order_number}`,
-      react: sendOrder({ id_order }),
+      react: sendOrder(order),
     });
 
     if (error) {

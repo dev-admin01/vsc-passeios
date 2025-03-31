@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSingleOrder } from "@/app/hooks/orders/useGetUpdateOrder";
-
+import { useDocsCostumer } from "@/app/hooks/costumer/useDocsCostumer";
 import { Input } from "@/components/ui/input";
 
 interface ClientOrderDocumentationProps {
@@ -13,8 +13,13 @@ interface ClientOrderDocumentationProps {
 export default function ClientOrderDocumentation({
   id,
 }: ClientOrderDocumentationProps) {
-  // Hooks para armazenar os dados da ordem
   const { data, error, isLoading } = useSingleOrder(id);
+  const {
+    trigger: saveDocs,
+    isMutating: isSaving,
+    error: errorSaving,
+    dataDocs,
+  } = useDocsCostumer();
 
   const [idOrder, setIdOrder] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
@@ -29,6 +34,7 @@ export default function ClientOrderDocumentation({
   const [services, setServices] = useState([]);
   const [needCNH, setNeedCNH] = useState(false);
 
+  // Campos que serão salvos no banco
   const [cpfCnpj, setCpfCnpj] = useState("");
   const [passaport, setPassaporte] = useState("");
   const [name, setName] = useState("");
@@ -36,11 +42,36 @@ export default function ClientOrderDocumentation({
   const [ddi, setDdi] = useState("");
   const [ddd, setDdd] = useState("");
   const [phone, setPhone] = useState("");
-  const [compPag, setCompPag] = useState("");
-  const [cnh, setCnh] = useState("");
 
+  // Campos base64
+  const [compPag, setCompPag] = useState<string>("");
+  const [cnh, setCnh] = useState<string>("");
+
+  // Estados para a autorização visual
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [typedOrderNumber, setTypedOrderNumber] = useState("");
+  const [authError, setAuthError] = useState("");
+
+  // Ao selecionar arquivos, geramos o base64
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setValue: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event: ProgressEvent<FileReader>) => {
+      if (!event.target?.result) return;
+      const base64String = (event.target.result as string).split(",")[1];
+      setValue(base64String);
+    };
+    reader.readAsDataURL(file);
+  };
+  console.log(costumer);
+
+  // Atualiza os estados com os dados carregados
   useEffect(() => {
-    console.log(data);
     if (data?.order) {
       const o = data.order;
       setIdOrder(o.id_order);
@@ -72,20 +103,74 @@ export default function ClientOrderDocumentation({
     }
   }, [data]);
 
+  // Verifica se precisa de CNH
   useEffect(() => {
-    console.log("services:", services);
-    services?.map((service: any) => {
-      const type = service.type;
-      if (type === "1") {
+    services.forEach((service: any) => {
+      if (service.type === "1") {
         setNeedCNH(true);
-        return;
       }
     });
   }, [services]);
 
+  // Função para verificar se o orderNumber digitado está correto
+  const handleAuthorize = () => {
+    if (typedOrderNumber === orderNumber) {
+      setIsAuthorized(true);
+      setAuthError("");
+    } else {
+      setAuthError("Número do pedido incorreto. Tente novamente.");
+    }
+  };
+
+  const handleSendDocs = async () => {
+    const payload = {
+      id_order: idOrder,
+      cpf_cnpj: cpfCnpj,
+      passaport: passaport,
+      name,
+      email,
+      ddi,
+      ddd,
+      phone,
+      compPag,
+      cnh,
+    };
+
+    await saveDocs(payload);
+    console.log(dataDocs);
+  };
+
   if (isLoading) return <div>Carregando...</div>;
   if (error) return <div>Erro ao carregar a ordem.</div>;
 
+  // Se não estiver autorizado, exibe apenas o formulário para digitar o orderNumber
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen bg-sky-100 flex items-center justify-center">
+        <div className="bg-white shadow p-4 rounded">
+          <h2 className="text-xl font-bold mb-4">
+            Digite o número do pedido para acessar a página
+          </h2>
+          <Input
+            type="text"
+            value={typedOrderNumber}
+            onChange={(e) => setTypedOrderNumber(e.target.value)}
+            placeholder="Ex: 123456"
+            className="mb-4"
+          />
+          <button
+            onClick={handleAuthorize}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Confirmar
+          </button>
+          {authError && <p className="text-red-500 mt-2">{authError}</p>}
+        </div>
+      </div>
+    );
+  }
+
+  // Se autorizado, exibe o conteúdo completo
   return (
     <div className="min-h-screen bg-sky-100 flex flex-col">
       <header className="bg-white shadow p-4 flex items-center justify-between">
@@ -94,11 +179,9 @@ export default function ClientOrderDocumentation({
           Orçamento: <span className="font-bold">{orderNumber}</span>
         </h1>
       </header>
+
       {idCostumer ? (
-        <div>
-          {costumer}
-          {idOrder}
-        </div>
+        <div>{idOrder}</div>
       ) : (
         <main className="flex flex-wrap p-4 w-screen">
           <div className="bg-white shadow-lg rounded-lg p-6 w-full">
@@ -125,8 +208,9 @@ export default function ClientOrderDocumentation({
               </div>
             </div>
           </div>
+
           <div className="bg-white shadow-lg rounded-lg p-6 w-full mt-4">
-            <h2 className="text-xl font-bold mb-4">cadastro do cliente</h2>
+            <h2 className="text-xl font-bold mb-4">Cadastro do cliente</h2>
             <div className="space-y-2 flex flex-wrap w-full">
               <div className="w-1/2 p-2">
                 <label className="font-semibold">CPF / CNPJ:</label>
@@ -175,28 +259,46 @@ export default function ClientOrderDocumentation({
                   onChange={(e) => setPhone(e.target.value)}
                 />
               </div>
+
+              {/* Comprovante de pagamento */}
               <div className="w-1/2 p-2">
                 <label className="font-semibold">
                   Comprovante de pagamento:
                 </label>
                 <Input
                   type="file"
-                  value={compPag}
-                  onChange={(e) => setCompPag(e.target.value)}
+                  onChange={(e) => handleFileChange(e, setCompPag)}
                 />
               </div>
+
+              {/* CNH (somente se precisar) */}
               {needCNH && (
                 <div className="w-1/2 p-2">
                   <label className="font-semibold">CNH:</label>
                   <Input
                     type="file"
-                    value={cnh}
-                    onChange={(e) => setCnh(e.target.value)}
+                    onChange={(e) => handleFileChange(e, setCnh)}
                   />
                 </div>
               )}
             </div>
+
+            <div className="w-full mt-4">
+              <button
+                onClick={handleSendDocs}
+                disabled={isSaving}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                {isSaving ? "Enviando..." : "Salvar Documentos"}
+              </button>
+              {errorSaving && (
+                <p className="text-red-500 mt-2">
+                  Erro ao enviar documentos: {String(errorSaving)}
+                </p>
+              )}
+            </div>
           </div>
+
           {services && services.length > 0 && (
             <div className="bg-white shadow-lg rounded-lg p-6 w-full mt-4">
               <h2 className="text-xl font-bold mb-4">Passeios:</h2>
