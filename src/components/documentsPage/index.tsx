@@ -71,7 +71,6 @@ export default function ClientOrderDocumentation({
 
   console.log(costumer);
 
-
   // Atualiza os estados com os dados carregados
   useEffect(() => {
     if (data?.order) {
@@ -188,20 +187,20 @@ export default function ClientOrderDocumentation({
         <main className="flex flex-wrap p-4 w-screen">
           <div className="bg-white shadow-lg rounded-lg p-6 w-full">
             <h2 className="text-xl font-bold mb-4">Pré-cadastro do cliente</h2>
-            <div className="space-y-2 flex w-full">
-              <div className="me-6">
+            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6 w-full">
+              <div>
                 <span className="font-semibold">Nome:</span> {preName}
               </div>
-              <div className="me-6">
+              <div>
                 <span className="font-semibold">Email:</span> {preEmail}
               </div>
-              <div className="me-6">
+              <div>
                 <span className="font-semibold">Telefone:</span>{" "}
                 {preDdi && `+${preDdi} `}
                 {preDdd && `(${preDdd}) `}
                 {prePhone}
               </div>
-              <div className="me-6">
+              <div>
                 <span className="font-semibold">Preço:</span>{" "}
                 {Number(price).toLocaleString("pt-BR", {
                   style: "currency",
