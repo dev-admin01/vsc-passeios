@@ -8,7 +8,7 @@ import {
   Image,
 } from "@react-pdf/renderer";
 
-import { OrderPDFProps } from "@/types/orders.type";
+import { PDFData } from "@/types/orders.type";
 
 function toTitleCase(str: string) {
   return str.replace(
@@ -24,7 +24,24 @@ function formatPhone(phone: string) {
   return tel || "";
 }
 
-export default function OrderPDF({ order }: OrderPDFProps) {
+function formatCurrency(value: string | number | undefined) {
+  if (!value) return "R$ 0,00";
+
+  let numericValue: number;
+  if (typeof value === "string") {
+    numericValue = parseFloat(value.replace(",", "."));
+  } else {
+    numericValue = value;
+  }
+
+  return numericValue.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
+export default function OrderPDF({ pdfData }: PDFData) {
+  const { order, condPag } = pdfData;
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -62,6 +79,7 @@ export default function OrderPDF({ order }: OrderPDFProps) {
         <View style={styles.servicesContainer}>
           <View style={styles.serviceRow}>
             <Text style={styles.serviceDescription}>Descrição</Text>
+            <Text style={styles.serviceDescription}>Quantidade</Text>
             <Text style={styles.servicePrice}>Preço</Text>
             <Text style={styles.serviceDiscount}>Desconto</Text>
             <Text style={styles.serviceDate}>Data sugerida</Text>
@@ -71,38 +89,77 @@ export default function OrderPDF({ order }: OrderPDFProps) {
               <Text style={styles.serviceDescription}>
                 {service.service.description}
               </Text>
+              <Text style={styles.serviceDescription}>{service.quantity}</Text>
               <Text style={styles.servicePrice}>
-                {Number(service.price).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
+                {formatCurrency(service.price)}
               </Text>
               <Text style={styles.serviceDiscount}>
-                {Number(service.discount).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
+                {formatCurrency(
+                  order.orders_service[index].discount?.toString() || "0"
+                )}
               </Text>
               <Text style={styles.serviceDate}>
-                {new Date(service.suggested_date).toLocaleDateString("pt-BR")}
+                {new Date(
+                  order.orders_service[index].suggested_date
+                ).toLocaleDateString("pt-BR")}
               </Text>
             </View>
           ))}
         </View>
+
         <View style={styles.footer}>
           <View style={styles.line}></View>
 
-          <Text style={styles.total}>
-            Total:{" "}
-            {order.price
-              ? Number(order.price).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })
-              : "R$ 0,00"}
-          </Text>
-          <View style={styles.line}></View>
+          {order.coupons ? (
+            <View>
+              <Text style={styles.textCondPag}>
+                Cupom de desconto aplicado: {order.coupons.coupon} -{" "}
+                {order.coupons.discount}%
+              </Text>
+              <Text style={styles.total}>
+                Total: {formatCurrency(order.price)}
+              </Text>
+            </View>
+          ) : (
+            <Text style={styles.total}>
+              Total: {formatCurrency(order.price)}
+            </Text>
+          )}
 
+          {condPag.installments === "1" ? (
+            condPag.description === "Pix" ? (
+              order.coupons ? (
+                <Text key={condPag.description} style={styles.textCondPag}>
+                  Á vista no {condPag.description}.
+                </Text>
+              ) : (
+                <Text key={condPag.description} style={styles.textCondPag}>
+                  À vista no {condPag.description} com {condPag.discount}% de
+                  desconto por{" "}
+                  {formatCurrency(
+                    parseFloat(order.price?.replace(",", ".") || "0") *
+                      (1 - parseFloat(condPag.discount) / 100)
+                  )}
+                </Text>
+              )
+            ) : (
+              <Text key={condPag.description} style={styles.textCondPag}>
+                À vista no {condPag.description}.
+              </Text>
+            )
+          ) : (
+            <Text key={condPag.description} style={styles.textCondPag}>
+              Em até {condPag.installments}x no {condPag.description}
+            </Text>
+          )}
+          {order.cond_pag ? (
+            <Text key={order.cond_pag.description} style={styles.textCondPag}>
+              Em até {order.cond_pag.installments}x no{" "}
+              {order.cond_pag.description}
+            </Text>
+          ) : null}
+
+          <View style={styles.line}></View>
           <View style={styles.borda}></View>
         </View>
       </Page>
@@ -147,6 +204,11 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 12,
     marginBottom: 4,
+  },
+  textCondPag: {
+    fontSize: 12,
+    marginBottom: 4,
+    textAlign: "right",
   },
   image: {
     height: 80,
@@ -194,6 +256,7 @@ const styles = StyleSheet.create({
     textAlign: "right",
     fontWeight: "bold",
     margin: 5,
+    marginBottom: 10,
   },
   footer: {
     position: "absolute",

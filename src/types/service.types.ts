@@ -2,10 +2,11 @@ export interface Services {
   id_service?: number;
   description?: string;
   type?: number;
-  price?: number;
+  price?: string;
   observation?: string;
   created_at?: string;
   updated_ate?: string;
+  time: string;
 }
 
 export interface ServicesResponse {

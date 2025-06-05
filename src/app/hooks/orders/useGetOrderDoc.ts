@@ -10,7 +10,6 @@ export async function useSingleOrder(id: string) {
   const response = await api.get(`/api/orders/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  console.log("hook novo", response.data);
   return response.data; // { order: { ... }, status_code: 200 }
 }
 

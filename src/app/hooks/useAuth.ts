@@ -1,52 +1,110 @@
 "use client";
+import { useState } from "react";
+import useSWR from "swr";
 
-import { setCookie } from "cookies-next/client";
+import { setCookie, deleteCookie } from "cookies-next";
 import { api } from "@/services/api";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
 export interface AuthResp {
   statusCode: number;
+  message?: string;
+}
+
+export interface User {
+  id_user: string;
+  email: string;
+  name: string;
+  token: string;
+}
+
+export interface AuthResponse {
+  user: User;
 }
 
 // Transformando useAuth em um hook customizado com o prefixo "use"
 export function useAuth() {
   const router = useRouter();
+  // const [authLoading, setAuthLoading] = useState(false);
+
+  // const { data: user, error, isLoading } = useSWR("/api/auth", fetcher);
 
   const login = async (
     email: string,
     password: string
   ): Promise<AuthResp | undefined> => {
     try {
-      const response = await api.post("/api/auth", { email, password });
+      const response = await api.post<AuthResponse>("/api/auth", {
+        email,
+        password,
+      });
 
       if (!response.data.user.token) {
-        return { statusCode: 400 };
+        return {
+          statusCode: 400,
+          message: "Token não encontrado na resposta",
+        };
       }
 
-      const expressTime = 60 * 60 * 24;
-      setCookie("vsc-session", response.data.user.token, {
-        maxAge: expressTime,
-        httpOnly: false,
+      const cookieOptions = {
         secure: process.env.NODE_ENV === "production",
-      });
+        sameSite: "strict" as const,
+        maxAge: 60 * 60 * 24, // 1 dia
+        path: "/",
+      };
 
-      setCookie("vsc-identify", response.data.user.id_user, {
-        maxAge: expressTime,
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-      });
+      console.log("passou aqui");
 
-      // Redirecionamento no client-side usando router.push
+      // Salva o token
+      setCookie("vsc-session", response.data.user.token, cookieOptions);
+      const userInfo = {
+        id_user: response.data.user.id_user,
+        name: response.data.user.name,
+        email: response.data.user.email,
+        id_position: response.data.user.id_user,
+      };
+
+      const dataUser = JSON.stringify(userInfo);
+
+      setCookie("vsc-identify", dataUser, cookieOptions);
+
       router.push("/dashboard");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return { statusCode: error.response?.data.status_code };
+        const statusCode = error.response?.data.status_code || 500;
+        const message = error.response?.data.message || "Erro ao fazer login";
+        return { statusCode, message };
       }
-      console.error(error);
-      return { statusCode: 500 };
+      console.error("Erro não tratado:", error);
+      return {
+        statusCode: 500,
+        message: "Erro interno do servidor",
+      };
     }
   };
 
-  return { login };
+  const logout = () => {
+    try {
+      const cookieOptions = {
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict" as const,
+        path: "/",
+      };
+
+      deleteCookie("vsc-session", cookieOptions);
+      deleteCookie("vsc-identify", cookieOptions);
+
+      // Força a limpeza do cache do navegador
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+
+      router.push("/");
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      router.push("/");
+    }
+  };
+
+  return { login, logout };
 }

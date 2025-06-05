@@ -9,24 +9,37 @@ export interface IServiceData {
   price?: number;
   suggested_date?: string;
   discount?: number;
+  quantity?: number;
 }
 
 export interface CreateOrderPayload {
   id_user: string;
-  price: number;
   pre_name: string;
   pre_email: string;
   pre_ddi: string;
   pre_ddd: string;
   pre_phone: string;
-  id_costumer?: string;
-  id_status_order?: number;
-  services?: IServiceData[];
+  price: string;
+  id_cond_pag?: string;
+  id_coupons?: string;
+  services: {
+    id_service: number;
+    price: string;
+    quantity: number;
+    discount: number;
+    suggested_date?: string;
+    time?: string;
+  }[];
 }
 
 export const useCreateOrder = () => {
   const createOrder = useCallback(async (orderData: CreateOrderPayload) => {
     console.log("hooke", orderData);
+    console.log("hooke.services", orderData.services);
+    orderData.price = orderData.price.toString().replace(".", ",");
+    orderData.services.forEach((service) => {
+      service.price = service.price.toString();
+    });
     const token = await getCookieclient();
     const response = await api.post("/api/orders", orderData, {
       headers: { Authorization: `Bearer ${token}` },

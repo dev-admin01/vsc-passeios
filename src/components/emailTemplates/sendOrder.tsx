@@ -57,7 +57,7 @@ export const sendOrder = ({
               src={`${baseUrl}/logo.png`}
               width="90"
               height="90"
-              alt="Vercel"
+              alt="logo-vsc-passeios"
               className="my-0 mx-auto"
             />
             <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
@@ -67,16 +67,11 @@ export const sendOrder = ({
               Olá, {name ? toTitleCase(name) : ""}! Que alegria poder ajudar
               você a planejar sua próxima aventura! Preparamos tudo com muito
               carinho e atenção para tornar esse processo o mais simples e
-              inspirador possível. Confira abaixo os links que preparamos para
-              você:
+              inspirador possível. Confira abaixo o link do seu orçamento:
             </Text>
-            <Link href={`${urlDoc}`}>Anexar comprovante</Link>
+            <Link href={`${urlPDF}`}>Ver PDF</Link>
             <br />
             <br />
-            <Link href={`${urlPDF}`}>PDF {order_number}</Link>
-            <br />
-            <br />
-            <Link href={"#"}>Informativos</Link>
             <Text>
               Estamos super animados para fazer parte dessa jornada e ajudar a
               transformar seus sonhos em realidade. Se surgir qualquer dúvida ou

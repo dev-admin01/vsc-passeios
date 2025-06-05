@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import Image from "next/image";
-import { useAuth } from "./hooks/useAuth";
+import { useAuthContext } from "./contexts/authContext";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login } = useAuthContext();
   const [statusCode, setStatusCode] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 

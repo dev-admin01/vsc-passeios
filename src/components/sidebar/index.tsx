@@ -1,3 +1,5 @@
+"use client";
+
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "@/components/ui/button";
@@ -10,7 +12,10 @@ import {
   Sailboat,
   Settings,
   ShoppingBag,
+  TicketPercent,
+  Users,
 } from "lucide-react";
+import { useAuthContext } from "@/app/contexts/authContext";
 
 import {
   TooltipContent,
@@ -20,6 +25,8 @@ import {
 } from "../ui/tooltip";
 
 export function Sidebar() {
+  const { logout } = useAuthContext();
+
   return (
     <div className="flex w-full flex-col bg-muted/40">
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-17 border-r sm:flex sm:flex-col bg-blue-800">
@@ -32,8 +39,8 @@ export function Sidebar() {
               <Image
                 src="/logo.png"
                 alt="Logo"
-                width={100} // adjust the width as needed
-                height={100} // adjust the height as needed
+                width={100}
+                height={100}
                 className="mx-auto "
               />
               <span className="sr-only">Dashboard avatar</span>
@@ -77,7 +84,31 @@ export function Sidebar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="#"
+                  href="/customers"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <Users className="h-7 w-7 text-white" />
+                  <span className="sr-only">Clientes</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right">Clientes</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/coupons"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <TicketPercent className="h-7 w-7 text-white" />
+                  <span className="sr-only">Cupons</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right">Cupons</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/settings"
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <Settings className="h-7 w-7 text-white" />
@@ -88,17 +119,18 @@ export function Sidebar() {
             </Tooltip>
           </TooltipProvider>
         </nav>
+
         <nav className="mt-auto flex flex-col items-center gap-4 px-2 py-5">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link
-                  href="#"
+                <button
+                  onClick={logout}
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <LogOut className="h-7 w-7 text-red-500" />
                   <span className="sr-only">Sair</span>
-                </Link>
+                </button>
               </TooltipTrigger>
               <TooltipContent side="right">Sair</TooltipContent>
             </Tooltip>
@@ -135,7 +167,7 @@ export function Sidebar() {
                 </Link>
 
                 <Link
-                  href={"#"}
+                  href="/dashboard"
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
                   prefetch={false}
                 >
@@ -144,7 +176,7 @@ export function Sidebar() {
                 </Link>
 
                 <Link
-                  href={"#"}
+                  href="/orders"
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
                   prefetch={false}
                 >
@@ -152,7 +184,7 @@ export function Sidebar() {
                   Orçamentos
                 </Link>
                 <Link
-                  href={"#"}
+                  href="/services"
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
                   prefetch={false}
                 >
@@ -160,13 +192,38 @@ export function Sidebar() {
                   Passeios
                 </Link>
                 <Link
-                  href={"#"}
+                  href="/customers"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  prefetch={false}
+                >
+                  <Users className="h-5 w-5 transition-all" />
+                  Clientes
+                </Link>
+                <Link
+                  href="/coupons"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  prefetch={false}
+                >
+                  <TicketPercent className="h-5 w-5 transition-all" />
+                  Cupons
+                </Link>
+
+                <Link
+                  href="/settings"
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
                   prefetch={false}
                 >
                   <Settings className="h-5 w-5 transition-all" />
                   Configurações
                 </Link>
+
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-4 px-2.5 text-red-500 hover:text-red-600 transition-colors duration-200"
+                >
+                  <LogOut className="h-5 w-5 transition-all" />
+                  Sair
+                </button>
               </nav>
             </SheetContent>
           </Sheet>

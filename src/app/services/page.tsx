@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sidebar } from "@/components/sidebar";
@@ -24,18 +25,21 @@ import { useGetService } from "@/app/hooks/service/useGetService";
 
 // Ícones do lucide-react (instale via npm i lucide-react)
 import { Edit, Trash2 } from "lucide-react";
+// Novo componente de modal
 
-import { CreateServicePayload } from "@/types/service.types";
-
-// (Opcional) componente de criação que você já tem
-import { CreateServiceModal } from "@/components/createServiceModal";
 interface ServiceData {
   id_service: number;
   description: string;
   type: string;
   price: string;
   observation: string;
-  // etc
+}
+
+interface ServiceFormData {
+  name: string;
+  description: string;
+  price: string;
+  duration: string;
 }
 
 export default function ServicesPage() {
@@ -48,20 +52,6 @@ export default function ServicesPage() {
   const { deleteService } = useDeleteService();
   const { getService } = useGetService();
   const { updateService } = useUpdateService();
-
-  // ----- Modal de criação -----
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  function openCreateModal() {
-    setIsCreateModalOpen(true);
-  }
-  function closeCreateModal() {
-    setIsCreateModalOpen(false);
-  }
-  async function handleCreateService(payload: CreateServicePayload) {
-    await createService(payload);
-    mutate(); // Recarrega a lista
-  }
 
   // ----- Modal de exclusão -----
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -174,7 +164,9 @@ export default function ServicesPage() {
           onChange={handleSearchChange}
           className="bg-amber-50"
         />
-        <Button onClick={openCreateModal}>Novo Passeio</Button>
+        <Button className="cursor-pointer">
+          <Link href="/services/new">Novo Passeio</Link>
+        </Button>
       </div>
 
       {/* Tabela de serviços */}
@@ -205,25 +197,35 @@ export default function ServicesPage() {
                   <TableCell>{item.id_service}</TableCell>
                   <TableCell>{item.description}</TableCell>
                   <TableCell>
-                    {Number(item.price).toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
+                    {(() => {
+                      let value = item.price;
+                      if (value) {
+                        value = value.toString().replace(/\D/g, "");
+                        value = (parseInt(value, 10) / 100).toFixed(2);
+                        value = value.replace(".", ",");
+                        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                        value = "R$ " + value;
+                      }
+                      return value;
+                    })()}
                   </TableCell>
                   <TableCell>{item.observation}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
                         variant="ghost"
-                        onClick={() => openEditModal(item.id_service)}
                         title="Editar"
+                        className="cursor-pointer"
                       >
-                        <Edit className="h-4 w-4" />
+                        <Link href={`/services/update/${item.id_service}`}>
+                          <Edit className="h-4 w-4" />
+                        </Link>
                       </Button>
                       <Button
                         variant="ghost"
                         onClick={() => openDeleteModal(item.id_service)}
                         title="Excluir"
+                        className="cursor-pointer"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -252,20 +254,7 @@ export default function ServicesPage() {
           </Button>
         </div>
       )}
-
-      {/*
-        MODAL DE CRIAÇÃO
-        (Aqui usando o seu componente <CreateServiceModal>)
-      */}
-      <CreateServiceModal
-        isOpen={isCreateModalOpen}
-        onClose={closeCreateModal}
-        onCreate={handleCreateService}
-      />
-
-      {/*
-        MODAL DE EXCLUSÃO (confirmação simples)
-      */}
+      {/* Modal de Exclusão */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
           <div className="bg-white p-4 rounded shadow-md max-w-md w-full">
@@ -283,11 +272,7 @@ export default function ServicesPage() {
         </div>
       )}
 
-      {/*
-        MODAL DE EDIÇÃO
-        - Ao abrir, faz GET /services/:id e preenche os campos
-        - Ao salvar, faz PUT /services/:id
-      */}
+      {/* Modal de Edição */}
       {isEditModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
           <div className="bg-white p-4 rounded shadow-md max-w-md w-full">
