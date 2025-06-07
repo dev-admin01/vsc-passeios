@@ -23,7 +23,8 @@ export default function MidiaPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [page, setPage] = useState(1);
+  // const [page, setPage] = useState(1);
+  const page = 1;
   const [search, setSearch] = useState("");
   const perPage = 10;
 

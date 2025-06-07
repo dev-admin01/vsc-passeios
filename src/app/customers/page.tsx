@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+// import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -21,7 +21,8 @@ interface Customer {
 }
 
 export default function CustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  // const [customers, setCustomers] = useState<Customer[]>([]);
+  const customers: Customer[] = [];
 
   return (
     <div className="sm:ml-17 p-4 min-h-screen bg-sky-100">

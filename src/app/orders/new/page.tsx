@@ -163,6 +163,7 @@ export default function NewOrders() {
       );
       router.push("/orders");
     } catch (error) {
+      console.log(error);
       toast.error("Erro ao criar orçamento");
     }
   };

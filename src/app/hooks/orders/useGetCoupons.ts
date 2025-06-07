@@ -26,6 +26,7 @@ export function useGetCoupons() {
         setCoupons(response.data.coupons);
         setLoading(false);
       } catch (err) {
+        console.log(err);
         setError("Erro ao carregar cupons");
         setLoading(false);
       }

@@ -2,6 +2,7 @@
 
 import { CheckCircle2, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function DocumentsSent({ status }: { status: number }) {
   const [mounted, setMounted] = useState(false);
@@ -19,14 +20,19 @@ export default function DocumentsSent({ status }: { status: number }) {
       <div className="min-h-screen bg-sky-100 flex flex-col items-center justify-center p-4">
         <div className="bg-white shadow-lg rounded-lg p-8 max-w-2xl w-full text-center">
           <div className="flex justify-center mb-6">
-            <img src="/logo.png" alt="Logo" className="h-24 w-auto" />
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={100}
+              height={100}
+              className="mx-auto"
+            />
           </div>
 
           <div className="flex flex-col items-center space-y-6">
-            <div className="bg-green-100 p-4 rounded-full">
-              <CheckCircle2 className="h-16 w-16 text-green-500" />
+            <div className="flex justify-center mb-4">
+              <CheckCircle2 className="w-12 h-12 text-green-500" />
             </div>
-
             <h1 className="text-3xl font-bold text-gray-800">
               Documentos Recebidos com Sucesso!
             </h1>
@@ -69,14 +75,19 @@ export default function DocumentsSent({ status }: { status: number }) {
     <div className="min-h-screen bg-sky-100 flex flex-col items-center justify-center p-4">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-2xl w-full text-center">
         <div className="flex justify-center mb-6">
-          <img src="/logo.png" alt="Logo" className="h-24 w-auto" />
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={100}
+            height={100}
+            className="mx-auto"
+          />
         </div>
 
         <div className="flex flex-col items-center space-y-6">
-          <div className="bg-yellow-100 p-4 rounded-full">
-            <Clock className="h-16 w-16 text-yellow-500" />
+          <div className="flex justify-center mb-4">
+            <Clock className="w-12 h-12 text-orange-500" />
           </div>
-
           <h1 className="text-3xl font-bold text-gray-800">
             Aguarde a Aprovação
           </h1>

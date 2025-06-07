@@ -1,22 +1,22 @@
-import useSWR from "swr"
-import { api } from "@/lib/axios"
+import useSWR from "swr";
+import { api } from "@/services/api";
 
 interface Customer {
-  id: string
-  name: string
-  email: string
-  phone: string
-  createdAt: string
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  createdAt: string;
 }
 
 export function useCustomer() {
   const { data: customers, isLoading } = useSWR<Customer[]>(
     "/customers",
-    async (url) => {
-      const response = await api.get(url)
-      return response.data
+    async () => {
+      const response = await api.get("/customers");
+      return response.data;
     }
-  )
+  );
 
-  return { customers, isLoading }
-} 
+  return { customers, isLoading };
+}

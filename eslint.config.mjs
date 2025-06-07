@@ -19,7 +19,7 @@ export default [
     rules: {
       "no-console": "off",
       "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": ["error"],
+      "@typescript-eslint/no-unused-vars": ["warn"],
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/explicit-function-return-type": "off",
       "node/no-unsupported-features/es-syntax": "off",

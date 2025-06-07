@@ -112,7 +112,6 @@ function formatPassport(value: string) {
 }
 
 export default function ClientOrderDocumentation({
-  id,
   orderData,
   initialOrderNumber,
 }: ClientOrderDocumentationProps) {
@@ -332,7 +331,10 @@ export default function ClientOrderDocumentation({
       </header>
 
       {idCostumer ? (
-        <div>{idOrder}</div>
+        <div>
+          <div>{idOrder}</div>
+          <div>{costumer?.nome}</div>
+        </div>
       ) : (
         <main className="flex flex-wrap p-4 w-screen">
           <div className="bg-white shadow-lg rounded-lg p-6 w-full">

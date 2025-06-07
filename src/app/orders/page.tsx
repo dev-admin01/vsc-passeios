@@ -21,16 +21,12 @@ import {
   FileCheck2,
   BookUp2,
 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+
 import { toast } from "sonner";
 
 import { useOrders } from "@/app/hooks/orders/useOrder";
 import { useDeleteOrder } from "@/app/hooks/orders/useDeleteOrder";
-import { useCreateOrder } from "@/app/hooks/orders/useCreateOrders";
-import {
-  useUpdateOrder,
-  UpdateOrderPayload,
-} from "@/app/hooks/orders/useUpdateOrder";
+
 import { useUpdateStatus } from "../hooks/orders/useUpdateStatus";
 
 import { DeleteOrderModal } from "@/components/deleteOrderModal";
@@ -60,8 +56,6 @@ export default function OrdersPage() {
   const { data, error, isLoading, mutate } = useOrders(page, perpage, search);
   const { deleteOrder } = useDeleteOrder();
   const { updateStatus } = useUpdateStatus();
-
-  const searchParams = useSearchParams();
 
   // Modals
 
@@ -190,6 +184,7 @@ export default function OrdersPage() {
         toast.error("ID do pedido inválido para atualizar o status.");
       }
     } catch (error) {
+      console.log(error);
       toast.error("Erro ao enviar o email!");
     } finally {
       mutate();
@@ -256,6 +251,7 @@ export default function OrdersPage() {
         toast.error("ID do pedido inválido para atualizar o status.");
       }
     } catch (error) {
+      console.log(error);
       toast.error("Erro ao enviar o link de cadastro!");
     } finally {
       mutate();
@@ -297,6 +293,7 @@ export default function OrdersPage() {
         setOrderToDocument(null);
         setOrderToDocumentNumber(null);
       } catch (error) {
+        console.log(error);
         toast.error("Erro ao verificar documentos!");
       } finally {
         setIsSending(false);

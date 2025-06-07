@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useDocumentation } from "@/app/hooks/documentation/useDocumentation";
 import { Button } from "@/components/ui/button";
-import { Loader2, FileText, Image, Eye } from "lucide-react";
+import { Loader2, FileText, Image as ImageIcon, Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface Document {
@@ -50,7 +51,7 @@ export function VerifyDocsModal({
     if (isOpen) {
       mutate();
     }
-  }, [isOpen]);
+  }, [isOpen, mutate]);
 
   if (!isOpen) return null;
 
@@ -75,7 +76,7 @@ export function VerifyDocsModal({
                     {getFileType(doc.file) === "pdf" ? (
                       <FileText className="h-5 w-5 text-red-500" />
                     ) : (
-                      <Image className="h-5 w-5 text-blue-500" />
+                      <ImageIcon className="h-5 w-5 text-blue-500" />
                     )}
                     <span>{doc.name}</span>
                   </div>
@@ -127,10 +128,12 @@ export function VerifyDocsModal({
                   className="w-full h-full"
                 />
               ) : (
-                <img
+                <Image
                   src={`data:image/png;base64,${selectedDoc.file}`}
                   alt={selectedDoc.name}
                   className="max-w-full h-auto"
+                  width={1000}
+                  height={1000}
                 />
               )}
             </div>

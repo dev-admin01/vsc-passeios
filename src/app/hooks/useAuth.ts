@@ -1,6 +1,4 @@
 "use client";
-import { useState } from "react";
-import useSWR from "swr";
 
 import { setCookie, deleteCookie } from "cookies-next";
 import { api } from "@/services/api";

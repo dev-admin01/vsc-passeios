@@ -11,14 +11,6 @@ interface CondicaoPagamento {
   updated_at: string;
 }
 
-interface ListCondicaoPagamentoResponse {
-  condicoesPagamento: CondicaoPagamento[];
-  page: number;
-  perpage: number;
-  lastPage: number;
-  totalCount: number;
-}
-
 export function useGetCondPag() {
   const [condPag, setCondPag] = useState<CondicaoPagamento[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +28,7 @@ export function useGetCondPag() {
         setCondPag(response.data.condicoesPagamento);
         setLoading(false);
       } catch (err) {
+        console.log(err);
         setError("Erro ao carregar condições de pagamento");
         setLoading(false);
       }

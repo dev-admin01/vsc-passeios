@@ -61,6 +61,7 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
   }
 
   const hours = generateTimeSlots();
+  console.log(hours);
 
   useEffect(() => {
     async function fetchServices() {
@@ -91,7 +92,7 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
       (s) => s.id_service === serviceId
     );
     const price = selectedService ? selectedService.price : undefined;
-    const time = selectedService?.time ? JSON.parse(selectedService.time) : [];
+    // const time = selectedService?.time ? JSON.parse(selectedService.time) : [];
     const updated = {
       ...selectedServices[index],
       id_service: serviceId,

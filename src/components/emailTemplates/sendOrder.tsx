@@ -15,23 +15,18 @@ import { EmailOrderProps } from "@/types/orders.type";
 
 export const sendOrder = ({
   id_order,
-  order_number,
   pre_name,
   costumer,
 }: EmailOrderProps) => {
-  let urlDoc;
   let urlPDF;
   let baseUrl;
-  const docPath = "orderdocumentation";
   const pdfPath = "pdf";
 
   if (process.env.NODE_ENV === "production") {
     baseUrl = "https://vscpasseios.com.br";
-    urlDoc = `${baseUrl}/${docPath}/${id_order}`;
     urlPDF = `${baseUrl}/${pdfPath}/${id_order}`;
   } else {
     baseUrl = "http://localhost:3001";
-    urlDoc = `${baseUrl}/${docPath}/${id_order}`;
     urlPDF = `${baseUrl}/${pdfPath}/${id_order}`;
   }
 

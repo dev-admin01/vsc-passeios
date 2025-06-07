@@ -62,20 +62,17 @@ export function useCoupons(
   const createCoupon = async (data: CreateCouponData) => {
     try {
       const token = await getCookieclient();
-      const response = await api.post<CreateCouponResponse>(
-        "/api/coupons",
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.post<CreateCouponResponse>("/api/coupons", data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       toast.success("Cupom criado com sucesso!");
       mutate();
       return true;
     } catch (error) {
+      console.log(error);
       toast.error("Erro ao criar cupom");
       return false;
     }
@@ -94,6 +91,7 @@ export function useCoupons(
       mutate();
       return true;
     } catch (error) {
+      console.log(error);
       toast.error("Erro ao atualizar cupom");
       return false;
     }
@@ -112,6 +110,7 @@ export function useCoupons(
       mutate();
       return true;
     } catch (error) {
+      console.log(error);
       toast.error("Erro ao excluir cupom");
       return false;
     }
