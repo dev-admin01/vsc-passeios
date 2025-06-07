@@ -13,7 +13,7 @@ import { ServicesResponse } from "@/types/service.types";
 const fetchServices = async (page: number, perpage: number, search: string) => {
   // Buscar o token
   const token = await getCookieclient();
-
+  console.log(token);
   // Fazer a requisição para /services
   // Passando query params e Bearer Token
   const response = await api.get<ServicesResponse>("/api/services", {

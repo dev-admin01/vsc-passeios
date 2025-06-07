@@ -2,36 +2,132 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSingleOrder } from "@/app/hooks/orders/useGetUpdateOrder";
-import { useDocsCostumer } from "@/app/hooks/costumer/useDocsCostumer";
+import { usePostDocsCostumer } from "@/app/hooks/costumer/useDocsCostumer";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+
+interface Service {
+  id_order_service: number;
+  id_service: number;
+  price: string;
+  discount: string;
+  suggestedDate: string;
+  time: string;
+  description: string;
+  type: string;
+  observation: string;
+}
+
+interface Costumer {
+  id_costumer: string;
+  nome: string;
+  email: string;
+  cpf_cnpj: string;
+  passaporte: string;
+  razao_social: string | null;
+  nome_fantasia: string | null;
+  ddi: string;
+  ddd: string;
+  telefone: string;
+  indicacao: string | null;
+}
 
 interface ClientOrderDocumentationProps {
   id: string;
+  orderData: {
+    order: {
+      id_order: string;
+      order_number: string;
+      price: string;
+      pre_name: string;
+      pre_email: string;
+      pre_ddi: string;
+      pre_ddd: string;
+      pre_phone: string;
+      created_at: string;
+      orders_service: Array<{
+        id_order_service: number;
+        id_service: number;
+        discount: string;
+        price: string;
+        suggested_date: string;
+        quantity: number;
+        time: string;
+        service: {
+          description: string;
+          observation: string;
+          type: string;
+        };
+      }>;
+      cond_pag: {
+        description: string;
+        installments: string;
+        discount: string;
+      };
+      coupons?: {
+        coupon: string;
+        discount: string;
+      };
+      costumer?: Costumer;
+    };
+    status_code: number;
+  };
+  initialOrderNumber: string;
+}
+
+// Função para formatar CPF
+function formatCPF(value: string) {
+  // Remove tudo que não é número
+  const numbers = value.replace(/\D/g, "");
+
+  // Aplica a máscara de CPF (000.000.000-00)
+  if (numbers.length <= 3) {
+    return numbers;
+  } else if (numbers.length <= 6) {
+    return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
+  } else if (numbers.length <= 9) {
+    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
+  } else {
+    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+  }
+}
+
+// Função para formatar Passaporte
+function formatPassport(value: string) {
+  // Converte para maiúsculas e remove caracteres especiais
+  const cleanValue = value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+
+  // Separa letras e números
+  const letters = cleanValue.match(/[A-Za-z]+/)?.[0] || "";
+  const numbers = cleanValue.match(/[0-9]+/)?.[0] || "";
+
+  // Limita a 2 letras e 6 números
+  const formattedLetters = letters.slice(0, 2);
+  const formattedNumbers = numbers.slice(0, 6);
+
+  // Retorna o formato AA000000
+  return `${formattedLetters}${formattedNumbers}`;
 }
 
 export default function ClientOrderDocumentation({
-  id,
+  orderData,
+  initialOrderNumber,
 }: ClientOrderDocumentationProps) {
-  const { data, error, isLoading } = useSingleOrder(id);
-  const {
-    trigger: saveDocs,
-    isMutating: isSaving,
-    error: errorSaving,
-    dataDocs,
-  } = useDocsCostumer();
-
+  const { postDoc } = usePostDocsCostumer();
+  const router = useRouter();
   const [idOrder, setIdOrder] = useState("");
-  const [orderNumber, setOrderNumber] = useState("");
+  const [orderNumber, setOrderNumber] = useState(initialOrderNumber);
   const [preName, setPreName] = useState("");
   const [preEmail, setPreEmail] = useState("");
   const [preDdi, setPreDdi] = useState("");
   const [preDdd, setPreDdd] = useState("");
   const [prePhone, setPrePhone] = useState("");
-  const [price, setPrice] = useState<number>(0);
+  const [price, setPrice] = useState("");
   const [idCostumer, setIdCostumer] = useState("");
-  const [costumer, setCostumer] = useState([]);
-  const [services, setServices] = useState([]);
+  const [costumer, setCostumer] = useState<Costumer | null>(null);
+  const [services, setServices] = useState<Service[]>([]);
   const [needCNH, setNeedCNH] = useState(false);
 
   // Campos que serão salvos no banco
@@ -52,6 +148,8 @@ export default function ClientOrderDocumentation({
   const [typedOrderNumber, setTypedOrderNumber] = useState("");
   const [authError, setAuthError] = useState("");
 
+  const [isSaving, setIsSaving] = useState(false);
+
   // Ao selecionar arquivos, geramos o base64
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -69,12 +167,11 @@ export default function ClientOrderDocumentation({
     reader.readAsDataURL(file);
   };
 
-  console.log(costumer);
-
   // Atualiza os estados com os dados carregados
   useEffect(() => {
-    if (data?.order) {
-      const o = data.order;
+    if (orderData?.order) {
+      const o = orderData.order;
+
       setIdOrder(o.id_order);
       setOrderNumber(o.order_number);
       setPreName(o.pre_name ?? "");
@@ -82,27 +179,51 @@ export default function ClientOrderDocumentation({
       setPreDdi(o.pre_ddi ?? "");
       setPreDdd(o.pre_ddd ?? "");
       setPrePhone(o.pre_phone ?? "");
-      setPrice(Number(o.price) || 0);
-      setIdCostumer(o.id_costumer || "");
-      setCostumer(o.costumer);
+      setPrice(o.price || "");
+      setIdCostumer(o.costumer?.id_costumer || "");
+      setCostumer(o.costumer || null);
+
+      // Carregando dados do cliente nos inputs
+      if (o.costumer) {
+        setCpfCnpj(o.costumer.cpf_cnpj || "");
+        setPassaporte(o.costumer.passaporte || "");
+        setName(o.costumer.nome || "");
+        setEmail(o.costumer.email || "");
+        setDdi(o.costumer.ddi || "");
+        setDdd(o.costumer.ddd || "");
+        setPhone(o.costumer.telefone || "");
+      } else {
+        // Se não houver cliente, carrega os dados do pré-cadastro
+        setCpfCnpj("");
+        setPassaporte("");
+        setName(o.pre_name || "");
+        setEmail(o.pre_email || "");
+        setDdi(o.pre_ddi || "");
+        setDdd(o.pre_ddd || "");
+        setPhone(o.pre_phone || "");
+        setPrice(o.price || "");
+      }
 
       if (o.orders_service) {
-        const mapped = o.orders_service.map((srv: any) => ({
-          id_order_service: srv.id_order_service,
-          id_service: srv.id_service,
-          price: Number(srv.price) || 0,
-          discount: Number(srv.discount) || 0,
-          suggestedDate: srv.suggested_date,
-          description: srv.service.description,
-          type: srv.service.type,
-          observation: srv.service.observation,
-        }));
+        const mapped = o.orders_service.map((srv) => {
+          return {
+            id_order_service: srv.id_order_service,
+            id_service: srv.id_service,
+            price: srv.price,
+            discount: srv.discount,
+            suggestedDate: srv.suggested_date,
+            time: srv.time || "",
+            description: srv.service.description,
+            type: srv.service.type,
+            observation: srv.service.observation,
+          };
+        });
         setServices(mapped);
       } else {
         setServices([]);
       }
     }
-  }, [data]);
+  }, [orderData]);
 
   // Verifica se precisa de CNH
   useEffect(() => {
@@ -124,25 +245,53 @@ export default function ClientOrderDocumentation({
   };
 
   const handleSendDocs = async () => {
-    const payload = {
-      id_order: idOrder,
-      cpf_cnpj: cpfCnpj,
-      passaport: passaport,
-      name,
-      email,
-      ddi,
-      ddd,
-      phone,
-      compPag,
-      cnh,
-    };
+    try {
+      setIsSaving(true);
+      const payload = {
+        id_order: idOrder,
+        cpf_cnpj: cpfCnpj,
+        passaport: passaport,
+        name,
+        email,
+        ddi,
+        ddd,
+        phone,
+        compPag,
+        cnh,
+      };
 
-    await saveDocs(payload);
-    console.log(dataDocs);
+      const response = await postDoc(payload);
+
+      if (response.status_code === 200) {
+        toast.success("Documentos enviados com sucesso!");
+        router.push(`/orderdocumentation/${idOrder}`);
+      } else {
+        toast.error(response.message);
+      }
+    } catch (error) {
+      console.error("Erro ao enviar documentos:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  if (isLoading) return <div>Carregando...</div>;
-  if (error) return <div>Erro ao carregar a ordem.</div>;
+  function formatCurrency(value: string | number) {
+    if (!value) return "0,00";
+
+    const numericValue =
+      typeof value === "string"
+        ? parseFloat(value.replace(/[^\d,-]/g, "").replace(",", "."))
+        : value;
+
+    return numericValue.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+
+  if (orderData === null) return <div>Carregando...</div>;
+  if (orderData?.status_code !== 200)
+    return <div>Erro ao carregar a ordem.</div>;
 
   // Se não estiver autorizado, exibe apenas o formulário para digitar o orderNumber
   if (!isAuthorized) {
@@ -182,7 +331,10 @@ export default function ClientOrderDocumentation({
       </header>
 
       {idCostumer ? (
-        <div>{idOrder}</div>
+        <div>
+          <div>{idOrder}</div>
+          <div>{costumer?.nome}</div>
+        </div>
       ) : (
         <main className="flex flex-wrap p-4 w-screen">
           <div className="bg-white shadow-lg rounded-lg p-6 w-full">
@@ -200,12 +352,18 @@ export default function ClientOrderDocumentation({
                 {preDdd && `(${preDdd}) `}
                 {prePhone}
               </div>
-              <div>
-                <span className="font-semibold">Preço:</span>{" "}
-                {Number(price).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
+              <div className="flex flex-row justify-between">
+                {orderData.order.coupons && (
+                  <div className="me-4">
+                    <span className="font-semibold">Cupom aplicado:</span>{" "}
+                    {orderData.order.coupons.coupon} -{" "}
+                    {orderData.order.coupons.discount}%
+                  </div>
+                )}
+                <div>
+                  <span className="font-semibold me-2">Preço: </span> R${" "}
+                  {formatCurrency(price)}
+                </div>
               </div>
             </div>
           </div>
@@ -214,11 +372,16 @@ export default function ClientOrderDocumentation({
             <h2 className="text-xl font-bold mb-4">Cadastro do cliente</h2>
             <div className="space-y-2 flex flex-wrap w-full">
               <div className="w-1/2 p-2">
-                <label className="font-semibold">CPF / CNPJ:</label>
+                <label className="font-semibold">CPF:</label>
                 <Input
                   type="text"
                   value={cpfCnpj}
-                  onChange={(e) => setCpfCnpj(e.target.value)}
+                  onChange={(e) => {
+                    const formattedValue = formatCPF(e.target.value);
+                    setCpfCnpj(formattedValue);
+                  }}
+                  maxLength={14}
+                  placeholder="000.000.000-00"
                 />
               </div>
               <div className="w-1/2 p-2">
@@ -226,7 +389,12 @@ export default function ClientOrderDocumentation({
                 <Input
                   type="text"
                   value={passaport}
-                  onChange={(e) => setPassaporte(e.target.value)}
+                  onChange={(e) => {
+                    const formattedValue = formatPassport(e.target.value);
+                    setPassaporte(formattedValue);
+                  }}
+                  maxLength={8}
+                  placeholder="AA000000"
                 />
               </div>
               <div className="w-1/2 p-2">
@@ -288,15 +456,17 @@ export default function ClientOrderDocumentation({
               <button
                 onClick={handleSendDocs}
                 disabled={isSaving}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {isSaving ? "Enviando..." : "Salvar Documentos"}
+                {isSaving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  "Salvar Documentos"
+                )}
               </button>
-              {errorSaving && (
-                <p className="text-red-500 mt-2">
-                  Erro ao enviar documentos: {String(errorSaving)}
-                </p>
-              )}
             </div>
           </div>
 
@@ -315,26 +485,14 @@ export default function ClientOrderDocumentation({
                     {service.type === "1" && (
                       <p className="text-red-500">Necessário CNH</p>
                     )}
-                    <p>
-                      Preço:{" "}
-                      {Number(service.price).toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
-                    </p>
-                    <p>
-                      Desconto:{" "}
-                      {Number(service.discount).toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
-                    </p>
+                    <p>Preço: R$ {formatCurrency(service.price)}</p>
                     <p>
                       Data Sugerida:{" "}
                       {new Date(service.suggestedDate).toLocaleDateString(
                         "pt-BR"
                       )}
                     </p>
+                    {service.time && <p>Horário: {service.time}</p>}
                     <p>{service.observation}</p>
                   </div>
                 ))}

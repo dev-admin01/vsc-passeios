@@ -16,14 +16,15 @@ export async function GET(
 
   const { id } = await params;
 
-  const response = await fetch(`${baseUrl}/api/orders/${id}`, {});
+  const response = await fetch(`${baseUrl}/api/pdf/order/${id}`, {});
+
   if (!response.ok) {
     return new NextResponse("Erro ao buscar dados.", { status: 500 });
   }
-  const orderData = await response.json();
+  const pdfData = await response.json();
 
   // Passe os dados que precisar para o componente do PDF
-  const docElement = <OrderPDF order={orderData.order} />;
+  const docElement = <OrderPDF pdfData={pdfData.pdfData} />;
 
   const nodeStream = (await renderToStream(
     docElement
