@@ -130,14 +130,8 @@ export default function UpdateService() {
 
   async function onSubmit(values: any) {
     try {
-      // Remove a formatação do preço antes de enviar
-      const priceWithoutFormat = values.price
-        ? values.price.replace(/\D/g, "")
-        : "0";
-
       const serviceData = {
         ...values,
-        price: priceWithoutFormat,
         time: JSON.stringify(selectedHours),
       };
 
@@ -201,10 +195,16 @@ export default function UpdateService() {
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
                       >
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Necessário CNH?" />
+                          <SelectValue>
+                            {field.value == "0"
+                              ? "Não"
+                              : field.value == "1"
+                                ? "Sim"
+                                : "Selecione"}
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="0">Não</SelectItem>
