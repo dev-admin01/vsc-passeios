@@ -6,7 +6,7 @@ const serviceSchema = z.object({
   description: z
     .string()
     .min(1, { message: "Descrição do passeio obrigatória." }),
-  type: z.string().min(1, { message: "Escolha o tipo de passeio" }),
+  type: z.string().min(1, { message: "Defino se é necessário CNH" }),
   price: z.string().min(1, { message: "Informe o valor do passeio" }),
   observation: z.string(),
   time: z.array(z.string()).optional(),
@@ -19,7 +19,7 @@ export function useServiceForm() {
     resolver: zodResolver(serviceSchema),
     defaultValues: {
       description: "",
-      type: "1",
+      type: "",
       price: "",
       observation: "",
     },

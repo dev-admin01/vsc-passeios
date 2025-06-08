@@ -40,8 +40,8 @@ import Link from "next/link";
 export default function NewServices() {
   const [selectedHours, setSelectedHours] = useState<string[]>([]);
   const [hoursModalIsOpen, setHoursModalIsOpen] = useState(false);
-  const form = useServiceForm();
   const { createService } = useCreateService();
+  const form = useServiceForm();
 
   function generateTimeSlots(): string[] {
     const hours: string[] = [];
@@ -133,11 +133,12 @@ export default function NewServices() {
                   <FormItem>
                     <FormLabel>Carteira de motorista</FormLabel>
                     <FormControl>
-                      <Select onValueChange={field.onChange} defaultValue="0">
+                      <Select onValueChange={field.onChange} defaultValue="2">
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Necessário CNH?" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="2">Selecione</SelectItem>
                           <SelectItem value="0">Não</SelectItem>
                           <SelectItem value="1">Sim</SelectItem>
                         </SelectContent>
