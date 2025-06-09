@@ -9,6 +9,9 @@ interface DocsPayload {
   ddi?: string;
   ddd?: string;
   phone?: string;
+  hotel?: string;
+  hotelCheckin?: string;
+  hotelCheckout?: string;
   compPag?: string;
   cnh?: string;
 }
@@ -29,7 +32,7 @@ export const usePostDocsCostumer = () => {
           : undefined,
         cnh: costumerData.cnh ? compressBase64(costumerData.cnh) : undefined,
       };
-
+      console.log(compressedData);
       const response = await api.put("/api/orderdocs", compressedData, {
         headers: {
           "Content-Type": "application/json",

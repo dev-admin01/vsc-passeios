@@ -138,8 +138,9 @@ export default function ClientOrderDocumentation({
   const [ddi, setDdi] = useState("");
   const [ddd, setDdd] = useState("");
   const [phone, setPhone] = useState("");
-
-  // Campos base64
+  const [hotel, setHotel] = useState<string>("");
+  const [hotelCheckin, setHotelCheckin] = useState<string>("");
+  const [hotelCheckout, setHotelCheckout] = useState<string>("");
   const [compPag, setCompPag] = useState<string>("");
   const [cnh, setCnh] = useState<string>("");
 
@@ -256,15 +257,20 @@ export default function ClientOrderDocumentation({
         ddi,
         ddd,
         phone,
+        hotel,
+        hotelCheckin,
+        hotelCheckout,
         compPag,
         cnh,
       };
 
       const response = await postDoc(payload);
 
+      console.log("1232312", response);
+
       if (response.status_code === 200) {
         toast.success("Documentos enviados com sucesso!");
-        router.push(`/orderdocumentation/${idOrder}`);
+        router.refresh();
       } else {
         toast.error(response.message);
       }
@@ -426,6 +432,29 @@ export default function ClientOrderDocumentation({
                 <Input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
+              <div className="w-1/2 p-2">
+                <label className="font-semibold">Hotel:</label>
+                <Input
+                  value={hotel}
+                  onChange={(e) => setHotel(e.target.value)}
+                />
+              </div>
+              <div className="w-1/4 p-2">
+                <label className="font-semibold">Check-in:</label>
+                <Input
+                  type="date"
+                  value={hotelCheckin || ""}
+                  onChange={(e) => setHotelCheckin(e.target.value)}
+                />
+              </div>
+              <div className="w-1/4 p-2">
+                <label className="font-semibold">Check-out:</label>
+                <Input
+                  type="date"
+                  value={hotelCheckout || ""}
+                  onChange={(e) => setHotelCheckout(e.target.value)}
                 />
               </div>
 
