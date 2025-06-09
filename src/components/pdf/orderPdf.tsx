@@ -42,6 +42,7 @@ function formatCurrency(value: string | number | undefined) {
 
 export default function OrderPDF({ pdfData }: PDFData) {
   const { order, condPag } = pdfData;
+  console.log("order", order);
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -79,9 +80,9 @@ export default function OrderPDF({ pdfData }: PDFData) {
         <View style={styles.servicesContainer}>
           <View style={styles.serviceRow}>
             <Text style={styles.serviceDescription}>Descrição</Text>
-            <Text style={styles.serviceDescription}>Quantidade</Text>
+            <Text style={styles.serviceQuantity}>Quantidade</Text>
             <Text style={styles.servicePrice}>Preço</Text>
-            <Text style={styles.serviceDiscount}>Desconto</Text>
+            <Text style={styles.serviceDiscount}>Horário</Text>
             <Text style={styles.serviceDate}>Data sugerida</Text>
           </View>
           {order.orders_service.map((service, index) => (
@@ -89,14 +90,12 @@ export default function OrderPDF({ pdfData }: PDFData) {
               <Text style={styles.serviceDescription}>
                 {service.service.description}
               </Text>
-              <Text style={styles.serviceDescription}>{service.quantity}</Text>
+              <Text style={styles.serviceQuantity}>{service.quantity}</Text>
               <Text style={styles.servicePrice}>
                 {formatCurrency(service.price)}
               </Text>
               <Text style={styles.serviceDiscount}>
-                {formatCurrency(
-                  order.orders_service[index].discount?.toString() || "0"
-                )}
+                {order.orders_service[index].time}
               </Text>
               <Text style={styles.serviceDate}>
                 {new Date(
@@ -235,6 +234,11 @@ const styles = StyleSheet.create({
   serviceDescription: {
     fontSize: 10,
     flex: 1,
+  },
+  serviceQuantity: {
+    fontSize: 10,
+    width: 80,
+    textAlign: "right",
   },
   servicePrice: {
     fontSize: 10,

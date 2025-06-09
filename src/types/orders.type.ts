@@ -31,6 +31,7 @@ export interface OrderPDFProps {
     price: string;
     suggested_date: string;
     quantity: number;
+    time: string;
     service: {
       description: string;
     };
