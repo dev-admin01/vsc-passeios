@@ -1,20 +1,15 @@
 import { api } from "@/services/api";
-import { mutate } from "swr";
+import { CustomerFormData } from "@/app/customers/customer-form";
+import { getCookieclient } from "@/lib/cookieClient";
 
-interface UpdateCustomerData {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-}
-
-export function useUpdateCustomer() {
-  const updateCustomer = async (data: UpdateCustomerData) => {
-    const { id, ...rest } = data;
-    const response = await api.put(`/api/customers/${id}`, rest);
-    await mutate("/api/customers");
+export const useUpdateCustomer = () => {
+  const updateCustomer = async (id: string, data: CustomerFormData) => {
+    const token = await getCookieclient();
+    const response = await api.put(`/api/customers/${id}`, data, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     return response.data;
   };
 
   return { updateCustomer };
-}
+};

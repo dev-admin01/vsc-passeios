@@ -271,12 +271,12 @@ export default function ClientOrderDocumentation({
       if (response.status_code === 200) {
         toast.success("Documentos enviados com sucesso!");
         router.refresh();
+        setIsSaving(false);
       } else {
         toast.error(response.message);
       }
     } catch (error) {
       console.error("Erro ao enviar documentos:", error);
-    } finally {
       setIsSaving(false);
     }
   };

@@ -1,22 +1,12 @@
-import useSWR from "swr";
 import { api } from "@/services/api";
+import { GetCustomerResponse } from "@/types/custumer.type";
+import { getCookieclient } from "@/lib/cookieClient";
 
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  createdAt: string;
-}
-
-export function useCustomer() {
-  const { data: customers, isLoading } = useSWR<Customer[]>(
-    "/customers",
-    async () => {
-      const response = await api.get("/customers");
-      return response.data;
-    }
-  );
-
-  return { customers, isLoading };
-}
+export const fetchCustomer = async (id: string) => {
+  const token = await getCookieclient();
+  const response = await api.get<GetCustomerResponse>(`/api/customers/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  console.log("cliente hook", response.data);
+  return response.data;
+};

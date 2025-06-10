@@ -1,16 +1,21 @@
 import { api } from "@/services/api";
 import { mutate } from "swr";
-
-interface CreateCustomerData {
-  name: string;
-  email: string;
-  phone: string;
-}
+import { CreateCustomerData } from "@/types/custumer.type";
+import { getCookieclient } from "@/lib/cookieClient";
 
 export function useCreateCustomer() {
   const createCustomer = async (data: CreateCustomerData) => {
-    const response = await api.post("/customers", data);
+    const token = await getCookieclient();
+    data.cpf_cnpj = data.cpf_cnpj.replace(/\D/g, "");
+    data.telefone = data.telefone.replace(/\D/g, "");
+    console.log(data);
+    const response = await api.post("/api/customers", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     await mutate("/customers");
+    console.log(response.data);
     return response.data;
   };
 

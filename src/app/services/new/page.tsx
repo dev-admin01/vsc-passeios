@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ServiceFormData, useServiceForm } from "./service-form";
 import {
   Form,
@@ -111,7 +111,6 @@ export default function NewServices() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
-            <CardHeader>Novo Passeio</CardHeader>
             <CardContent className="space-y-6">
               <FormField
                 control={form.control}
