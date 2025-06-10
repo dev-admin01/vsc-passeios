@@ -3,8 +3,8 @@ import { mutate } from "swr";
 
 export function useDeleteCustomer() {
   const deleteCustomer = async (customerId: string) => {
-    await api.delete(`/customers/${customerId}`);
-    await mutate("/customers");
+    await api.delete(`/api/customers/${customerId}`);
+    await mutate("/api/customers");
   };
 
   return { deleteCustomer };
