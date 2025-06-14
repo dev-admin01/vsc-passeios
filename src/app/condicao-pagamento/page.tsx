@@ -151,7 +151,10 @@ export default function CondicaoPagamentoPage() {
       <CreateCondicaoModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={() => {}}
+        onSuccess={() => {
+          setIsCreateModalOpen(false);
+          setSearch("");
+        }}
       />
     </div>
   );

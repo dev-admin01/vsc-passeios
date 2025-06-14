@@ -48,7 +48,6 @@ export default function CouponsPage() {
       }
     }
   };
-  console.log("data", data);
 
   return (
     <div className="sm:ml-17 p-4 min-h-screen bg-sky-100">
