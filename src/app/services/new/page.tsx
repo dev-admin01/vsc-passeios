@@ -40,6 +40,7 @@ import Link from "next/link";
 export default function NewServices() {
   const [selectedHours, setSelectedHours] = useState<string[]>([]);
   const [hoursModalIsOpen, setHoursModalIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { createService } = useCreateService();
   const form = useServiceForm();
 
@@ -63,15 +64,21 @@ export default function NewServices() {
         ? prev.filter((h) => h !== hour)
         : [...prev, hour].sort()
     );
-    console.log(selectedHours);
   }
 
   async function onSubmit(values: ServiceFormData) {
+    setIsLoading(true);
+    if (selectedHours.length === 0) {
+      toast.error("Selecione pelo menos um horário", { closeButton: true });
+      setIsLoading(false);
+      return;
+    }
+
     const serviceData = {
       ...values,
       time: selectedHours,
     };
-    console.log(serviceData);
+
     const service = await createService(serviceData);
 
     if (service.status !== 201) {
@@ -81,6 +88,7 @@ export default function NewServices() {
     toast.success(service.data.message, { closeButton: true });
     form.reset();
     setSelectedHours([]);
+    setIsLoading(false);
   }
 
   function changeCurrency(event: React.ChangeEvent<HTMLInputElement>) {
@@ -239,9 +247,10 @@ export default function NewServices() {
 
               <Button
                 type="submit"
-                className="w-full bg-sky-300 hover:bg-sky-800 text-black"
+                className="w-full bg-sky-300 hover:bg-sky-800 text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isLoading}
               >
-                Salvar Passeio
+                {isLoading ? "Salvando..." : "Salvar Passeio"}
               </Button>
             </CardContent>
           </Card>
