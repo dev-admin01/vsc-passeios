@@ -93,7 +93,7 @@ export function CreateCouponModal({
           <div className="space-y-2">
             <Label htmlFor="midia">Mídia</Label>
             <Select value={idMidia} onValueChange={setIdMidia} required>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white w-full">
                 <SelectValue placeholder="Selecione uma mídia" />
               </SelectTrigger>
               <SelectContent>

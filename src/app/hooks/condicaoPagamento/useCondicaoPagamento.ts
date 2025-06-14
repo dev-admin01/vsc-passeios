@@ -22,7 +22,7 @@ export interface GetCondicaoPagamentoResponse {
 
 export interface CreateCondicaoPagamentoResponse {
   message: string;
-  condicao: CondicaoPagamento;
+  condicaoPagamento: CondicaoPagamento;
   status_code: number;
 }
 
@@ -66,11 +66,10 @@ export function useCondicaoPagamento(
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log(response.status);
       if (response.status === 201) {
-        toast.success("Condição de pagamento criada com sucesso!");
+        toast.success(response.data.message);
         mutate();
-        return response.data.condicao;
+        return response.data.condicaoPagamento;
       }
       return null;
     } catch (error) {
@@ -95,9 +94,9 @@ export function useCondicaoPagamento(
       );
 
       if (response.status === 200) {
-        toast.success("Condição de pagamento atualizada com sucesso!");
+        toast.success(response.data.message);
         mutate();
-        return response.data.condicao;
+        return response.data.condicaoPagamento;
       }
       return null;
     } catch (error) {

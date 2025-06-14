@@ -31,6 +31,7 @@ export function CreateCondicaoModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const condicao = await createCondicao(description, installments, discount);
+    console.log(condicao);
     if (condicao) {
       setDescription("");
       setInstallments("");
