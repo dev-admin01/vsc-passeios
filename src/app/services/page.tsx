@@ -18,12 +18,13 @@ import { useServices } from "@/app/hooks/service/useServices";
 import { useDeleteService } from "@/app/hooks/service/useDeleteService";
 
 import { Edit, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ServicesPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
-
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const { data, isLoading, error, mutate } = useServices(page, limit, search);
   const { deleteService } = useDeleteService();
 
@@ -41,11 +42,15 @@ export default function ServicesPage() {
     setServiceIdToDelete(null);
   }
   async function handleConfirmDelete() {
+    setIsDeleteLoading(true);
+
     if (serviceIdToDelete) {
-      await deleteService(serviceIdToDelete);
+      const response = await deleteService(serviceIdToDelete);
+      toast.success(response.message, { closeButton: true });
       mutate();
     }
     closeDeleteModal();
+    setIsDeleteLoading(false);
   }
 
   function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -172,8 +177,12 @@ export default function ServicesPage() {
               <Button variant="outline" onClick={closeDeleteModal}>
                 Cancelar
               </Button>
-              <Button variant="destructive" onClick={handleConfirmDelete}>
-                Excluir
+              <Button
+                variant="destructive"
+                onClick={handleConfirmDelete}
+                disabled={isDeleteLoading}
+              >
+                {isDeleteLoading ? "Excluindo..." : "Excluir"}
               </Button>
             </div>
           </div>
