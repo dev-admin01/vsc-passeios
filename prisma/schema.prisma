@@ -1,0 +1,231 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Position {
+  id_position       Int @id @default(autoincrement())
+  description       String @unique
+  users             User[]
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now())
+
+  @@map("positions")
+}
+
+model User {
+   id_user          String @id @default(uuid())
+   name             String @db.VarChar(256)
+   email            String @unique @db.VarChar(254)
+   password         String @db.VarChar(72)
+   positions        Position @relation(fields: [id_position], references: [id_position])
+   id_position      Int
+   ddi              String? @db.VarChar(3)
+   ddd              String? @db.VarChar(3)
+   phone            String? @db.VarChar(10)
+   created_at       DateTime @default(now())
+   updated_at       DateTime @default(now())
+ 
+   @@map("users") 
+   orders Order[]
+   orders_history OrderHistory[]
+   session Session[]
+   
+}
+
+model Session {
+  id_session String @id @default(uuid())
+  id_user String
+  user User @relation(fields: [id_user], references: [id_user])
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@map("sessions")
+}
+
+ model Service {
+  id_service       Int @id @default(autoincrement())
+  description      String 
+  type             String @db.VarChar(1)
+  price            String 
+  time             String
+  observation      String @db.Text
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now())
+
+  @@map("services")
+  
+  orders_service OrderService[]
+}
+
+model Customer {
+  id_customer   String   @id @default(uuid())
+  nome          String
+  email         String  @unique
+  cpf_cnpj      String? @unique
+  rg            String? @unique 
+  razao_social  String?
+  nome_fantasia String?
+  ddi           String?
+  ddd           String?
+  telefone      String?
+  indicacao     String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@map("customers")
+  orders Order[]
+}
+
+model Order {
+  id_order    String   @id @default(uuid())
+  order_number String?
+  link_signature String?
+
+  id_customer String?
+  customer    Customer? @relation(fields: [id_customer], references: [id_customer])
+
+  pre_name String?
+  pre_email String?
+  pre_ddi String?
+  pre_ddd String?
+  pre_phone String?
+
+  id_user String
+  user    User    @relation(fields: [id_user], references: [id_user])
+
+  price      String?
+  time       String
+
+  id_cond_pag String?
+  cond_pag CondicaoPagamento? @relation(fields: [id_cond_pag], references: [id_cond_pag])
+
+  id_coupons String?
+  coupons Coupon? @relation(fields: [id_coupons], references: [id_coupons])
+
+  hotel String?
+  hotel_checkin DateTime?
+  hotel_checkout DateTime?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  orders_service OrderService[]
+
+  orders_history OrderHistory[]
+
+  id_status_order Int?
+  status          OrderStatus? @relation(fields: [id_status_order], references: [id_status_order])
+
+  @@map("orders")
+  order_documentation OrderDocumentation[]
+}
+
+model OrderService {
+  id_order_service Int    @id @default(autoincrement())
+
+  id_order String
+  order    Order @relation(fields: [id_order], references: [id_order], onDelete: Cascade)
+
+  id_service Int
+  service    Service @relation(fields: [id_service], references: [id_service])
+
+  discount Decimal?
+  quantity Int?
+
+  suggested_date DateTime?
+  price          String?
+
+  time String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@map("orders_service")
+}
+
+model OrderDocumentation {
+  id_order_documentation Int      @id @default(autoincrement())
+  id_order               String
+  order                  Order   @relation(fields: [id_order], references: [id_order], onDelete: Cascade)
+  name                   String
+  file                   String   
+  created_at             DateTime @default(now())
+  updated_at             DateTime @default(now())
+  
+  @@map("orders_documentation")
+}
+
+model OrderHistory {
+  id_order_history Int @id @default(autoincrement())
+
+  id_order String
+  order    Order @relation(fields: [id_order], references: [id_order], onDelete: Cascade)
+
+  id_user String?
+  user    User? @relation(fields: [id_user], references: [id_user])
+
+  id_status_order Int
+  status OrderStatus @relation(fields: [id_status_order], references: [id_status_order])
+
+  created_at DateTime @default(now())
+
+  @@map("orders_history")
+}
+
+model OrderStatus {
+  id_status_order Int    @id @default(autoincrement())
+  description     String @unique
+  created_at      DateTime @default(now())
+
+  @@map("orders_status")
+  orders Order[]
+  orders_history OrderHistory[]
+}
+
+model Midia {
+  id_midia Int @id @default(autoincrement())
+  description String @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@map("midias")
+  coupon Coupon[]
+}
+
+model Coupon {
+  id_coupons String @id @default(uuid())
+  coupon String @db.VarChar(15) @unique  
+
+  discount String
+
+  id_midia Int
+  midia Midia @relation(fields: [id_midia], references: [id_midia])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@map("coupons")
+  orders Order[]
+}
+
+model CondicaoPagamento {
+  id_cond_pag String @id @default(uuid())
+
+  description String @unique
+
+  installments String @db.VarChar(2)
+
+  discount String @db.VarChar(3)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  orders Order[]
+
+  @@map("condicoes_pagamentos")
+}
