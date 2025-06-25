@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import {
   InternalServerError,
   MethodNotAllowedError,
@@ -7,7 +7,7 @@ import {
   UnauthorizedError,
 } from "./errors";
 
-function onNoMatchHandler(request: NextRequest) {
+function onNoMatchHandler() {
   const publicErrorObject = new MethodNotAllowedError();
   console.log("no onNoMatchHandler", publicErrorObject);
   return NextResponse.json(publicErrorObject, {
@@ -15,7 +15,7 @@ function onNoMatchHandler(request: NextRequest) {
   });
 }
 
-function onErrorHandler(error: Error, request: NextRequest) {
+function onErrorHandler(error: Error) {
   if (error instanceof ValidationError) {
     return NextResponse.json(error, {
       status: error.statusCode,
