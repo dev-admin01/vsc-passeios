@@ -3,13 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run services:up && next dev",
+    "dev": "npm run services:up && npm run services:wait:database && npm run migrations:up && next dev",
     "services:up": "docker compose -f infra/compose.yml up -d",
     "services:down": "docker compose -f infra/compose.yml down",
+    "services:stop": "docker compose stop",
     "test": "npm run services:up && concurrently -n next,jest --hide next -k -s command-jest \"next dev\" \"jest --runInBand --verbose\"",
     "build": "next build",
     "start": "next start",
     "test:watch": "jest --watchAll --runInBand --verbose",
+    "services:wait:database": "node infra/scripts/wait-for-postgres.js",
+    "migrations:up": "npx prisma migrate dev",
     "lint:prettier:check": "prettier --check .",
     "lint:prettier:fix": "prettier --write .",
     "lint:eslint:check": "next lint"
@@ -64,6 +67,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "3",
+    "@faker-js/faker": "^9.8.0",
     "@tailwindcss/postcss": "4",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "6.6.3",

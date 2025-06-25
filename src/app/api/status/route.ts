@@ -9,13 +9,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       status,
     });
-  } catch (error) {
-    return controller.errorHandlers.onError(error, request);
+  } catch (error: any) {
+    return controller.errorHandlers.onError(error);
   }
 }
 
-const unsupportedMethodHandler = (request: NextRequest) =>
-  controller.errorHandlers.onNoMatch(request);
+const unsupportedMethodHandler = () => controller.errorHandlers.onNoMatch();
 
 export const POST = unsupportedMethodHandler;
 export const PUT = unsupportedMethodHandler;

@@ -1,5 +1,6 @@
 import retry from "async-retry";
 import prismaClient from "../src/prisma/index";
+import migrator from "../src/models/migrator";
 
 // import { RunMigrationsService } from "../src/services/migrations/run_migrations_services";
 
@@ -31,15 +32,15 @@ async function clearDatabase() {
   }
 }
 
-// async function runPendingMigrations() {
-//   const migrationsService = new RunMigrationsService();
-//   await migrationsService.execute();
-// }
+async function runPendingMigrations() {
+  const migrations = await migrator.runMigrations();
+  return migrations;
+}
 
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
-  // runPendingMigrations,
+  runPendingMigrations,
 };
 
 export default orchestrator;

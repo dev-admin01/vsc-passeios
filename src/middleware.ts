@@ -5,9 +5,9 @@ export function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-// export const config = {
-//   matcher: ["/api/:path*"],
-// };
+export const config = {
+  matcher: ["/api/:path*"],
+};
 
 // import { NextRequest, NextResponse } from "next/server";
 // import { api } from "./services/api";

@@ -11,8 +11,6 @@ describe("GET /api/v1/status", () => {
 
       const responseBody = await response.json();
 
-      console.log(responseBody);
-
       const parseUpdatedAt = new Date(
         responseBody.status.updated_at
       ).toISOString();
