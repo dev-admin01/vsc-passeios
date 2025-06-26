@@ -1,8 +1,9 @@
 import retry from "async-retry";
 import prismaClient from "../src/prisma/index";
 import migrator from "../src/models/migrator";
+import user from "@/models/user";
 
-// import { RunMigrationsService } from "../src/services/migrations/run_migrations_services";
+import { faker } from "@faker-js/faker";
 
 async function waitForAllServices() {
   await waitForWebServices();
@@ -37,10 +38,23 @@ async function runPendingMigrations() {
   return migrations;
 }
 
+async function createUser(userData: any) {
+  return await user.createUser({
+    name: userData.name || faker.person.fullName(),
+    email: userData.email || faker.internet.email(),
+    password: userData.password || "senha123",
+    id_position: userData.id_position || 2,
+    ddi: userData.ddi || "55",
+    ddd: userData.ddd || "11",
+    phone: userData.phone || "999995555",
+  });
+}
+
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
   runPendingMigrations,
+  createUser,
 };
 
 export default orchestrator;
