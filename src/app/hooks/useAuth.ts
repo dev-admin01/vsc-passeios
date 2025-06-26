@@ -30,7 +30,7 @@ export function useAuth() {
 
   const login = async (
     email: string,
-    password: string
+    password: string,
   ): Promise<AuthResp | undefined> => {
     try {
       const response = await api.post<AuthResponse>("/api/auth", {

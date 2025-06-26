@@ -29,7 +29,7 @@ export interface CreateCondicaoPagamentoResponse {
 const fetchCondicoes = async (
   page: number,
   perpage: number,
-  search: string
+  search: string,
 ) => {
   const token = await getCookieclient();
   const response = await api.get<GetCondicaoPagamentoResponse>(
@@ -37,7 +37,7 @@ const fetchCondicoes = async (
     {
       params: { page, perpage, search },
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
   return response.data;
 };
@@ -45,25 +45,25 @@ const fetchCondicoes = async (
 export function useCondicaoPagamento(
   page: number = 1,
   perpage: number = 10,
-  search: string = ""
+  search: string = "",
 ) {
   const { data, error, isLoading, mutate } =
     useSWR<GetCondicaoPagamentoResponse>(
       ["get-condicoes", page, perpage, search],
-      () => fetchCondicoes(page, perpage, search)
+      () => fetchCondicoes(page, perpage, search),
     );
 
   const createCondicao = async (
     description: string,
     installments: string,
-    discount: string
+    discount: string,
   ): Promise<CondicaoPagamento | null> => {
     try {
       const token = await getCookieclient();
       const response = await api.post<CreateCondicaoPagamentoResponse>(
         "/api/condicao-pagamento",
         { description, installments, discount },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (response.status === 201) {
@@ -83,14 +83,14 @@ export function useCondicaoPagamento(
     id: string,
     description: string,
     installments: string,
-    discount: string
+    discount: string,
   ): Promise<CondicaoPagamento | null> => {
     try {
       const token = await getCookieclient();
       const response = await api.put<CreateCondicaoPagamentoResponse>(
         `/api/condicao-pagamento/${id}`,
         { description, installments, discount },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (response.status === 200) {

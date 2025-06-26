@@ -21,7 +21,7 @@ const fetchOrderDocs = async (orderId: string) => {
 export const useDocumentation = (orderId: string) => {
   const { data, error, isLoading, mutate } = useSWR<GetOrderDocsResponse>(
     ["get-order-docs", orderId],
-    () => fetchOrderDocs(orderId)
+    () => fetchOrderDocs(orderId),
   );
   return { data, error, isLoading, mutate };
 };

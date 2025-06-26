@@ -154,7 +154,7 @@ export default function ClientOrderDocumentation({
   // Ao selecionar arquivos, geramos o base64
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    setValue: React.Dispatch<React.SetStateAction<string>>
+    setValue: React.Dispatch<React.SetStateAction<string>>,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -518,7 +518,7 @@ export default function ClientOrderDocumentation({
                     <p>
                       Data Sugerida:{" "}
                       {new Date(service.suggestedDate).toLocaleDateString(
-                        "pt-BR"
+                        "pt-BR",
                       )}
                     </p>
                     {service.time && <p>Horário: {service.time}</p>}

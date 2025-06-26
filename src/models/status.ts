@@ -15,7 +15,7 @@ class VerifyStatusService {
       { max_connections: string }[]
     >("SHOW max_connections;");
     const databaseMaxConnectionsValue = parseInt(
-      databaseMaxConnectionsResult.max_connections
+      databaseMaxConnectionsResult.max_connections,
     );
     // Conexões ativas
     const databaseName = process.env.POSTGRES_DB;
@@ -24,7 +24,7 @@ class VerifyStatusService {
     const queryConnections = `
       SELECT count(*)::int AS count
       FROM pg_stat_activity
-      WHERE datname = $1;
+      WHERE datname = $1 AND state = 'active';
     `;
     const [databaseOpenedConnectionResult] = await prismaClient.$queryRawUnsafe<
       { count: number }[]
