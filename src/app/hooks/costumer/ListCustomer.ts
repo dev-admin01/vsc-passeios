@@ -6,7 +6,7 @@ import { getCookieclient } from "@/lib/cookieClient";
 const fetchCustomers = async (
   page: number,
   perpage: number,
-  search: string
+  search: string,
 ) => {
   const token = await getCookieclient();
   const response = await api.get<ListCustomerResponse>("/api/customers", {
@@ -25,7 +25,7 @@ const fetchCustomers = async (
 export function useCustomer(page: number, perpage: number, search: string) {
   const { data, error, isLoading, mutate } = useSWR<ListCustomerResponse>(
     ["get-customers", page, perpage, search],
-    () => fetchCustomers(page, perpage, search)
+    () => fetchCustomers(page, perpage, search),
   );
 
   return { data, error, isLoading, mutate };

@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import migrator from "../../../models/migrator";
 import controller from "../../../errors/controller";
 import { ServiceError } from "@/errors/errors";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const migrations = await migrator.defaultMigrations();
 
@@ -11,14 +11,14 @@ export async function GET(request: NextRequest) {
       {
         migrations,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     return controller.errorHandlers.onError(error);
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const migrations = await migrator.runMigrations();
     return NextResponse.json(migrations, { status: 201 });
@@ -31,3 +31,9 @@ export async function POST(request: NextRequest) {
     return controller.errorHandlers.onError(publicErrorObject);
   }
 }
+
+const unsupportedMethodHandler = () => controller.errorHandlers.onNoMatch();
+
+export const PUT = unsupportedMethodHandler;
+export const DELETE = unsupportedMethodHandler;
+export const PATCH = unsupportedMethodHandler;

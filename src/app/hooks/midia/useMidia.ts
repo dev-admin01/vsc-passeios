@@ -35,11 +35,11 @@ const fetchMidias = async (page: number, perpage: number, search: string) => {
 export function useMidia(
   page: number = 1,
   perpage: number = 10,
-  search: string = ""
+  search: string = "",
 ) {
   const { data, error, isLoading, mutate } = useSWR<GetMidiaResponse>(
     ["get-midias", page, perpage, search],
-    () => fetchMidias(page, perpage, search)
+    () => fetchMidias(page, perpage, search),
   );
 
   const createMidia = async (description: string): Promise<Midia | null> => {
@@ -48,7 +48,7 @@ export function useMidia(
       const response = await api.post<CreateMidiaResponse>(
         "/api/midia",
         { description },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (response.status === 201) {
@@ -66,14 +66,14 @@ export function useMidia(
 
   const updateMidia = async (
     id: number,
-    description: string
+    description: string,
   ): Promise<Midia | null> => {
     try {
       const token = await getCookieclient();
       const response = await api.put<CreateMidiaResponse>(
         `/api/midia/${id}`,
         { description },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (response.status === 200) {

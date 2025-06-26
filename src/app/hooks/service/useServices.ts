@@ -35,7 +35,7 @@ export const useServices = (page: number, perpage: number, search: string) => {
   // A chave do SWR será o array com strings e valores que mudam a cada nova consulta
   const { data, error, isLoading, mutate } = useSWR<ServicesResponse>(
     ["get-services", page, perpage, search],
-    () => fetchServices(page, perpage, search)
+    () => fetchServices(page, perpage, search),
   );
 
   return {

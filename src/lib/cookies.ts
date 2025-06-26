@@ -7,14 +7,14 @@ export function getCookieclient(name: string): string | undefined {
 export function setCookieclient(
   name: string,
   value: string,
-  options?: Cookies.CookieAttributes
+  options?: Cookies.CookieAttributes,
 ): string | undefined {
   return Cookies.set(name, value, options);
 }
 
 export function removeCookieclient(
   name: string,
-  options?: Cookies.CookieAttributes
+  options?: Cookies.CookieAttributes,
 ): void {
   Cookies.remove(name, options);
 }

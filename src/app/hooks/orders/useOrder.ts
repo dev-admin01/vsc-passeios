@@ -17,7 +17,7 @@ const fetchOrders = async (page: number, perpage: number, search: string) => {
 export const useOrders = (page: number, perpage: number, search: string) => {
   const { data, error, isLoading, mutate } = useSWR<OrdersResponse>(
     ["get-orders", page, perpage, search],
-    () => fetchOrders(page, perpage, search)
+    () => fetchOrders(page, perpage, search),
   );
   return { data, error, isLoading, mutate };
 };

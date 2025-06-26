@@ -52,11 +52,11 @@ const fetchCoupons = async (page: number, perpage: number, search: string) => {
 export function useCoupons(
   page: number = 1,
   perPage: number = 10,
-  search: string = ""
+  search: string = "",
 ) {
   const { data, error, mutate } = useSWR<GetCouponsResponse>(
     ["get-coupons", page, perPage, search],
-    () => fetchCoupons(page, perPage, search)
+    () => fetchCoupons(page, perPage, search),
   );
 
   const createCoupon = async (data: CreateCouponData) => {

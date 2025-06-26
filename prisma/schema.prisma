@@ -22,8 +22,8 @@ model User {
    name             String @db.VarChar(256)
    email            String @unique @db.VarChar(254)
    password         String @db.VarChar(72)
-   positions        Position @relation(fields: [id_position], references: [id_position])
    id_position      Int
+   positions        Position @relation(fields: [id_position], references: [id_position])
    ddi              String? @db.VarChar(3)
    ddd              String? @db.VarChar(3)
    phone            String? @db.VarChar(10)

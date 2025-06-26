@@ -18,30 +18,32 @@ async function main() {
   const password = "senha123";
   const passwordHash = await hash(password, 8);
 
-  await prisma.user.createMany({
-    data: [
-      {
-        name: "teste",
-        email: "teste@teste.com",
-        password: passwordHash,
-        id_position: 1,
-        ddi: "55",
-        ddd: "11",
-        phone: "999999999",
-      },
-      {
-        name: "seller",
-        email: "seller@teste.com",
-        password: passwordHash,
-        id_position: 3,
-        ddi: "55",
-        ddd: "11",
-        phone: "999999999",
-      },
-    ],
-    // Caso já existam dados, esse parâmetro evita duplicatas
-    skipDuplicates: true,
-  });
+  if (process.env.NODE_ENV !== "test") {
+    await prisma.user.createMany({
+      data: [
+        {
+          name: "teste",
+          email: "teste@teste.com",
+          password: passwordHash,
+          id_position: 1,
+          ddi: "55",
+          ddd: "11",
+          phone: "999999999",
+        },
+        {
+          name: "seller",
+          email: "seller@teste.com",
+          password: passwordHash,
+          id_position: 3,
+          ddi: "55",
+          ddd: "11",
+          phone: "999999999",
+        },
+      ],
+      // Caso já existam dados, esse parâmetro evita duplicatas
+      skipDuplicates: true,
+    });
+  }
 
   await prisma.orderStatus.createMany({
     data: [

@@ -22,7 +22,7 @@ import { toast } from "sonner";
 
 const formatPhoneNumber = (
   ddd: string | undefined,
-  phone: string | undefined
+  phone: string | undefined,
 ) => {
   if (!ddd || !phone) return "";
   const cleaned = phone.replace(/\D/g, "");

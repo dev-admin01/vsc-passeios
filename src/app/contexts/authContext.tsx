@@ -14,7 +14,7 @@ interface AuthProviderProps {
 }
 
 export const AuthContext = createContext<AuthContextType>(
-  {} as AuthContextType
+  {} as AuthContextType,
 );
 
 export function AuthProvider({

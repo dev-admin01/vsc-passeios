@@ -111,7 +111,7 @@ export class NotFoundError extends Error {
       options.message || "Não foi possível encontrar o recurso no sistema.",
       {
         cause: options.cause,
-      }
+      },
     );
 
     this.name = "NotFoundError";

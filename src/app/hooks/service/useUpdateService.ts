@@ -21,7 +21,7 @@ export const useUpdateService = () => {
       });
       return response.data;
     },
-    []
+    [],
   );
 
   return { updateService };
