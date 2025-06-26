@@ -1,19 +1,18 @@
-export interface createUserInput {
+export interface User {
+  id_user?: string;
   name: string;
   email: string;
   password: string;
-  id_position?: string;
+  id_position?: number;
   ddi?: string;
   ddd?: string;
   phone?: string;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
-export interface User {
-  id_user?: string;
-  name?: string;
-  email?: string;
-  password?: string;
-  id_position?: string;
+export interface UserInputValues extends User {
+  id_position: number;
 }
 
 export interface authUserInput {
