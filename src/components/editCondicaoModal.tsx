@@ -45,7 +45,7 @@ export function EditCondicaoModal({
       condicao.id_cond_pag,
       description,
       installments,
-      discount
+      discount,
     );
     if (updatedCondicao) {
       onSuccess();

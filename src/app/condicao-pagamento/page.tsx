@@ -35,7 +35,7 @@ export default function CondicaoPagamentoPage() {
   const { data, isLoading, deleteCondicao } = useCondicaoPagamento(
     page,
     perPage,
-    search
+    search,
   );
 
   const handleEdit = (condicao: CondicaoPagamento) => {

@@ -18,7 +18,7 @@ describe("GET /api/users/[id_user]", () => {
     const newUser = await orchestrator.createUser(userdata);
 
     const response = await fetch(
-      `http://localhost:3000/api/users/${newUser.id_user}`
+      `http://localhost:3000/api/users/${newUser.id_user}`,
     );
 
     const responseBody = await response.json();

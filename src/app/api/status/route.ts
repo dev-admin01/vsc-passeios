@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { VerifyStatusService } from "../../../models/status";
 import controller from "../../../errors/controller";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const statusService = new VerifyStatusService();
     const status = await statusService.execute();

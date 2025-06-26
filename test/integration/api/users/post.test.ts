@@ -55,11 +55,11 @@ describe("POST /api/users", () => {
 
       const correctPasswordMatch = await password.compare(
         userData.password,
-        userInDatabase?.password
+        userInDatabase?.password,
       );
       const incorrectPasswordMatch = await password.compare(
         "senhateste2",
-        userInDatabase.password
+        userInDatabase.password,
       );
 
       expect(correctPasswordMatch).toBe(true);
@@ -182,11 +182,11 @@ describe("POST /api/users", () => {
 
       const correctPasswordMatch = await password.compare(
         userData.password,
-        userInDatabase?.password
+        userInDatabase?.password,
       );
       const incorrectPasswordMatch = await password.compare(
         "senhateste2",
-        userInDatabase.password
+        userInDatabase.password,
       );
 
       expect(correctPasswordMatch).toBe(true);

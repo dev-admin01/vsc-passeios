@@ -13,7 +13,7 @@ import { PDFData } from "@/types/orders.type";
 function toTitleCase(str: string) {
   return str.replace(
     /\w\S*/g,
-    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
   );
 }
 function formatPhone(phone: string) {
@@ -99,7 +99,7 @@ export default function OrderPDF({ pdfData }: PDFData) {
               </Text>
               <Text style={styles.serviceDate}>
                 {new Date(
-                  order.orders_service[index].suggested_date
+                  order.orders_service[index].suggested_date,
                 ).toLocaleDateString("pt-BR")}
               </Text>
             </View>
@@ -137,7 +137,7 @@ export default function OrderPDF({ pdfData }: PDFData) {
                   desconto por{" "}
                   {formatCurrency(
                     parseFloat(order.price?.replace(",", ".") || "0") *
-                      (1 - parseFloat(condPag.discount) / 100)
+                      (1 - parseFloat(condPag.discount) / 100),
                   )}
                 </Text>
               )

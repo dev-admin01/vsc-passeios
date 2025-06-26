@@ -30,7 +30,7 @@ export default function ServicesPage() {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [serviceIdToDelete, setServiceIdToDelete] = useState<number | null>(
-    null
+    null,
   );
 
   function openDeleteModal(id: number) {

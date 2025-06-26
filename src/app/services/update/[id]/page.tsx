@@ -66,7 +66,7 @@ export default function UpdateService() {
     setSelectedHours((prev) =>
       prev.includes(hour)
         ? prev.filter((h) => h !== hour)
-        : [...prev, hour].sort()
+        : [...prev, hour].sort(),
     );
   }
 
@@ -287,7 +287,7 @@ export default function UpdateService() {
                             className={cn(
                               "h-10",
                               selectedHours.includes(hour) &&
-                                "border-2 border-sky-500 text-primary font-semibold"
+                                "border-2 border-sky-500 text-primary font-semibold",
                             )}
                             onClick={() => toggleHour(hour)}
                           >

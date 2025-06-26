@@ -40,7 +40,7 @@ async function update(id_user: string, userInputValues: UserInputValues) {
 
   async function runUpdateQuery(
     id_user: string,
-    userInputValues: UserInputValues
+    userInputValues: UserInputValues,
   ) {
     const updatedUser = await prismaClient.user.update({
       where: { id_user },

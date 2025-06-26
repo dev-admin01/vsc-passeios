@@ -40,8 +40,8 @@ async function runMigrations() {
       if (code !== 0) {
         return reject(
           new Error(
-            `Migrações falharam com código ${code}\nLog: ${migrateOutput}`
-          )
+            `Migrações falharam com código ${code}\nLog: ${migrateOutput}`,
+          ),
         );
       }
 
@@ -65,7 +65,7 @@ async function runMigrations() {
       prismaSeed.on("close", (seedCode) => {
         if (seedCode !== 0) {
           return reject(
-            new Error(`Seed falhou com código ${seedCode}\nLog: ${seedOutput}`)
+            new Error(`Seed falhou com código ${seedCode}\nLog: ${seedOutput}`),
           );
         }
 
@@ -81,7 +81,7 @@ async function runMigrations() {
         // Extrair nomes das migrações aplicadas
         const startIndex = migrateOutput.indexOf("migrations/");
         const endIndex = migrateOutput.indexOf(
-          "All migrations have been successfully applied."
+          "All migrations have been successfully applied.",
         );
 
         // Se não achar, usa o output inteiro

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id_user: string }> }
+  { params }: { params: Promise<{ id_user: string }> },
 ) {
   const { id_user } = await params;
   try {
@@ -17,7 +17,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id_user: string }> }
+  { params }: { params: Promise<{ id_user: string }> },
 ) {
   const { id_user } = await params;
   const userInputValues = await request.json();
@@ -31,7 +31,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id_user: string }> }
+  { params }: { params: Promise<{ id_user: string }> },
 ) {
   const { id_user } = await params;
   try {
@@ -41,3 +41,6 @@ export async function DELETE(
     return controller.errorHandlers.onError(error);
   }
 }
+const unsupportedMethodHandler = () => controller.errorHandlers.onNoMatch();
+export const POST = unsupportedMethodHandler;
+export const PATCH = unsupportedMethodHandler;

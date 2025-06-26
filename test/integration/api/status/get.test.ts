@@ -14,18 +14,18 @@ describe("GET /api/status", () => {
       const responseBody = await response.json();
 
       const parseUpdatedAt = new Date(
-        responseBody.status.updated_at
+        responseBody.status.updated_at,
       ).toISOString();
       expect(responseBody.status.updated_at).toEqual(parseUpdatedAt);
 
       expect(responseBody.status.dependencies.database.version).toEqual("16.0");
 
       expect(responseBody.status.dependencies.database.max_connections).toEqual(
-        100
+        100,
       );
 
       expect(
-        responseBody.status.dependencies.database.opened_connections
+        responseBody.status.dependencies.database.opened_connections,
       ).toEqual(1);
     });
   });

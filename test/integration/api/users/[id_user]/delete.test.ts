@@ -40,7 +40,7 @@ describe("DELETE /api/users/[id_user]", () => {
       `http://localhost:3000/api/users/${newUser.id_user}`,
       {
         method: "DELETE",
-      }
+      },
     );
 
     expect(response.status).toBe(200);

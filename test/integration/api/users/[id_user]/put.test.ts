@@ -43,7 +43,7 @@ describe("PUT /api/users/[id_user]", () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(userUpdatedData),
-        }
+        },
       );
 
       const responseBody = await response.json();
@@ -75,7 +75,7 @@ describe("PUT /api/users/[id_user]", () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(userUpdatedData),
-        }
+        },
       );
 
       expect(response.status).toBe(200);
@@ -105,11 +105,12 @@ describe("PUT /api/users/[id_user]", () => {
 
       const correctPasswordMatch = await password.compare(
         "senhaNova",
-        userInDatabase?.password
+
+        userInDatabase?.password,
       );
       const incorrectPasswordMatch = await password.compare(
         "senhaAntiga",
-        userInDatabase.password
+        userInDatabase.password,
       );
 
       expect(correctPasswordMatch).toBe(true);
@@ -140,7 +141,7 @@ describe("PUT /api/users/[id_user]", () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(userUpdatedData),
-        }
+        },
       );
 
       expect(response.status).toBe(200);

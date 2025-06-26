@@ -33,7 +33,7 @@ export default function NewCustomerPage() {
 
       localStorage.setItem(
         "CustomerSuccessMessage",
-        response.message || "Cliente criado com sucesso!"
+        response.message || "Cliente criado com sucesso!",
       );
 
       router.push("/customers");

@@ -80,7 +80,7 @@ export default function OrdersPage() {
 
   const [isRegisterLinkModalOpen, setIsRegisterLinkModalOpen] = useState(false);
   const [orderToRegisterLink, setOrderToRegisterLink] = useState<string | null>(
-    null
+    null,
   );
   const [orderToRegisterLinkNumber, setOrderToRegisterLinkNumber] = useState<
     string | null
@@ -287,7 +287,7 @@ export default function OrdersPage() {
 
         mutate();
         toast.success(
-          `Documentos do orçamento ${orderToDocumentNumber} validados com sucesso!`
+          `Documentos do orçamento ${orderToDocumentNumber} validados com sucesso!`,
         );
         setIsDocumentModalOpen(false);
         setOrderToDocument(null);
@@ -379,7 +379,7 @@ export default function OrdersPage() {
                           onClick={() =>
                             openClientApprovedModal(
                               order.id_order,
-                              order.order_number
+                              order.order_number,
                             )
                           }
                           title="Aprovar orçamento"
@@ -416,7 +416,7 @@ export default function OrdersPage() {
                           onClick={() =>
                             openRegisterLinkModal(
                               order.id_order,
-                              order.order_number
+                              order.order_number,
                             )
                           }
                           title="Enviar cadastro"
@@ -432,7 +432,7 @@ export default function OrdersPage() {
                           onClick={() =>
                             openDocumentModal(
                               order.id_order,
-                              order.order_number
+                              order.order_number,
                             )
                           }
                           title="Analisar documentos"

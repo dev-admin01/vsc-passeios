@@ -15,7 +15,7 @@ class VerifyStatusService {
       { max_connections: string }[]
     >("SHOW max_connections;");
     const databaseMaxConnectionsValue = parseInt(
-      databaseMaxConnectionsResult.max_connections
+      databaseMaxConnectionsResult.max_connections,
     );
     // Conexões ativas
     const databaseName = process.env.POSTGRES_DB;
