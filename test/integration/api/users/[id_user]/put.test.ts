@@ -105,7 +105,6 @@ describe("PUT /api/users/[id_user]", () => {
 
       const correctPasswordMatch = await password.compare(
         "senhaNova",
-
         userInDatabase?.password,
       );
       const incorrectPasswordMatch = await password.compare(

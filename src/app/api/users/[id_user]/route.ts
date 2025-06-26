@@ -41,6 +41,8 @@ export async function DELETE(
     return controller.errorHandlers.onError(error);
   }
 }
+
 const unsupportedMethodHandler = () => controller.errorHandlers.onNoMatch();
+
 export const POST = unsupportedMethodHandler;
 export const PATCH = unsupportedMethodHandler;

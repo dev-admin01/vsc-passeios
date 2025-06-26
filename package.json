@@ -8,14 +8,15 @@
     "services:down": "docker compose -f infra/compose.yml down",
     "services:stop": "docker compose stop",
     "test": "npm run services:up && concurrently -n next,jest --hide next -k -s command-jest \"next dev\" \"jest --runInBand --verbose\"",
-    "build": "next build",
+    "build": "npm run prisma:generate && next build",
     "start": "next start",
     "test:watch": "jest --watchAll --runInBand --verbose",
     "services:wait:database": "node infra/scripts/wait-for-postgres.js",
     "migrations:up": "npx prisma migrate dev",
     "lint:prettier:check": "prettier --check .",
     "lint:prettier:fix": "prettier --write .",
-    "lint:eslint:check": "next lint"
+    "lint:eslint:check": "next lint",
+    "prisma:generate": "npx prisma generate"
   },
   "prisma": {
     "seed": "ts-node ./prisma/seed.ts"

@@ -2,7 +2,6 @@ import controller from "@/errors/controller";
 import user from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
 
-
 const unsupportedMethodHandler = () => controller.errorHandlers.onNoMatch();
 
 export async function POST(request: NextRequest) {
