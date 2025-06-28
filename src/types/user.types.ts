@@ -4,9 +4,9 @@ export interface User {
   email: string;
   password: string;
   id_position?: number;
-  ddi?: string;
-  ddd?: string;
-  phone?: string;
+  ddi?: string | null;
+  ddd?: string | null;
+  phone?: string | null;
   created_at?: Date;
   updated_at?: Date;
 }

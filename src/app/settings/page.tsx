@@ -2,13 +2,19 @@
 
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { Settings, Image, CreditCard } from "lucide-react";
+import { Settings, Image, CreditCard, Users } from "lucide-react";
 import { Sidebar } from "@/components/sidebar";
 
 export default function SettingsPage() {
   const router = useRouter();
 
   const settingsCards = [
+    {
+      title: "Usuários",
+      description: "Gerencie usuários do sistema",
+      icon: <Users className="w-6 h-6" />,
+      path: "/users",
+    },
     {
       title: "Mídia",
       description: "Gerencie suas mídias",

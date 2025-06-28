@@ -1,14 +1,19 @@
-type AuthContextType = {
+import { User } from "./user.types";
+
+export type AuthContextType = {
   user: User | null;
   login: (user: User) => void;
   logout: () => void;
 };
 
-type User = {
-  id_user: string;
-  name: string;
-  email: string;
+export type AuthResponse = {
   token: string;
+  authenticatedUser: User;
 };
 
-export type { AuthContextType, User };
+export type AuthErrorResponse = {
+  name: string;
+  message: string;
+  action: string;
+  status_code: number;
+};

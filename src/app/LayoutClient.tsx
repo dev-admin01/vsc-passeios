@@ -11,7 +11,8 @@ export default function LayoutClient({
 }) {
   // Podemos usar hooks de client aqui
   const pathname = usePathname();
-  const hideSidebar = pathname === "/" || pathname === "/status";
+  const hideSidebar =
+    pathname === "/" || pathname === "/status" || pathname === "/login";
 
   return (
     <>
