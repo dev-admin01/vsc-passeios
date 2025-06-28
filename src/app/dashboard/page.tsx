@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -9,11 +11,28 @@ import { Sidebar } from "@/components/sidebar";
 
 import { ChartOverview } from "@/components/chart/index";
 import { Brain, Clock10, DollarSign, ShoppingBagIcon } from "lucide-react";
+import { useAuthContext } from "../contexts/authContext";
 
 export default function Dashboard() {
+  const { user } = useAuthContext();
+
   return (
     <main className="sm:ml-17 min-h-screen  p-4 bg-sky-100">
       <Sidebar />
+      <div className="p-6 sm:-mt-15">
+        <div className="mb-4">
+          {user && (
+            <p className="text-gray-600">
+              Bem-vindo,{" "}
+              <span className="font-semibold">
+                {user.name.split(" ")[0].charAt(0).toUpperCase() +
+                  user.name.split(" ")[0].slice(1).toLowerCase()}
+              </span>
+              !
+            </p>
+          )}
+        </div>
+      </div>
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Card className="bg-sky-200">
           <CardHeader>

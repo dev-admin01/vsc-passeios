@@ -109,6 +109,8 @@ async function findOneByEmail(email: string) {
         action: "Verifique se o email está correto.",
       });
     }
+
+    return user;
   }
 }
 
@@ -147,10 +149,64 @@ async function deleteUser(id_user: string) {
   }
 }
 
+async function findAllWithPagination({
+  page = 1,
+  perpage = 10,
+  search = "",
+}: {
+  page?: number;
+  perpage?: number;
+  search?: string;
+}) {
+  const offset = (page - 1) * perpage;
+
+  const whereClause = search
+    ? {
+        OR: [
+          { name: { contains: search, mode: "insensitive" as const } },
+          { email: { contains: search, mode: "insensitive" as const } },
+        ],
+      }
+    : {};
+
+  const [users, totalCount] = await Promise.all([
+    prismaClient.user.findMany({
+      where: whereClause,
+      skip: offset,
+      take: perpage,
+      orderBy: { created_at: "desc" },
+      select: {
+        id_user: true,
+        name: true,
+        email: true,
+        id_position: true,
+        ddi: true,
+        ddd: true,
+        phone: true,
+        created_at: true,
+        updated_at: true,
+        // Não retorna a senha por segurança
+      },
+    }),
+    prismaClient.user.count({ where: whereClause }),
+  ]);
+
+  const lastPage = Math.ceil(totalCount / perpage);
+
+  return {
+    users,
+    page,
+    perpage,
+    totalCount,
+    lastPage,
+  };
+}
+
 const user = {
   createUser,
   findOneById,
   findOneByEmail,
+  findAllWithPagination,
   update,
   delete: deleteUser,
 };

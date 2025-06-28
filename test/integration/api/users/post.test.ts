@@ -77,7 +77,7 @@ describe("POST /api/users", () => {
         phone: "999995555",
       };
 
-      const response = await fetch("http://localhost:3000/api/users", {
+      await fetch("http://localhost:3000/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

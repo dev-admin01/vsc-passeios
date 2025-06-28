@@ -1,12 +1,29 @@
 "use client";
 
-import React, { createContext, useContext, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
 import { useAuth } from "../hooks/useAuth";
-import { AuthResp } from "../hooks/useAuth";
+import { AuthResponse, AuthErrorResponse } from "@/types/auth.types";
+import { api } from "@/services/api";
+
+interface User {
+  name: string;
+  email: string;
+}
 
 interface AuthContextType {
-  login: (email: string, password: string) => Promise<AuthResp | undefined>;
+  user: User | null;
+  login: (
+    email: string,
+    password: string,
+  ) => Promise<AuthResponse | AuthErrorResponse | undefined>;
   logout: () => void;
+  setUser: (user: User | null) => void;
 }
 
 interface AuthProviderProps {
@@ -20,10 +37,51 @@ export const AuthContext = createContext<AuthContextType>(
 export function AuthProvider({
   children,
 }: AuthProviderProps): React.ReactElement {
-  const { login, logout } = useAuth();
+  const [user, setUser] = useState<User | null>(null);
+  const { login: originalLogin, logout: originalLogout } = useAuth();
+
+  // Busca dados do usuário ao carregar o contexto
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await api.get("/api/me");
+        if (response.status === 200) {
+          setUser(response.data);
+          console.log("User loaded from API:", response.data);
+        }
+      } catch (error) {
+        console.log("Usuário não autenticado ou erro ao buscar dados");
+        console.log(error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    const result = await originalLogin(email, password);
+
+    console.log("AuthContext login result:", result);
+
+    // Se login foi bem-sucedido, armazena os dados do usuário
+    if (result && "authenticatedUser" in result) {
+      console.log("Setting user:", result.authenticatedUser);
+      setUser({
+        name: result.authenticatedUser.name,
+        email: result.authenticatedUser.email,
+      });
+    }
+
+    return result;
+  };
+
+  const logout = async () => {
+    await originalLogout();
+    setUser(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );
