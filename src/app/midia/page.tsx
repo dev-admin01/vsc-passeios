@@ -11,18 +11,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Sidebar } from "@/components/sidebar";
-import { useMidia, Midia } from "../hooks/midia/useMidia";
+import { useMidia } from "../hooks/midia/useMidia";
 import { Edit, Trash2, Plus } from "lucide-react";
 import { EditMidiaModal } from "../../components/editMidiaModal";
 import { DeleteMidiaModal } from "../../components/deleteMidiaModal";
 import { CreateMidiaModal } from "../../components/createMidiaModal";
 import { Input } from "@/components/ui/input";
+import { Midia } from "@/types/midia.types";
 
 export default function MidiaPage() {
   const [selectedMidia, setSelectedMidia] = useState<Midia | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [isCreateLoading, setIsCreateLoading] = useState(false);
   // const [page, setPage] = useState(1);
   const page = 1;
   const [search, setSearch] = useState("");
@@ -42,9 +45,11 @@ export default function MidiaPage() {
 
   const handleDeleteConfirm = async () => {
     if (selectedMidia) {
-      const success = await deleteMidia(selectedMidia.id_midia);
+      setIsDeleteLoading(true);
+      const success = await deleteMidia(selectedMidia.id_midia!);
       if (success) {
         setIsDeleteModalOpen(false);
+        setIsDeleteLoading(false);
       }
     }
   };
@@ -95,7 +100,9 @@ export default function MidiaPage() {
                 <TableRow key={midia.id_midia}>
                   <TableCell>{midia.description}</TableCell>
                   <TableCell>
-                    {new Date(midia.created_at).toLocaleDateString()}
+                    {midia.created_at
+                      ? new Date(midia.created_at).toLocaleDateString()
+                      : "N/A"}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
@@ -132,6 +139,7 @@ export default function MidiaPage() {
             isOpen={isDeleteModalOpen}
             onClose={() => setIsDeleteModalOpen(false)}
             onConfirm={handleDeleteConfirm}
+            isLoading={isDeleteLoading}
           />
         </>
       )}

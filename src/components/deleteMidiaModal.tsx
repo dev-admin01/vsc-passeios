@@ -8,17 +8,20 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 interface DeleteMidiaModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  isLoading: boolean;
 }
 
 export function DeleteMidiaModal({
   isOpen,
   onClose,
   onConfirm,
+  isLoading,
 }: DeleteMidiaModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -34,8 +37,13 @@ export function DeleteMidiaModal({
           <Button type="button" variant="outline" onClick={onClose}>
             Cancelar
           </Button>
-          <Button type="button" variant="destructive" onClick={onConfirm}>
-            Excluir
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={onConfirm}
+            disabled={isLoading}
+          >
+            {isLoading ? <Loader2 className="animate-spin" /> : "Excluir"}
           </Button>
         </div>
       </DialogContent>
