@@ -30,7 +30,7 @@ describe("PATCH /api/midia/:id_midia", () => {
       {
         method: "PATCH",
         body: JSON.stringify(dataMidia2),
-      }
+      },
     );
 
     expect(responseUpdate.status).toBe(200);
@@ -62,7 +62,7 @@ describe("PATCH /api/midia/:id_midia", () => {
       {
         method: "PATCH",
         body: JSON.stringify(dataMidia),
-      }
+      },
     );
 
     expect(responseUpdate.status).toBe(400);

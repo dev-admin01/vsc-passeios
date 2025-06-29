@@ -50,7 +50,7 @@ describe("POST /api/midia", () => {
     expect(responseBody.message).toBe("Dados enviados inválidos");
     expect(responseBody.name).toBe("ValidationError");
     expect(responseBody.action).toBe(
-      "Ajuste os dados informados e tente novamente."
+      "Ajuste os dados informados e tente novamente.",
     );
     expect(responseBody.status_code).toBe(400);
   });
@@ -79,7 +79,7 @@ describe("POST /api/midia", () => {
     expect(responseBody2.message).toBe("Descrição já cadastrada.");
     expect(responseBody2.name).toBe("ValidationError");
     expect(responseBody2.action).toBe(
-      "Ajuste os dados informados e tente novamente."
+      "Ajuste os dados informados e tente novamente.",
     );
     expect(responseBody2.status_code).toBe(400);
   });

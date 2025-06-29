@@ -22,8 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetCoupons } from "@/app/hooks/orders/useGetCoupons";
-import { useGetCondPag } from "@/app/hooks/condicaoPagamento/useGetCondPag";
+import { useCondicaoPagamento } from "@/app/hooks/condicaoPagamento/useCondicaoPagamento";
 import { useRouter } from "next/navigation";
+import { CondicaoPagamento } from "@/types/condicao-pagamento.types";
 
 export default function NewOrders() {
   const [idUser, setIdUser] = useState<string>("");
@@ -38,7 +39,8 @@ export default function NewOrders() {
   const { createOrder } = useCreateOrder();
   const [selectedCoupon, setSelectedCoupon] = useState<string>("");
   const { coupons, loading: loadingCoupons } = useGetCoupons();
-  const { condPag, loading: loadingCondPag } = useGetCondPag();
+  const { data: condicoesPagamento, isLoading: loadingCondPag } =
+    useCondicaoPagamento();
   const [selectedCondPag, setSelectedCondPag] = useState<string>("");
   const router = useRouter();
 
@@ -125,7 +127,7 @@ export default function NewOrders() {
     e.preventDefault();
     if (loadingUser || !idUser) {
       toast.error(
-        "Aguardando carregamento do usuário. Por favor, tente novamente em instantes.",
+        "Aguardando carregamento do usuário. Por favor, tente novamente em instantes."
       );
       return;
     }
@@ -159,7 +161,7 @@ export default function NewOrders() {
       const response = await createOrder(newOrder);
       localStorage.setItem(
         "orderSuccessMessage",
-        response.message || "Orçamento criado com sucesso!",
+        response.message || "Orçamento criado com sucesso!"
       );
       router.push("/orders");
     } catch (error) {
@@ -267,24 +269,27 @@ export default function NewOrders() {
                       Carregando condições de pagamento...
                     </SelectItem>
                   ) : (
-                    condPag.map((condPag) => {
-                      if (
-                        condPag.description !== "Pix" &&
-                        condPag.description !== "pix" &&
-                        condPag.description !== "PIX"
-                      ) {
-                        return (
-                          <SelectItem
-                            key={condPag.id_cond_pag}
-                            value={condPag.id_cond_pag.toString()}
-                          >
-                            {condPag.description} - {condPag.installments}{" "}
-                            parcelas
-                          </SelectItem>
-                        );
+                    condicoesPagamento?.condicoesPagamento.map(
+                      (condPag: CondicaoPagamento) => {
+                        if (
+                          condPag.description !== "Pix" &&
+                          condPag.description !== "Pix" &&
+                          condPag.description !== "pix" &&
+                          condPag.description !== "PIX"
+                        ) {
+                          return (
+                            <SelectItem
+                              key={condPag.id_cond_pag}
+                              value={condPag.id_cond_pag.toString()}
+                            >
+                              {condPag.description} - {condPag.installments}{" "}
+                              parcelas
+                            </SelectItem>
+                          );
+                        }
+                        return null;
                       }
-                      return null;
-                    })
+                    )
                   )}
                 </SelectContent>
               </Select>

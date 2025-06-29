@@ -25,7 +25,6 @@ export default function MidiaPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
-  const [isCreateLoading, setIsCreateLoading] = useState(false);
   // const [page, setPage] = useState(1);
   const page = 1;
   const [search, setSearch] = useState("");
@@ -57,7 +56,7 @@ export default function MidiaPage() {
   return (
     <div className="sm:ml-17 p-4 min-h-screen bg-sky-100">
       <Sidebar />
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Mídias</h1>
         <div className="flex gap-4">
           <Input
@@ -66,9 +65,12 @@ export default function MidiaPage() {
             onChange={(e) => setSearch(e.target.value)}
             className="bg-amber-50 w-64"
           />
-          <Button onClick={() => setIsCreateModalOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Nova Mídia
+          <Button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="cursor-pointer flex items-center justify-center sm:justify-center"
+          >
+            <Plus className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:block">Nova Mídia</span>
           </Button>
         </div>
       </div>
@@ -109,6 +111,7 @@ export default function MidiaPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleEdit(midia)}
+                      className="cursor-pointer"
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -116,6 +119,7 @@ export default function MidiaPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(midia)}
+                      className="cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </Button>

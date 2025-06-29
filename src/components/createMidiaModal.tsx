@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useMidia } from "@/app/hooks/midia/useMidia";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
 
 interface CreateMidiaModalProps {
   isOpen: boolean;
@@ -38,10 +37,13 @@ export function CreateMidiaModal({
       setDescription("");
       onSuccess();
       onClose();
-    } else {
-      toast.error("Erro ao criar mídia");
+      setIsLoading(false);
     }
-    setIsLoading(false);
+
+    if (!midia) {
+      setIsLoading(false);
+      onClose();
+    }
   };
 
   return (
@@ -62,10 +64,19 @@ export function CreateMidiaModal({
             />
           </div>
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="cursor-pointer"
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="cursor-pointer flex items-center"
+            >
               {isLoading ? <Loader2 className="animate-spin" /> : "Criar"}
             </Button>
           </div>

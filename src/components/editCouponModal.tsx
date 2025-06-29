@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useCoupons } from "@/app/hooks/coupons/useCoupons";
+import { useCoupon } from "@/app/hooks/coupons/useCoupon";
 import { useMidia } from "@/app/hooks/midia/useMidia";
 import {
   Select,
@@ -19,7 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Coupon } from "@/app/hooks/coupons/useCoupons";
+import { Coupon } from "@/types/coupon.types";
+import { Loader2 } from "lucide-react";
 
 interface EditCouponModalProps {
   coupon: Coupon;
@@ -37,8 +38,9 @@ export function EditCouponModal({
   const [couponCode, setCouponCode] = useState(coupon.coupon);
   const [discount, setDiscount] = useState(coupon.discount.toString());
   const [idMidia, setIdMidia] = useState(coupon.id_midia.toString());
-  const { updateCoupon } = useCoupons(1, 10, "");
+  const { updateCoupon } = useCoupon(1, 10, "");
   const { data: midiasData } = useMidia(1, 100, "");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setCouponCode(coupon.coupon);
@@ -56,6 +58,7 @@ export function EditCouponModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     const success = await updateCoupon(coupon.id_coupons, {
       coupon: couponCode,
       discount: discount,
@@ -65,6 +68,11 @@ export function EditCouponModal({
     if (success) {
       onSuccess();
       onClose();
+      setIsLoading(false);
+    }
+
+    if (!success) {
+      setIsLoading(false);
     }
   };
 
@@ -99,7 +107,7 @@ export function EditCouponModal({
           <div className="space-y-2">
             <Label htmlFor="midia">Mídia</Label>
             <Select value={idMidia} onValueChange={setIdMidia} required>
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Selecione uma mídia" />
               </SelectTrigger>
               <SelectContent>
@@ -115,10 +123,21 @@ export function EditCouponModal({
             </Select>
           </div>
           <div className="flex justify-end gap-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="cursor-pointer"
+            >
               Cancelar
             </Button>
-            <Button type="submit">Salvar</Button>
+            <Button
+              type="submit"
+              className="cursor-pointer flex items-center"
+              disabled={isLoading}
+            >
+              {isLoading ? <Loader2 className="animate-spin" /> : "Salvar"}
+            </Button>
           </div>
         </form>
       </DialogContent>

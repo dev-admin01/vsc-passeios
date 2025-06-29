@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useCoupons } from "@/app/hooks/coupons/useCoupons";
+import { useCoupon } from "@/app/hooks/coupons/useCoupon";
 import { useMidia } from "@/app/hooks/midia/useMidia";
 import {
   Select,
@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
 
 interface CreateCouponModalProps {
   isOpen: boolean;
@@ -34,8 +35,9 @@ export function CreateCouponModal({
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState("");
   const [idMidia, setIdMidia] = useState("");
-  const { createCoupon } = useCoupons(1, 10, "");
+  const { createCoupon } = useCoupon(1, 10, "");
   const { data: midiasData } = useMidia(1, 100, "");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -47,6 +49,7 @@ export function CreateCouponModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     const success = await createCoupon({
       coupon,
       discount: discount,
@@ -58,6 +61,12 @@ export function CreateCouponModal({
       setDiscount("");
       setIdMidia("");
       onSuccess();
+      onClose();
+      setIsLoading(false);
+    }
+
+    if (!success) {
+      setIsLoading(false);
       onClose();
     }
   };
@@ -87,6 +96,7 @@ export function CreateCouponModal({
               value={discount}
               onChange={handleDiscountChange}
               placeholder="Digite o percentual de desconto"
+              maxLength={3}
               required
             />
           </div>
@@ -109,10 +119,25 @@ export function CreateCouponModal({
             </Select>
           </div>
           <div className="flex justify-end gap-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="cursor-pointer"
+            >
               Cancelar
             </Button>
-            <Button type="submit">Criar</Button>
+            <Button
+              type="submit"
+              className="cursor-pointer flex items-center"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                "Criar"
+              )}
+            </Button>
           </div>
         </form>
       </DialogContent>
