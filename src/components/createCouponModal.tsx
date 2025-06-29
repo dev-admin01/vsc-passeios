@@ -100,7 +100,7 @@ export function CreateCouponModal({
                 {midiasData?.midias.map((midia) => (
                   <SelectItem
                     key={midia.id_midia}
-                    value={midia.id_midia.toString()}
+                    value={midia.id_midia?.toString() || ""}
                   >
                     {midia.description}
                   </SelectItem>

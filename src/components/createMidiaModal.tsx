@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useMidia } from "@/app/hooks/midia/useMidia";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface CreateMidiaModalProps {
   isOpen: boolean;
@@ -25,15 +27,21 @@ export function CreateMidiaModal({
 }: CreateMidiaModalProps) {
   const [description, setDescription] = useState("");
   const { createMidia } = useMidia();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     const midia = await createMidia(description);
+
     if (midia) {
       setDescription("");
       onSuccess();
       onClose();
+    } else {
+      toast.error("Erro ao criar mídia");
     }
+    setIsLoading(false);
   };
 
   return (
@@ -57,7 +65,9 @@ export function CreateMidiaModal({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit">Criar</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? <Loader2 className="animate-spin" /> : "Criar"}
+            </Button>
           </div>
         </form>
       </DialogContent>

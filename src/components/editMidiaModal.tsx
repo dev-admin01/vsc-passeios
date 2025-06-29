@@ -10,7 +10,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useMidia, Midia } from "@/app/hooks/midia/useMidia";
+import { useMidia } from "@/app/hooks/midia/useMidia";
+import { Midia } from "@/types/midia.types";
+
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { ErrorOptions } from "@/errors/errors";
 
 interface EditMidiaModalProps {
   midia: Midia;
@@ -27,6 +32,7 @@ export function EditMidiaModal({
 }: EditMidiaModalProps) {
   const [description, setDescription] = useState(midia.description);
   const { updateMidia } = useMidia();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setDescription(midia.description);
@@ -34,10 +40,13 @@ export function EditMidiaModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedMidia = await updateMidia(midia.id_midia, description);
+    setIsLoading(true);
+    const updatedMidia = await updateMidia(midia.id_midia!, description);
+
     if (updatedMidia) {
       onSuccess();
       onClose();
+      setIsLoading(false);
     }
   };
 
@@ -62,7 +71,9 @@ export function EditMidiaModal({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit">Salvar</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? <Loader2 className="animate-spin" /> : "Salvar"}
+            </Button>
           </div>
         </form>
       </DialogContent>
