@@ -23,7 +23,7 @@ describe("DELETE /api/midia/:id_midia", () => {
       `http://localhost:3000/api/midia/${responseBody.id_midia}`,
       {
         method: "DELETE",
-      }
+      },
     );
 
     expect(responseDelete.status).toBe(200);
@@ -39,7 +39,7 @@ describe("DELETE /api/midia/:id_midia", () => {
       "http://localhost:3000/api/midia/12312313",
       {
         method: "DELETE",
-      }
+      },
     );
 
     expect(responseDelete.status).toBe(404);

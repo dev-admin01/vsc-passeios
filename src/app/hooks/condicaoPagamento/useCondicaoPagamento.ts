@@ -3,26 +3,18 @@
 import useSWR from "swr";
 import { api } from "@/services/api";
 import { toast } from "sonner";
-import { getCookieclient } from "@/lib/cookieClient";
-
-export interface CondicaoPagamento {
-  id_cond_pag: string;
-  description: string;
-  installments: string;
-  discount: string;
-  created_at: string;
-  updated_at: string;
-}
+import { CondicaoPagamento } from "@/types/condicao-pagamento.types";
 
 export interface GetCondicaoPagamentoResponse {
-  message: string;
   condicoesPagamento: CondicaoPagamento[];
-  status_code: number;
+  page: number;
+  perpage: number;
+  totalCount: number;
+  lastPage: number;
 }
 
-export interface CreateCondicaoPagamentoResponse {
+export interface DeleteCondicaoPagamentoResponse {
   message: string;
-  condicaoPagamento: CondicaoPagamento;
   status_code: number;
 }
 
@@ -31,12 +23,10 @@ const fetchCondicoes = async (
   perpage: number,
   search: string,
 ) => {
-  const token = await getCookieclient();
   const response = await api.get<GetCondicaoPagamentoResponse>(
     "/api/condicao-pagamento",
     {
       params: { page, perpage, search },
-      headers: { Authorization: `Bearer ${token}` },
     },
   );
   return response.data;
@@ -53,68 +43,61 @@ export function useCondicaoPagamento(
       () => fetchCondicoes(page, perpage, search),
     );
 
-  const createCondicao = async (
-    description: string,
-    installments: string,
-    discount: string,
-  ): Promise<CondicaoPagamento | null> => {
-    try {
-      const token = await getCookieclient();
-      const response = await api.post<CreateCondicaoPagamentoResponse>(
-        "/api/condicao-pagamento",
-        { description, installments, discount },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+  const createCondicao = async (condicaoData: {
+    description: string;
+    installments: string;
+    discount: string;
+  }): Promise<any> => {
+    const response = await api.post("/api/condicao-pagamento", condicaoData);
 
-      if (response.status === 201) {
-        toast.success(response.data.message);
-        mutate();
-        return response.data.condicaoPagamento;
-      }
-      return null;
-    } catch (error) {
-      console.error("Erro ao criar condição de pagamento:", error);
-      toast.error("Erro ao criar condição de pagamento");
-      return null;
+    if (response.status !== 201) {
+      toast.error(response.data.message);
+      return false;
     }
+
+    toast.success(
+      `Condição de pagamento ${condicaoData.description} criada com sucesso!`,
+    );
+    mutate();
+    return response.data;
   };
 
   const updateCondicao = async (
     id: string,
-    description: string,
-    installments: string,
-    discount: string,
-  ): Promise<CondicaoPagamento | null> => {
-    try {
-      const token = await getCookieclient();
-      const response = await api.put<CreateCondicaoPagamentoResponse>(
-        `/api/condicao-pagamento/${id}`,
-        { description, installments, discount },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+    condicaoData: {
+      description: string;
+      installments: string;
+      discount: string;
+    },
+  ): Promise<any> => {
+    const response = await api.patch(
+      `/api/condicao-pagamento/${id}`,
+      condicaoData,
+    );
 
-      if (response.status === 200) {
-        toast.success(response.data.message);
-        mutate();
-        return response.data.condicaoPagamento;
-      }
-      return null;
-    } catch (error) {
-      console.error("Erro ao atualizar condição de pagamento:", error);
-      toast.error("Erro ao atualizar condição de pagamento");
-      return null;
+    if (response.status !== 200) {
+      toast.error(response.data.message);
+      return false;
     }
+
+    toast.success(
+      `Condição de pagamento ${condicaoData.description} atualizada com sucesso!`,
+    );
+    mutate();
+    return response.data;
   };
 
   const deleteCondicao = async (id: string): Promise<boolean> => {
     try {
-      const token = await getCookieclient();
-      const response = await api.delete(`/api/condicao-pagamento/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.delete<DeleteCondicaoPagamentoResponse>(
+        `/api/condicao-pagamento/${id}`,
+      );
 
       if (response.status === 200) {
-        toast.success("Condição de pagamento excluída com sucesso!");
+        toast.success(
+          response.data.message ||
+            "Condição de pagamento excluída com sucesso!",
+        );
         mutate();
         return true;
       }

@@ -4,7 +4,7 @@ import controller from "../../../../errors/controller";
 
 export const DELETE = async (
   request: NextRequest,
-  { params }: { params: Promise<{ id_midia: string }> }
+  { params }: { params: Promise<{ id_midia: string }> },
 ) => {
   try {
     const { id_midia } = await params;
@@ -18,7 +18,7 @@ export const DELETE = async (
 
 export const PATCH = async (
   request: NextRequest,
-  { params }: { params: Promise<{ id_midia: string }> }
+  { params }: { params: Promise<{ id_midia: string }> },
 ) => {
   try {
     const { id_midia } = await params;
@@ -26,7 +26,7 @@ export const PATCH = async (
 
     const updatedMidia = await midia.updateById(
       Number(id_midia),
-      midiaInputValues
+      midiaInputValues,
     );
     return NextResponse.json(updatedMidia);
   } catch (error: any) {

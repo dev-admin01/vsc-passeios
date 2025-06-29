@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 import { useCondicaoPagamento } from "@/app/hooks/condicaoPagamento/useCondicaoPagamento";
 
 interface CreateCondicaoModalProps {
@@ -27,16 +28,27 @@ export function CreateCondicaoModal({
   const [installments, setInstallments] = useState("");
   const [discount, setDiscount] = useState("");
   const { createCondicao } = useCondicaoPagamento();
-
+  const [isLoading, setIsLoading] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const condicao = await createCondicao(description, installments, discount);
-    console.log(condicao);
+    setIsLoading(true);
+    const condicao = await createCondicao({
+      description,
+      installments,
+      discount,
+    });
+
     if (condicao) {
       setDescription("");
       setInstallments("");
       setDiscount("");
       onSuccess();
+      onClose();
+      setIsLoading(false);
+    }
+
+    if (!condicao) {
+      setIsLoading(false);
       onClose();
     }
   };
@@ -81,10 +93,21 @@ export function CreateCondicaoModal({
             />
           </div>
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="cursor-pointer"
+            >
               Cancelar
             </Button>
-            <Button type="submit">Criar</Button>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="cursor-pointer flex items-center"
+            >
+              {isLoading ? <Loader2 className="animate-spin" /> : "Criar"}
+            </Button>
           </div>
         </form>
       </DialogContent>

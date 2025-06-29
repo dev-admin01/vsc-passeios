@@ -10,10 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  useCondicaoPagamento,
-  CondicaoPagamento,
-} from "@/app/hooks/condicaoPagamento/useCondicaoPagamento";
+import { useCondicaoPagamento } from "@/app/hooks/condicaoPagamento/useCondicaoPagamento";
+import { CondicaoPagamento } from "@/types/condicao-pagamento.types";
+import { Loader2 } from "lucide-react";
 
 interface EditCondicaoModalProps {
   condicao: CondicaoPagamento;
@@ -31,6 +30,7 @@ export function EditCondicaoModal({
   const [description, setDescription] = useState(condicao.description);
   const [installments, setInstallments] = useState(condicao.installments);
   const [discount, setDiscount] = useState(condicao.discount);
+  const [isLoading, setIsLoading] = useState(false);
   const { updateCondicao } = useCondicaoPagamento();
 
   useEffect(() => {
@@ -41,14 +41,20 @@ export function EditCondicaoModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedCondicao = await updateCondicao(
-      condicao.id_cond_pag,
+    setIsLoading(true);
+    const updatedCondicao = await updateCondicao(condicao.id_cond_pag, {
       description,
       installments,
       discount,
-    );
+    });
     if (updatedCondicao) {
       onSuccess();
+      onClose();
+      setIsLoading(false);
+    }
+
+    if (!updatedCondicao) {
+      setIsLoading(false);
       onClose();
     }
   };
@@ -93,10 +99,21 @@ export function EditCondicaoModal({
             />
           </div>
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="cursor-pointer"
+            >
               Cancelar
             </Button>
-            <Button type="submit">Salvar</Button>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="cursor-pointer flex items-center"
+            >
+              {isLoading ? <Loader2 className="animate-spin" /> : "Salvar"}
+            </Button>
           </div>
         </form>
       </DialogContent>

@@ -29,39 +29,33 @@ const fetchMidias = async (page: number, perpage: number, search: string) => {
 export function useMidia(
   page: number = 1,
   perpage: number = 10,
-  search: string = ""
+  search: string = "",
 ) {
   const { data, error, isLoading, mutate } = useSWR<GetMidiaResponse>(
     ["get-midias", page, perpage, search],
-    () => fetchMidias(page, perpage, search)
+    () => fetchMidias(page, perpage, search),
   );
 
-  const createMidia = async (description: string): Promise<Midia | null> => {
-    try {
-      const response = await api.post<Midia>("/api/midia", {
-        description,
-      });
+  const createMidia = async (description: string): Promise<any> => {
+    const response = await api.post("/api/midia", {
+      description,
+    });
 
-      if (response.status === 201) {
-        toast.success("Mídia criada com sucesso!");
-        mutate();
-        return {
-          id_midia: response.data.id_midia,
-          description: response.data.description,
-          created_at: response.data.created_at,
-        };
-      }
-      return null;
-    } catch (error) {
-      console.error("Erro ao criar mídia:", error);
-      toast.error("Erro ao criar mídia");
-      return null;
+    console.log(response.data);
+
+    if (response.status !== 201) {
+      toast.error(response.data.message);
+      return false;
     }
+
+    toast.success(`Mídia ${response.data.description} criada com sucesso!`);
+    mutate();
+    return response.data;
   };
 
   const updateMidia = async (
     id: number,
-    description: string
+    description: string,
   ): Promise<Midia | ErrorOptions | null> => {
     try {
       const response = await api.patch<Midia>(`/api/midia/${id}`, {
@@ -89,7 +83,7 @@ export function useMidia(
   const deleteMidia = async (id: number): Promise<boolean> => {
     try {
       const response = await api.delete<DeleteMidiaResponse>(
-        `/api/midia/${id}`
+        `/api/midia/${id}`,
       );
 
       if (response.status === 200) {

@@ -14,8 +14,6 @@ import { useMidia } from "@/app/hooks/midia/useMidia";
 import { Midia } from "@/types/midia.types";
 
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { ErrorOptions } from "@/errors/errors";
 
 interface EditMidiaModalProps {
   midia: Midia;
