@@ -2,16 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import authentication from "./models/authentication";
 
 export async function middleware(req: NextRequest) {
-  if (process.env.NODE_ENV !== "production") {
-    return NextResponse.next();
-  }
+  // if (process.env.NODE_ENV !== "production") {
+  //   return NextResponse.next();
+  // }
 
   if (
     req.nextUrl.pathname.startsWith("/login") ||
     req.nextUrl.pathname.startsWith("/_next") ||
     req.nextUrl.pathname.startsWith("/logo.png") ||
     req.nextUrl.pathname.startsWith("/favicon.ico") ||
-    req.nextUrl.pathname.startsWith("/api/sessions")
+    req.nextUrl.pathname.startsWith("/api/sessions") ||
+    req.nextUrl.pathname.startsWith("/api/status") ||
+    req.nextUrl.pathname.startsWith("/api/migrations")
   ) {
     return NextResponse.next();
   }

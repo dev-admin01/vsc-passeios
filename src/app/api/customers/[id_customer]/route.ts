@@ -1,5 +1,5 @@
 import controller from "@/errors/controller";
-import service from "@/models/service";
+import customer from "@/models/customer";
 import authentication from "@/models/authentication";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
@@ -23,23 +23,43 @@ async function verifyAuthentication() {
   return decoded;
 }
 
-export async function PATCH(
+export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id_service: string }> }
+  { params }: { params: Promise<{ id_customer: string }> }
 ) {
   try {
     // Verificar autenticação
     await verifyAuthentication();
 
-    const { id_service } = await params;
-    const serviceInputValues = await request.json();
+    const { id_customer } = await params;
+    const customerFound = await customer.findOneById(id_customer);
 
-    const updatedService = await service.updateById(
-      Number(id_service),
-      serviceInputValues
+    return NextResponse.json(customerFound, { status: 200 });
+  } catch (error: any) {
+    if (error.message?.includes("Token")) {
+      return NextResponse.json({ message: error.message }, { status: 401 });
+    }
+    return controller.errorHandlers.onError(error);
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id_customer: string }> }
+) {
+  try {
+    // Verificar autenticação
+    await verifyAuthentication();
+
+    const { id_customer } = await params;
+    const customerInputValues = await request.json();
+
+    const updatedCustomer = await customer.updateById(
+      id_customer,
+      customerInputValues
     );
 
-    return NextResponse.json(updatedService, { status: 200 });
+    return NextResponse.json(updatedCustomer, { status: 200 });
   } catch (error: any) {
     if (error.message?.includes("Token")) {
       return NextResponse.json({ message: error.message }, { status: 401 });
@@ -50,36 +70,16 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id_service: string }> }
+  { params }: { params: Promise<{ id_customer: string }> }
 ) {
   try {
     // Verificar autenticação
     await verifyAuthentication();
 
-    const { id_service } = await params;
-    const deletedService = await service.deleteById(Number(id_service));
+    const { id_customer } = await params;
+    const deletedCustomer = await customer.deleteById(id_customer);
 
-    return NextResponse.json(deletedService, { status: 200 });
-  } catch (error: any) {
-    if (error.message?.includes("Token")) {
-      return NextResponse.json({ message: error.message }, { status: 401 });
-    }
-    return controller.errorHandlers.onError(error);
-  }
-}
-
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id_service: string }> }
-) {
-  try {
-    // Verificar autenticação
-    await verifyAuthentication();
-
-    const { id_service } = await params;
-    const serviceFound = await service.findOneById(Number(id_service));
-
-    return NextResponse.json(serviceFound, { status: 200 });
+    return NextResponse.json(deletedCustomer, { status: 200 });
   } catch (error: any) {
     if (error.message?.includes("Token")) {
       return NextResponse.json({ message: error.message }, { status: 401 });
