@@ -15,30 +15,26 @@ import { CustomerFormData, useCustomerForm } from "../customer-form";
 import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useCreateCustomer } from "@/app/hooks/costumer/useCreateCustomer";
+import { useCustomer } from "@/app/hooks/costumer/useCostumer";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
 export default function NewCustomerPage() {
   const form = useCustomerForm();
-  const { createCustomer } = useCreateCustomer();
+  const { createCustomer } = useCustomer();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data: CustomerFormData) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
       const response = await createCustomer(data);
-
-      localStorage.setItem(
-        "CustomerSuccessMessage",
-        response.message || "Cliente criado com sucesso!",
-      );
-
-      router.push("/customers");
+      if (response) {
+        router.push("/customers");
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Erro inesperado:", error);
     } finally {
       setIsLoading(false);
     }
@@ -128,15 +124,14 @@ export default function NewCustomerPage() {
                   name="cpf_cnpj"
                   render={({ field }) => (
                     <FormItem className="mb-4 w-full sm:w-1/2 sm:pe-4">
-                      <FormLabel>CPF</FormLabel>
+                      <FormLabel>CPF/CNPJ</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="CPF"
-                          value={formatCPF(field.value || "")}
+                          placeholder="CPF/CNPJ"
                           onChange={(e) => {
-                            const formattedValue = formatCPF(e.target.value);
-                            field.onChange(formattedValue);
+                            const formatted = formatCPF(e.target.value);
+                            field.onChange(formatted);
                           }}
                         />
                       </FormControl>
@@ -146,12 +141,12 @@ export default function NewCustomerPage() {
                 />
                 <FormField
                   control={form.control}
-                  name="passaporte"
+                  name="rg"
                   render={({ field }) => (
                     <FormItem className="mb-4 w-full sm:w-1/2">
-                      <FormLabel>Passaporte</FormLabel>
+                      <FormLabel>RG</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Passaporte" />
+                        <Input {...field} placeholder="RG" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -203,10 +198,9 @@ export default function NewCustomerPage() {
                         <Input
                           {...field}
                           placeholder="Telefone"
-                          value={formatPhone(field.value || "")}
                           onChange={(e) => {
-                            const formattedValue = formatPhone(e.target.value);
-                            field.onChange(formattedValue);
+                            const formatted = formatPhone(e.target.value);
+                            field.onChange(formatted);
                           }}
                         />
                       </FormControl>
@@ -218,8 +212,8 @@ export default function NewCustomerPage() {
                   control={form.control}
                   name="indicacao"
                   render={({ field }) => (
-                    <FormItem className="mb-4 w-full sm:w-1/2">
-                      <FormLabel>Indicação</FormLabel>
+                    <FormItem className="mb-4 w-full">
+                      <FormLabel>Indicação (Opcional)</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="Indicação" />
                       </FormControl>
@@ -229,7 +223,7 @@ export default function NewCustomerPage() {
                 />
                 <Button
                   type="submit"
-                  className="w-full bg-sky-300 hover:bg-sky-800 text-black"
+                  className="w-full bg-sky-300 hover:bg-sky-800 text-black disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   disabled={isLoading}
                 >
                   {isLoading ? (

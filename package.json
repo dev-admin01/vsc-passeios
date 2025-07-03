@@ -8,6 +8,7 @@
     "services:down": "docker compose -f infra/compose.yml down",
     "services:stop": "docker compose stop",
     "test": "npm run services:up && concurrently -n next,jest --hide next -k -s command-jest \"TESTING_MODE=true next dev\" \"TESTING_MODE=true jest --runInBand --verbose\"",
+    "vercel-build": "npm run prisma:generate && prisma migrate deploy && next build",
     "build": "npm run prisma:generate && next build",
     "start": "next start",
     "test:watch": "TESTING_MODE=true jest --watchAll --runInBand --verbose",

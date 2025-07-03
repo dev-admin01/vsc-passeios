@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
     const authenticatedUser = await authentication.getAuthenticatedUser(
       userInputValues.email,
-      userInputValues.password,
+      userInputValues.password
     );
 
     const token = await authentication.generateToken(authenticatedUser);
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     cookieStore.set("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      // secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24,
       path: "/",
     });

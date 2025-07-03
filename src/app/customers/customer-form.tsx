@@ -9,7 +9,7 @@ const customerSchema = z.object({
     .min(1, { message: "Email é obrigatório" })
     .email({ message: "Email inválido" }),
   cpf_cnpj: z.string().min(1, { message: "CPF é obrigatório" }),
-  passaporte: z.string().optional(),
+  rg: z.string().optional(),
   ddi: z.string().min(1, { message: "DDI é obrigatório" }).max(2, {
     message: "DDI deve ter no máximo 2 dígitos",
   }),
@@ -29,7 +29,7 @@ export function useCustomerForm() {
       nome: "",
       email: "",
       cpf_cnpj: "",
-      passaporte: "",
+      rg: "",
       ddi: "",
       ddd: "",
       telefone: "",
