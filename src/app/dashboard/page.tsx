@@ -10,27 +10,52 @@ import {
 import { Sidebar } from "@/components/sidebar";
 
 import { ChartOverview } from "@/components/chart/index";
-import { Brain, Clock10, DollarSign, ShoppingBagIcon } from "lucide-react";
+import {
+  Brain,
+  Clock10,
+  DollarSign,
+  Loader2,
+  ShoppingBagIcon,
+} from "lucide-react";
 import { useAuthContext } from "../contexts/authContext";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
-  const { user } = useAuthContext();
+  const { user, loading } = useAuthContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen p-4 bg-sky-100 flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin" />
+      </main>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <main className="sm:ml-17 min-h-screen  p-4 bg-sky-100">
       <Sidebar />
       <div className="p-6 sm:-mt-15">
         <div className="mb-4">
-          {user && (
-            <p className="text-gray-600">
-              Bem-vindo,{" "}
-              <span className="font-semibold">
-                {user.name.split(" ")[0].charAt(0).toUpperCase() +
-                  user.name.split(" ")[0].slice(1).toLowerCase()}
-              </span>
-              !
-            </p>
-          )}
+          <p className="text-gray-600">
+            Bem-vindo,{" "}
+            <span className="font-semibold">
+              {user.name.split(" ")[0].charAt(0).toUpperCase() +
+                user.name.split(" ")[0].slice(1).toLowerCase()}
+            </span>
+            !
+          </p>
         </div>
       </div>
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">

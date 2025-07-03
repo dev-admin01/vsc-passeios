@@ -15,6 +15,14 @@ export interface UserInputValues extends User {
   id_position: number;
 }
 
+export interface AuthenticatedUser
+  extends Omit<
+    User,
+    "password" | "ddi" | "ddd" | "phone" | "created_at" | "updated_at"
+  > {
+  name: string;
+}
+
 export interface authUserInput {
   email: string;
   password: string;

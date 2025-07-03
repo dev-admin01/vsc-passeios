@@ -27,7 +27,6 @@ export default function UpdateOrderPage({
 //   UpdateServicesSelector,
 //   UpdateServiceSelection,
 // } from "@/components/updateServiceSelection";
-// import { getUserClient } from "@/lib/cookieClient";
 // import { useCreateOrder } from "@/app/hooks/orders/useCreateOrders";
 // import { ArrowLeft } from "lucide-react";
 // import Link from "next/link";
@@ -102,8 +101,7 @@ export default function UpdateOrderPage({
 
 //   useEffect(() => {
 //     const fetchUserId = async () => {
-//       const user = await getUserClient();
-//       setIdUser(user?.id_user || "");
+//       setIdUser("1");
 //       setLoadingUser(false);
 //     };
 

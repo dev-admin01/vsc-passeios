@@ -8,7 +8,6 @@ import {
   ServicesSelector,
   ServiceSelection,
 } from "@/components/servicesSelection";
-import { getUserClient } from "@/lib/cookieClient";
 import { useCreateOrder } from "@/app/hooks/orders/useCreateOrders";
 import { Sidebar } from "@/components/sidebar";
 import { ArrowLeft } from "lucide-react";
@@ -88,8 +87,7 @@ export default function NewOrders() {
 
   useEffect(() => {
     const fetchUserId = async () => {
-      const user = await getUserClient();
-      setIdUser(user?.id_user || "");
+      setIdUser("1");
       setLoadingUser(false);
     };
 
@@ -127,7 +125,7 @@ export default function NewOrders() {
     e.preventDefault();
     if (loadingUser || !idUser) {
       toast.error(
-        "Aguardando carregamento do usuário. Por favor, tente novamente em instantes.",
+        "Aguardando carregamento do usuário. Por favor, tente novamente em instantes."
       );
       return;
     }
@@ -161,7 +159,7 @@ export default function NewOrders() {
       const response = await createOrder(newOrder);
       localStorage.setItem(
         "orderSuccessMessage",
-        response.message || "Orçamento criado com sucesso!",
+        response.message || "Orçamento criado com sucesso!"
       );
       router.push("/orders");
     } catch (error) {
@@ -288,7 +286,7 @@ export default function NewOrders() {
                           );
                         }
                         return null;
-                      },
+                      }
                     )
                   )}
                 </SelectContent>

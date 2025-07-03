@@ -1,5 +1,5 @@
 import controller from "@/errors/controller";
-import service from "@/models/service";
+import customer from "@/models/customer";
 import { NextRequest, NextResponse } from "next/server";
 
 const unsupportedMethodHandler = () => controller.errorHandlers.onNoMatch();
@@ -11,13 +11,13 @@ export async function GET(request: NextRequest) {
     const perpage = parseInt(searchParams.get("perpage") || "10");
     const search = searchParams.get("search") || "";
 
-    const services = await service.findAllWithPagination({
+    const customers = await customer.findAllWithPagination({
       page,
       perpage,
       search,
     });
 
-    return NextResponse.json(services, { status: 200 });
+    return NextResponse.json(customers, { status: 200 });
   } catch (error: any) {
     if (error.message?.includes("Token")) {
       return NextResponse.json({ message: error.message }, { status: 401 });
@@ -28,10 +28,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const serviceInputValues = await request.json();
-    const newService = await service.create(serviceInputValues);
+    const customerInputValues = await request.json();
 
-    return NextResponse.json(newService, { status: 201 });
+    const newCustomer = await customer.create(customerInputValues);
+    return NextResponse.json(newCustomer, { status: 201 });
   } catch (error: any) {
     if (error.message?.includes("Token")) {
       return NextResponse.json({ message: error.message }, { status: 401 });

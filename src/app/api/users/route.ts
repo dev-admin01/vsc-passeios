@@ -19,6 +19,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(users, { status: 200 });
   } catch (error: any) {
+    if (error.message?.includes("Token")) {
+      return NextResponse.json({ message: error.message }, { status: 401 });
+    }
     return controller.errorHandlers.onError(error);
   }
 }
@@ -32,9 +35,13 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(newUser, { status: 201 });
   } catch (error: any) {
+    if (error.message?.includes("Token")) {
+      return NextResponse.json({ message: error.message }, { status: 401 });
+    }
     return controller.errorHandlers.onError(error);
   }
 }
+
 export const PUT = unsupportedMethodHandler;
 export const DELETE = unsupportedMethodHandler;
 export const PATCH = unsupportedMethodHandler;

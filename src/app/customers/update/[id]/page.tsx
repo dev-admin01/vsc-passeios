@@ -16,9 +16,8 @@ import { CustomerFormData, useCustomerForm } from "../../customer-form";
 import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { fetchCustomer } from "@/app/hooks/costumer/useCustomer";
+import { useCustomer } from "@/app/hooks/costumer/useCostumer";
 import { useRouter } from "next/navigation";
-import { useUpdateCustomer } from "@/app/hooks/costumer/useUpdateCustomer";
 import { toast } from "sonner";
 
 export default function UpdateCustomerPage({
@@ -31,13 +30,13 @@ export default function UpdateCustomerPage({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [customerLoading, setCustomerLoading] = useState(false);
-  const { updateCustomer } = useUpdateCustomer();
+  const { updateCustomer, getCustomer } = useCustomer();
 
   useEffect(() => {
     const loadCustomer = async () => {
       setCustomerLoading(true);
       try {
-        const response = await fetchCustomer(resolvedParams.id);
+        const response = await getCustomer(resolvedParams.id);
         const customer = response.costumer;
 
         // Preenche o formulário com os dados do cliente
@@ -46,7 +45,7 @@ export default function UpdateCustomerPage({
             nome: customer.nome,
             email: customer.email,
             cpf_cnpj: customer.cpf_cnpj,
-            passaporte: customer.passaporte || "",
+            rg: customer.rg || "",
             ddi: customer.ddi,
             ddd: customer.ddd,
             telefone: customer.telefone,
@@ -63,18 +62,17 @@ export default function UpdateCustomerPage({
     };
 
     loadCustomer();
-  }, [resolvedParams.id, form, router]);
+  }, [resolvedParams.id, form, router, getCustomer]);
 
   const onSubmit = async (data: CustomerFormData) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
       const response = await updateCustomer(resolvedParams.id, data);
-
-      toast.success(response.message || "Cliente atualizado com sucesso!");
-      router.push("/customers");
+      if (response) {
+        router.push("/customers");
+      }
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao atualizar cliente");
     } finally {
       setIsLoading(false);
     }
@@ -168,15 +166,14 @@ export default function UpdateCustomerPage({
                   name="cpf_cnpj"
                   render={({ field }) => (
                     <FormItem className="mb-4 w-full sm:w-1/2 sm:pe-4">
-                      <FormLabel>CPF</FormLabel>
+                      <FormLabel>CPF/CNPJ</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="CPF"
-                          value={formatCPF(field.value || "")}
+                          placeholder="CPF/CNPJ"
                           onChange={(e) => {
-                            const formattedValue = formatCPF(e.target.value);
-                            field.onChange(formattedValue);
+                            const formatted = formatCPF(e.target.value);
+                            field.onChange(formatted);
                           }}
                         />
                       </FormControl>
@@ -186,12 +183,12 @@ export default function UpdateCustomerPage({
                 />
                 <FormField
                   control={form.control}
-                  name="passaporte"
+                  name="rg"
                   render={({ field }) => (
                     <FormItem className="mb-4 w-full sm:w-1/2">
-                      <FormLabel>Passaporte</FormLabel>
+                      <FormLabel>RG</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Passaporte" />
+                        <Input {...field} placeholder="RG" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -243,10 +240,9 @@ export default function UpdateCustomerPage({
                         <Input
                           {...field}
                           placeholder="Telefone"
-                          value={formatPhone(field.value || "")}
                           onChange={(e) => {
-                            const formattedValue = formatPhone(e.target.value);
-                            field.onChange(formattedValue);
+                            const formatted = formatPhone(e.target.value);
+                            field.onChange(formatted);
                           }}
                         />
                       </FormControl>
@@ -258,8 +254,8 @@ export default function UpdateCustomerPage({
                   control={form.control}
                   name="indicacao"
                   render={({ field }) => (
-                    <FormItem className="mb-4 w-full sm:w-1/2">
-                      <FormLabel>Indicação</FormLabel>
+                    <FormItem className="mb-4 w-full">
+                      <FormLabel>Indicação (Opcional)</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="Indicação" />
                       </FormControl>
@@ -269,13 +265,13 @@ export default function UpdateCustomerPage({
                 />
                 <Button
                   type="submit"
-                  className="w-full bg-sky-300 hover:bg-sky-800 text-black"
+                  className="w-full bg-sky-300 hover:bg-sky-800 text-black disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Salvando...
+                      Atualizando...
                     </>
                   ) : (
                     "Atualizar Cliente"
