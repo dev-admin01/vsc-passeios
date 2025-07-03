@@ -4,7 +4,7 @@ import controller from "@/errors/controller";
 
 export const DELETE = async (
   request: NextRequest,
-  { params }: { params: Promise<{ id_coupon: string }> },
+  { params }: { params: Promise<{ id_coupon: string }> }
 ) => {
   try {
     const { id_coupon } = await params;
@@ -17,7 +17,7 @@ export const DELETE = async (
 
 export const PATCH = async (
   request: NextRequest,
-  { params }: { params: Promise<{ id_coupon: string }> },
+  { params }: { params: Promise<{ id_coupon: string }> }
 ) => {
   try {
     const { id_coupon } = await params;

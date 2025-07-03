@@ -26,6 +26,13 @@ describe("POST /api/services", () => {
     expect(response.status).toBe(201);
     expect(responseBody).toEqual({
       id_service: responseBody.id_service,
+      description: serviceData.description,
+      type: serviceData.type,
+      price: "1000099",
+      time: '["08:00","10:00","14:00"]',
+      observation: "Observação de teste",
+      created_at: expect.any(String),
+      updated_at: expect.any(String),
     });
     expect(typeof responseBody.id_service).toBe("number");
   });
@@ -49,6 +56,13 @@ describe("POST /api/services", () => {
     expect(response.status).toBe(201);
     expect(responseBody).toEqual({
       id_service: responseBody.id_service,
+      description: serviceData.description,
+      type: serviceData.type,
+      price: "1500000",
+      time: '["07:00","08:30","10:00","11:30","14:00","15:30"]',
+      observation: "Passeio com vários horários disponíveis",
+      created_at: expect.any(String),
+      updated_at: expect.any(String),
     });
   });
 
@@ -71,6 +85,13 @@ describe("POST /api/services", () => {
     expect(response.status).toBe(201);
     expect(responseBody).toEqual({
       id_service: responseBody.id_service,
+      description: serviceData.description,
+      type: serviceData.type,
+      price: "500000",
+      time: '["09:00"]',
+      observation: "Observação única",
+      created_at: expect.any(String),
+      updated_at: expect.any(String),
     });
   });
 
@@ -234,8 +255,6 @@ describe("POST /api/services", () => {
     });
 
     const responseBody = await response.json();
-
-    console.log("responseBody", responseBody);
 
     expect(response.status).toBe(400);
     expect(responseBody).toEqual({
