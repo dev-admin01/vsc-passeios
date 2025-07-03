@@ -32,16 +32,17 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-import { useCreateService } from "@/app/hooks/service/useCreateService";
+import { useService } from "@/app/hooks/services/useService";
 
 import { Sidebar } from "@/components/sidebar";
 import Link from "next/link";
+import { ConvertCurrency } from "@/lib/shared/currencyConverter";
 
 export default function NewServices() {
   const [selectedHours, setSelectedHours] = useState<string[]>([]);
   const [hoursModalIsOpen, setHoursModalIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { createService } = useCreateService();
+  const { createService } = useService();
   const form = useServiceForm();
 
   function generateTimeSlots(): string[] {
@@ -85,24 +86,17 @@ export default function NewServices() {
       toast.error(service.data.message, { closeButton: true });
     }
 
-    toast.success(service.data.message, { closeButton: true });
+    toast.success(`Passeio ${service.data.description} criado com sucesso!`, {
+      closeButton: true,
+    });
     form.reset();
     setSelectedHours([]);
     setIsLoading(false);
   }
 
   function changeCurrency(event: React.ChangeEvent<HTMLInputElement>) {
-    let { value } = event.target;
-    value = value.replace(/\D/g, "");
-
-    if (value) {
-      value = (parseInt(value, 10) / 100).toFixed(2);
-      value = value.replace(".", ",");
-      value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-
-    event.target.value = value;
-    form.setValue("price", value);
+    ConvertCurrency.changeCurrency(event);
+    form.setValue("price", event.target.value);
   }
 
   return (
@@ -247,7 +241,7 @@ export default function NewServices() {
 
               <Button
                 type="submit"
-                className="w-full bg-sky-300 hover:bg-sky-800 text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-sky-300 hover:bg-sky-800 text-black disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 disabled={isLoading}
               >
                 {isLoading ? "Salvando..." : "Salvar Passeio"}

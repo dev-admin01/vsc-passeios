@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useGetService } from "@/app/hooks/service/useGetService";
-import { useUpdateService } from "@/app/hooks/service/useUpdateService";
+import { useService } from "@/app/hooks/services/useService";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -38,12 +37,12 @@ import {
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { ConvertCurrency } from "@/lib/shared/currencyConverter";
 
 export default function UpdateService() {
   const params = useParams();
   const router = useRouter();
-  const { getService } = useGetService();
-  const { updateService } = useUpdateService();
+  const { getService, updateService } = useService();
   const form = useServiceForm();
   const [selectedHours, setSelectedHours] = useState<string[]>([]);
   const [hoursModalIsOpen, setHoursModalIsOpen] = useState(false);
@@ -74,6 +73,7 @@ export default function UpdateService() {
     async function loadService() {
       try {
         const service = await getService(Number(params.id));
+        console.log("service useEffect", service);
 
         // Formata o preço antes de definir no form
         let formattedPrice = service.price;
@@ -115,17 +115,8 @@ export default function UpdateService() {
   }, [params.id, getService, form]);
 
   function changeCurrency(event: React.ChangeEvent<HTMLInputElement>) {
-    let { value } = event.target;
-    value = value.replace(/\D/g, "");
-
-    if (value) {
-      value = (parseInt(value, 10) / 100).toFixed(2);
-      value = value.replace(".", ",");
-      value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-
-    event.target.value = value;
-    form.setValue("price", value);
+    ConvertCurrency.changeCurrency(event);
+    form.setValue("price", event.target.value);
   }
 
   async function onSubmit(values: any) {
@@ -138,14 +129,7 @@ export default function UpdateService() {
       const response = await updateService(Number(params.id), serviceData);
 
       if (response.status_code === 200) {
-        toast.success("Passeio atualizado com sucesso!", {
-          closeButton: true,
-        });
         router.push("/services");
-      } else {
-        toast.error("Erro ao atualizar passeio", {
-          closeButton: true,
-        });
       }
     } catch (error) {
       console.error("Erro ao atualizar serviço:", error);

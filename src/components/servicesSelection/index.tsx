@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Services } from "@/types/service.types";
-import { useSelectServices } from "@/app/hooks/service/useSelectServices";
+import { useService } from "@/app/hooks/services/useService";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -46,7 +46,7 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
   const [hoursModalIsOpen, setHoursModalIsOpen] = useState<number | null>(null);
   const [availableHours, setAvailableHours] = useState<string[]>([]);
 
-  const { selectServices } = useSelectServices();
+  const { selectServices } = useService();
 
   function generateTimeSlots(): string[] {
     const hours: string[] = [];
@@ -79,7 +79,7 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
   const handleChange = (
     index: number,
     field: keyof ServiceSelection,
-    value: any,
+    value: any
   ) => {
     const updated = [...selectedServices];
     updated[index] = { ...updated[index], [field]: value };
@@ -89,7 +89,7 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
   const handleServiceSelect = (index: number, value: string) => {
     const serviceId = Number(value);
     const selectedService = availableServices.find(
-      (s) => s.id_service === serviceId,
+      (s) => s.id_service === serviceId
     );
     const price = selectedService ? selectedService.price : undefined;
     // const time = selectedService?.time ? JSON.parse(selectedService.time) : [];
@@ -144,10 +144,10 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
     const service = selectedServices[index];
     if (service.id_service) {
       const selectedService = availableServices.find(
-        (s) => s.id_service === service.id_service,
+        (s) => s.id_service === service.id_service
       );
       if (selectedService?.time) {
-        setAvailableHours(JSON.parse(selectedService.time));
+        setAvailableHours(JSON.parse(selectedService.time as string));
       }
     }
     setHoursModalIsOpen(index);
@@ -266,7 +266,7 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
                           className={cn(
                             "h-10",
                             service.time?.includes(hour) &&
-                              "border-2 border-sky-500 text-primary font-semibold",
+                              "border-2 border-sky-500 text-primary font-semibold"
                           )}
                           onClick={() => toggleHour(index, hour)}
                         >

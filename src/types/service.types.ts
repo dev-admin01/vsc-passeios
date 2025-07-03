@@ -1,29 +1,28 @@
 export interface Services {
   id_service?: number;
   description?: string;
-  type?: number;
+  type?: string;
   price?: string;
   observation?: string;
-  created_at?: string;
-  updated_ate?: string;
-  time: string;
+  created_at?: string | Date;
+  updated_at?: string | Date;
+  time?: string | string[];
 }
 
 export interface ServicesResponse {
-  services: {
-    id_service: number;
-    description: string;
-    type: string;
-    price: string;
-    observation: string;
-    created_at: string;
-    updated_at: string;
-  }[];
+  services: Services[];
   page: number;
   perpage: number;
   lastPage: number;
   totalCount: number;
-  status_code: number;
+}
+
+export interface ServiceInputValues {
+  description: string;
+  type: string;
+  price: string;
+  observation: string;
+  time: string;
 }
 
 export interface CreateServicePayload {
@@ -31,6 +30,7 @@ export interface CreateServicePayload {
   type: string;
   price: string;
   observation: string;
+  time: string[];
 }
 
 export interface ServiceData {
@@ -39,4 +39,5 @@ export interface ServiceData {
   type: string;
   price: string;
   observation: string;
+  time: string;
 }

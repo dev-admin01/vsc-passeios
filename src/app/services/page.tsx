@@ -14,19 +14,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sidebar } from "@/components/sidebar";
 
-import { useServices } from "@/app/hooks/service/useServices";
-import { useDeleteService } from "@/app/hooks/service/useDeleteService";
+import { useService } from "@/app/hooks/services/useService";
 
 import { Edit, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 
 export default function ServicesPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const { useServices, deleteService } = useService();
   const { data, isLoading, error, mutate } = useServices(page, limit, search);
-  const { deleteService } = useDeleteService();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [serviceIdToDelete, setServiceIdToDelete] = useState<number | null>(
@@ -45,10 +43,10 @@ export default function ServicesPage() {
     setIsDeleteLoading(true);
 
     if (serviceIdToDelete) {
-      const response = await deleteService(serviceIdToDelete);
-      toast.success(response.message, { closeButton: true });
+      await deleteService(serviceIdToDelete);
       mutate();
     }
+
     closeDeleteModal();
     setIsDeleteLoading(false);
   }
@@ -106,7 +104,7 @@ export default function ServicesPage() {
             </TableRow>
           )}
           {!isLoading && !error && data?.services?.length
-            ? data.services.map((item) => (
+            ? data.services.map((item: any) => (
                 <TableRow key={item.id_service}>
                   <TableCell>{item.id_service}</TableCell>
                   <TableCell>{item.description}</TableCell>
