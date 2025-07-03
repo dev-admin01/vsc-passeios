@@ -47,7 +47,6 @@ export function AuthProvider({
         const response = await api.get("/api/me");
         if (response.status === 200) {
           setUser(response.data);
-          console.log("User loaded from API:", response.data);
         }
       } catch (error) {
         console.log("Usuário não autenticado ou erro ao buscar dados");
@@ -61,11 +60,8 @@ export function AuthProvider({
   const login = async (email: string, password: string) => {
     const result = await originalLogin(email, password);
 
-    console.log("AuthContext login result:", result);
-
     // Se login foi bem-sucedido, armazena os dados do usuário
     if (result && "authenticatedUser" in result) {
-      console.log("Setting user:", result.authenticatedUser);
       setUser({
         name: result.authenticatedUser.name,
         email: result.authenticatedUser.email,

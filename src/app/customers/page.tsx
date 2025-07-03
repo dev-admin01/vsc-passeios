@@ -11,14 +11,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Sidebar } from "@/components/sidebar";
-import { useCustomer } from "@/app/hooks/costumer/ListCustomer";
+import { useCustomer } from "@/app/hooks/costumer/useCostumer";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Eye, Pencil, Trash2 } from "lucide-react";
-import { DeleteCustomerModal } from "@/components/deleteCustomerModal";
-import { useDeleteCustomer } from "../hooks/costumer/useDeleteCustomer";
 import Link from "next/link";
 import { toast } from "sonner";
+import { Customer } from "@/types/customer.types";
 
 const formatPhoneNumber = (
   ddd: string | undefined,
@@ -37,8 +36,12 @@ export default function CustomersPage() {
   const [page, setPage] = useState(1);
   const [perpage] = useState(10);
   const [search, setSearch] = useState("");
-  const { data, error, isLoading, mutate } = useCustomer(page, perpage, search);
-  const { deleteCustomer } = useDeleteCustomer();
+  const { useCustomers, deleteCustomer } = useCustomer();
+  const { data, error, isLoading, mutate } = useCustomers(
+    page,
+    perpage,
+    search,
+  );
   const [customerToDelete, setCustomerToDelete] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -50,6 +53,7 @@ export default function CustomersPage() {
       localStorage.removeItem("CustomerSuccessMessage");
     }
   }, []);
+
   function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
     setSearch(e.target.value);
     setPage(1);
@@ -68,14 +72,20 @@ export default function CustomersPage() {
     setIsDeleteModalOpen(true);
   }
 
-  async function handleDelete() {
+  function closeDeleteModal() {
+    setIsDeleteModalOpen(false);
+    setCustomerToDelete(null);
+  }
+
+  async function handleConfirmDelete() {
     if (customerToDelete) {
       setIsDeleting(true);
       try {
         await deleteCustomer(customerToDelete);
         mutate();
-        setIsDeleteModalOpen(false);
-        setCustomerToDelete(null);
+        closeDeleteModal();
+      } catch (error) {
+        console.error("Erro ao deletar cliente:", error);
       } finally {
         setIsDeleting(false);
       }
@@ -113,16 +123,14 @@ export default function CustomersPage() {
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
-          {isLoading && (
-            <TableBody>
+          <TableBody>
+            {isLoading && (
               <TableRow>
                 <TableCell colSpan={5} className="text-center">
                   Carregando...
                 </TableCell>
               </TableRow>
-            </TableBody>
-          )}
-          <TableBody>
+            )}
             {error && (
               <TableRow>
                 <TableCell colSpan={5} className="text-center">
@@ -130,15 +138,17 @@ export default function CustomersPage() {
                 </TableCell>
               </TableRow>
             )}
-            {!isLoading && data?.customers.length === 0 ? (
+            {!isLoading && !error && data?.customers?.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} className="text-center">
                   Nenhum cliente cadastrado
                 </TableCell>
               </TableRow>
-            ) : (
-              data?.customers.map((customer) => (
-                <TableRow key={customer.id_costumer}>
+            )}
+            {!isLoading &&
+              !error &&
+              data?.customers?.map((customer: Customer) => (
+                <TableRow key={customer.id_customer}>
                   <TableCell>{customer.nome}</TableCell>
                   <TableCell>{customer.email}</TableCell>
                   <TableCell>
@@ -148,7 +158,7 @@ export default function CustomersPage() {
                     {new Date(customer.created_at || "").toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Link href={`/customers/view/${customer.id_costumer}`}>
+                    <Link href={`/customers/view/${customer.id_customer}`}>
                       <Button
                         variant="ghost"
                         title="Visualizar"
@@ -157,7 +167,7 @@ export default function CustomersPage() {
                         <Eye className="h-4 w-4" />
                       </Button>
                     </Link>
-                    <Link href={`/customers/update/${customer.id_costumer}`}>
+                    <Link href={`/customers/update/${customer.id_customer}`}>
                       <Button
                         variant="ghost"
                         title="Editar"
@@ -169,7 +179,7 @@ export default function CustomersPage() {
                     <Button
                       variant="ghost"
                       onClick={() =>
-                        openDeleteModal(customer.id_costumer || "")
+                        openDeleteModal(customer.id_customer || "")
                       }
                       title="Excluir"
                       className="cursor-pointer"
@@ -178,8 +188,7 @@ export default function CustomersPage() {
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
+              ))}
           </TableBody>
         </Table>
         {data && (
@@ -196,12 +205,33 @@ export default function CustomersPage() {
           </div>
         )}
       </div>
-      <DeleteCustomerModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleDelete}
-        isLoading={isDeleting}
-      />
+
+      {/* Modal de confirmação de exclusão */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white p-4 rounded shadow-md max-w-md w-full">
+            <h3 className="text-lg font-bold mb-2">Confirmar Exclusão</h3>
+            <p>Tem certeza que deseja excluir este cliente?</p>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={closeDeleteModal}
+                className="cursor-pointer"
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="cursor-pointer"
+              >
+                {isDeleting ? "Excluindo..." : "Excluir"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
