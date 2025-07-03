@@ -2,6 +2,7 @@ import retry from "async-retry";
 import prismaClient from "../src/prisma/index";
 import migrator from "../src/models/migrator";
 import user from "@/models/user";
+import customer from "@/models/customer";
 
 import { faker } from "@faker-js/faker";
 
@@ -50,11 +51,30 @@ async function createUser(userData: any) {
   });
 }
 
+async function createCustomer(customerData: any) {
+  // Gerar email único se não fornecido
+  const uniqueEmail =
+    customerData.email || `customer-${Date.now()}-${Math.random()}@example.com`;
+
+  return await customer.create({
+    nome: customerData.nome || faker.person.fullName(),
+    email: uniqueEmail,
+    cpf_cnpj: customerData.cpf_cnpj || faker.string.numeric(11),
+    rg: customerData.rg || faker.string.numeric(9),
+    ddi: customerData.ddi || "55",
+    ddd: customerData.ddd || "11",
+    telefone: customerData.telefone || faker.phone.number(),
+    indicacao: customerData.indicacao || null,
+    ...customerData,
+  });
+}
+
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
   runPendingMigrations,
   createUser,
+  createCustomer,
 };
 
 export default orchestrator;
