@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import authentication from "./models/authentication";
 
 export async function middleware(req: NextRequest) {
-  if (process.env.NODE_ENV !== "production") {
-    return NextResponse.next();
-  }
+  // if (process.env.NODE_ENV !== "production") {
+  //   return NextResponse.next();
+  // }
 
   if (
     req.nextUrl.pathname.startsWith("/login") ||
