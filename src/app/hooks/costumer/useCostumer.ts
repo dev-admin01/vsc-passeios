@@ -11,7 +11,7 @@ import { CustomersResponse } from "@/types/customer.types";
 const fetchCustomers = async (
   page: number,
   perpage: number,
-  search: string,
+  search: string
 ) => {
   const response = await api.get<CustomersResponse>("/api/customers", {
     params: {
@@ -33,7 +33,7 @@ export const useCustomer = () => {
   const useCustomers = (page: number, perpage: number, search: string) => {
     const { data, error, isLoading, mutate } = useSWR<CustomersResponse>(
       ["get-customers", page, perpage, search],
-      () => fetchCustomers(page, perpage, search),
+      () => fetchCustomers(page, perpage, search)
     );
 
     return {
@@ -46,42 +46,60 @@ export const useCustomer = () => {
 
   // Criar customer
   const createCustomer = useCallback(async (customerData: any) => {
-    const response = await api.post("/api/customers", customerData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      const response = await api.post("/api/customers", customerData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    if (response.status !== 201) {
-      toast.error(response.data.message, { closeButton: true });
+      if (response.status !== 201) {
+        toast.error(response.data.message || "Erro ao criar cliente", {
+          closeButton: true,
+        });
+        return false;
+      }
+
+      toast.success(`Cliente ${response.data.nome} criado com sucesso!`, {
+        closeButton: true,
+      });
+
+      return response;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || "Erro ao criar cliente";
+      toast.error(errorMessage, { closeButton: true });
       return false;
     }
-
-    toast.success(`Cliente ${response.data.nome} criado com sucesso!`, {
-      closeButton: true,
-    });
-
-    return response;
   }, []);
 
   // Atualizar customer
   const updateCustomer = useCallback(async (id: string, data: any) => {
-    const response = await api.patch(`/api/customers/${id}`, data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      const response = await api.patch(`/api/customers/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    if (response.status !== 200) {
-      toast.error(response.data.message, { closeButton: true });
+      if (response.status !== 200) {
+        toast.error(response.data.message || "Erro ao atualizar cliente", {
+          closeButton: true,
+        });
+        return false;
+      }
+
+      toast.success(`Cliente ${response.data.nome} atualizado com sucesso!`, {
+        closeButton: true,
+      });
+
+      return response.data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || "Erro ao atualizar cliente";
+      toast.error(errorMessage, { closeButton: true });
       return false;
     }
-
-    toast.success(`Cliente ${response.data.nome} atualizado com sucesso!`, {
-      closeButton: true,
-    });
-
-    return response;
   }, []);
 
   // Deletar customer
