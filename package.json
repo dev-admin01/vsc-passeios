@@ -8,8 +8,8 @@
     "services:down": "docker compose -f infra/compose.yml down",
     "services:stop": "docker compose stop",
     "test": "npm run services:up && concurrently -n next,jest --hide next -k -s command-jest \"TESTING_MODE=true next dev\" \"TESTING_MODE=true jest --runInBand --verbose\"",
-    "vercel-build": "npm run prisma:generate && prisma migrate deploy && next build",
-    "build": "npm run prisma:generate && next build",
+    "vercel-build": "npm run prisma:generate && prisma migrate deploy && npm run prisma:seed && next build",
+    "build": "npm run prisma:generate && prisma migrate deploy && npm run prisma:seed && next build",
     "start": "next start",
     "test:watch": "TESTING_MODE=true jest --watchAll --runInBand --verbose",
     "services:wait:database": "node infra/scripts/wait-for-postgres.js",
@@ -17,7 +17,8 @@
     "lint:prettier:check": "prettier --check .",
     "lint:prettier:fix": "prettier --write .",
     "lint:eslint:check": "next lint",
-    "prisma:generate": "npx prisma generate"
+    "prisma:generate": "npx prisma generate",
+    "prisma:seed": "npx prisma db seed"
   },
   "prisma": {
     "seed": "ts-node ./prisma/seed.ts"
