@@ -16,7 +16,10 @@ async function main() {
   });
 
   const password = "senha123";
-  const passwordHash = await hash(password, 8);
+  const passwordHash =
+    process.env.NODE_ENV === "test"
+      ? password
+      : await hash(password, process.env.NODE_ENV === "production" ? 10 : 1);
 
   if (process.env.NODE_ENV !== "test") {
     await prisma.user.createMany({

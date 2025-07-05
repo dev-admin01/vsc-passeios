@@ -8,7 +8,6 @@ import {
   ServicesSelector,
   ServiceSelection,
 } from "@/components/servicesSelection";
-import { getUserClient } from "@/lib/cookieClient";
 import { useCreateOrder } from "@/app/hooks/orders/useCreateOrders";
 import { Sidebar } from "@/components/sidebar";
 import { ArrowLeft } from "lucide-react";
@@ -88,8 +87,7 @@ export default function NewOrders() {
 
   useEffect(() => {
     const fetchUserId = async () => {
-      const user = await getUserClient();
-      setIdUser(user?.id_user || "");
+      setIdUser("1");
       setLoadingUser(false);
     };
 

@@ -1,4 +1,3 @@
-// Exemplo de rota em app/api/send/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { sendRegister } from "@/components/emailTemplates/sendRegister";

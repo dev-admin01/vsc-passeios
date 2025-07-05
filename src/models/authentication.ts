@@ -2,7 +2,7 @@ import user from "./user";
 import password from "./password";
 import { SignJWT, jwtVerify } from "jose";
 import { UnauthorizedError } from "../errors/errors";
-import { User } from "../types/user.types";
+import { AuthenticatedUser } from "../types/user.types";
 
 async function getAuthenticatedUser(
   providedEmail: string,
@@ -13,7 +13,13 @@ async function getAuthenticatedUser(
 
     await validatePassword(providedPassword, storedUser?.password);
 
-    return storedUser;
+    const authenticatedUser = {
+      id_user: storedUser?.id_user,
+      name: storedUser?.name,
+      email: storedUser?.email,
+      id_position: storedUser?.id_position,
+    };
+    return authenticatedUser;
   } catch (error) {
     console.error("Error in getAuthenticatedUser:", error);
     throw new UnauthorizedError({
@@ -40,10 +46,11 @@ async function validatePassword(
   }
 }
 
-async function generateToken(authenticatedUser: User) {
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+async function generateToken(authenticatedUser: AuthenticatedUser) {
+  const secret = hexToUint8Array(process.env.JWT_SECRET!);
 
   const token = await new SignJWT({
+    id_user: authenticatedUser.id_user,
     name: authenticatedUser.name,
     email: authenticatedUser.email,
   })
@@ -56,9 +63,28 @@ async function generateToken(authenticatedUser: User) {
 }
 
 async function validateToken(token: string) {
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-  const { payload } = await jwtVerify(token, secret);
-  return payload;
+  if (!token) {
+    return false;
+  }
+
+  const secret = hexToUint8Array(process.env.JWT_SECRET!);
+  const { payload } = await jwtVerify(token, secret, {
+    algorithms: ["HS256"],
+  });
+
+  if (!payload || !payload.sub) {
+    return false;
+  }
+
+  return payload.id_user;
+}
+
+function hexToUint8Array(hexString: string) {
+  const byteArray = new Uint8Array(hexString.length / 2);
+  for (let i = 0; i < byteArray.length; i++) {
+    byteArray[i] = parseInt(hexString.substr(i * 2, 2), 16);
+  }
+  return byteArray;
 }
 
 const authentication = {

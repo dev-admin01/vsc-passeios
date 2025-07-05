@@ -1,6 +1,5 @@
 "use client";
 import { api } from "@/services/api";
-import { getCookieclient, getUserClient } from "@/lib/cookieClient";
 
 export interface UpdateOrderPayload {
   id_order: string;
@@ -9,17 +8,8 @@ export interface UpdateOrderPayload {
 
 export const useUpdateStatus = () => {
   const updateStatus = async (payload: UpdateOrderPayload) => {
-    const token = await getCookieclient();
-    const id_user = await getUserClient();
-
-    const statusData = {
-      id_order: payload.id_order,
-      id_user,
-      id_status_order: payload.id_status_order,
-    };
-    const response = await api.put(`/api/statusupdate`, statusData, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    console.log("payload", payload);
+    const response = await api.put(`/api/statusupdate`, payload);
     return response.data;
   };
 

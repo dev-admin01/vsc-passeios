@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import authentication from "@/models/authentication";
-import { cookies } from "next/headers";
 import controller from "@/errors/controller";
+import { cookies } from "next/headers";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,21 +9,25 @@ export async function POST(request: NextRequest) {
 
     const authenticatedUser = await authentication.getAuthenticatedUser(
       userInputValues.email,
-      userInputValues.password
+      userInputValues.password,
     );
 
     const token = await authentication.generateToken(authenticatedUser);
 
-    const cookieStore = await cookies();
+    const authenticatedUserWithToken = {
+      ...authenticatedUser,
+      token,
+    };
 
-    cookieStore.set("token", token, {
+    const cookieStore = await cookies();
+    cookieStore.set("vsc-session", token, {
       httpOnly: true,
       // secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24,
       path: "/",
     });
 
-    return NextResponse.json({ token, authenticatedUser });
+    return NextResponse.json(authenticatedUserWithToken);
   } catch (error: any) {
     return controller.errorHandlers.onError(error);
   }

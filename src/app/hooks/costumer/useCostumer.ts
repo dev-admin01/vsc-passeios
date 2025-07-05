@@ -11,7 +11,7 @@ import { CustomersResponse } from "@/types/customer.types";
 const fetchCustomers = async (
   page: number,
   perpage: number,
-  search: string
+  search: string,
 ) => {
   const response = await api.get<CustomersResponse>("/api/customers", {
     params: {
@@ -33,7 +33,7 @@ export const useCustomer = () => {
   const useCustomers = (page: number, perpage: number, search: string) => {
     const { data, error, isLoading, mutate } = useSWR<CustomersResponse>(
       ["get-customers", page, perpage, search],
-      () => fetchCustomers(page, perpage, search)
+      () => fetchCustomers(page, perpage, search),
     );
 
     return {

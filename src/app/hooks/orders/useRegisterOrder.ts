@@ -3,13 +3,9 @@
 
 import useSWR from "swr";
 import { api } from "@/services/api";
-import { getCookieclient } from "@/lib/cookieClient";
 
 async function fetchOrder(url: string) {
-  const token = await getCookieclient();
-  const response = await api.get(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await api.get(url);
 
   return response.data;
 }

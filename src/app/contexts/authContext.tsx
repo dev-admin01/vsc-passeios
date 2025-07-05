@@ -24,6 +24,8 @@ interface AuthContextType {
   ) => Promise<AuthResponse | AuthErrorResponse | undefined>;
   logout: () => void;
   setUser: (user: User | null) => void;
+  fetchUser: () => Promise<void>;
+  loading: boolean;
 }
 
 interface AuthProviderProps {
@@ -38,34 +40,31 @@ export function AuthProvider({
   children,
 }: AuthProviderProps): React.ReactElement {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const { login: originalLogin, logout: originalLogout } = useAuth();
 
-  // Busca dados do usuário ao carregar o contexto
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await api.get("/api/me");
-        if (response.status === 200) {
-          setUser(response.data);
-        }
-      } catch (error) {
-        console.log("Usuário não autenticado ou erro ao buscar dados");
-        console.log(error);
+  const fetchUser = async () => {
+    try {
+      const response = await api.get("/api/me");
+      if (response.status === 200) {
+        setUser(response.data);
       }
-    };
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUser();
   }, []);
 
   const login = async (email: string, password: string) => {
     const result = await originalLogin(email, password);
 
-    // Se login foi bem-sucedido, armazena os dados do usuário
-    if (result && "authenticatedUser" in result) {
-      setUser({
-        name: result.authenticatedUser.name,
-        email: result.authenticatedUser.email,
-      });
+    if (result && "token" in result) {
+      await fetchUser();
     }
 
     return result;
@@ -77,7 +76,9 @@ export function AuthProvider({
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, setUser }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, fetchUser, setUser, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );

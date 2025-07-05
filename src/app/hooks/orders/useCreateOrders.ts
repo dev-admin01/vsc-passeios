@@ -2,7 +2,6 @@
 
 import { useCallback } from "react";
 import { api } from "@/services/api";
-import { getCookieclient } from "@/lib/cookieClient";
 
 export interface IServiceData {
   id_service: number;
@@ -40,10 +39,7 @@ export const useCreateOrder = () => {
     orderData.services.forEach((service) => {
       service.price = service.price.toString();
     });
-    const token = await getCookieclient();
-    const response = await api.post("/api/orders", orderData, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await api.post("/api/orders", orderData);
     return response.data;
   }, []);
 
