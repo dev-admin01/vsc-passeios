@@ -45,6 +45,7 @@ export async function DELETE(
 
 export async function GET(
   request: NextRequest,
+
   { params }: { params: Promise<{ id_service: string }> },
 ) {
   try {

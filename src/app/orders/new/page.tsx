@@ -125,7 +125,7 @@ export default function NewOrders() {
     e.preventDefault();
     if (loadingUser || !idUser) {
       toast.error(
-        "Aguardando carregamento do usuário. Por favor, tente novamente em instantes."
+        "Aguardando carregamento do usuário. Por favor, tente novamente em instantes.",
       );
       return;
     }
@@ -159,7 +159,7 @@ export default function NewOrders() {
       const response = await createOrder(newOrder);
       localStorage.setItem(
         "orderSuccessMessage",
-        response.message || "Orçamento criado com sucesso!"
+        response.message || "Orçamento criado com sucesso!",
       );
       router.push("/orders");
     } catch (error) {
@@ -286,7 +286,7 @@ export default function NewOrders() {
                           );
                         }
                         return null;
-                      }
+                      },
                     )
                   )}
                 </SelectContent>
