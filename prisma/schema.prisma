@@ -89,6 +89,7 @@ model Order {
   id_customer String?
   customer    Customer? @relation(fields: [id_customer], references: [id_customer])
 
+  pre_cpf_cnpj String?
   pre_name String?
   pre_email String?
   pre_ddi String?
@@ -98,8 +99,7 @@ model Order {
   id_user String
   user    User    @relation(fields: [id_user], references: [id_user])
 
-  price      String?
-  time       String
+  price      String?  
 
   id_cond_pag String?
   cond_pag CondicaoPagamento? @relation(fields: [id_cond_pag], references: [id_cond_pag])

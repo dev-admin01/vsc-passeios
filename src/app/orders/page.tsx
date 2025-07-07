@@ -20,20 +20,22 @@ import {
   FileSearch2,
   FileCheck2,
   BookUp2,
+  Mails,
+  Mail,
+  Signature,
 } from "lucide-react";
 
 import { toast } from "sonner";
 
-import { useOrders } from "@/app/hooks/orders/useOrder";
-import { useDeleteOrder } from "@/app/hooks/orders/useDeleteOrder";
-
-import { useUpdateStatus } from "../hooks/orders/useUpdateStatus";
+import { useOrder } from "@/app/hooks/orders/useOrder";
 
 import { DeleteOrderModal } from "@/components/deleteOrderModal";
 import { SendPdfOrderModal } from "@/components/sendPdfOrderModal";
 import { ClientApprovedModal } from "@/components/clientAprprovedModal";
 import { RegisterLinkModal } from "@/components/registerLinkModal";
 import { VerifyDocsModal } from "@/components/verifyDocsModal";
+import { SendContractModal } from "@/components/sendContractModal";
+import { ConfirmSignatureModal } from "@/components/confirmSignatureModal";
 
 function formatCurrency(value: string | number) {
   if (!value) return "0,00";
@@ -53,9 +55,15 @@ export default function OrdersPage() {
   const [perpage] = useState(10);
   const [search, setSearch] = useState("");
 
+  const {
+    useOrders,
+    deleteOrder,
+    updateStatus,
+    approveOrderDocumentation,
+    sendContract,
+    invalidateOrderDocumentation,
+  } = useOrder();
   const { data, error, isLoading, mutate } = useOrders(page, perpage, search);
-  const { deleteOrder } = useDeleteOrder();
-  const { updateStatus } = useUpdateStatus();
 
   // Modals
 
@@ -91,6 +99,25 @@ export default function OrdersPage() {
   const [orderToDocumentNumber, setOrderToDocumentNumber] = useState<
     string | null
   >(null);
+  const [isInvalidatingDocs, setIsInvalidatingDocs] = useState(false);
+
+  const [isSendContractModalOpen, setIsSendContractModalOpen] = useState(false);
+  const [orderToSendContract, setOrderToSendContract] = useState<string | null>(
+    null,
+  );
+  const [orderToSendContractNumber, setOrderToSendContractNumber] = useState<
+    string | null
+  >(null);
+  const [isSendingContract, setIsSendingContract] = useState(false);
+
+  const [isConfirmSignatureModalOpen, setIsConfirmSignatureModalOpen] =
+    useState(false);
+  const [orderToConfirmSignature, setOrderToConfirmSignature] = useState<
+    string | null
+  >(null);
+  const [orderToConfirmSignatureNumber, setOrderToConfirmSignatureNumber] =
+    useState<string | null>(null);
+  const [isConfirmingSignature, setIsConfirmingSignature] = useState(false);
 
   useEffect(() => {
     const successMessage = localStorage.getItem("orderSuccessMessage");
@@ -128,6 +155,18 @@ export default function OrdersPage() {
     setIsRegisterLinkModalOpen(true);
   }
 
+  function openSendContractModal(id_order: string, order_number: string) {
+    setOrderToSendContract(id_order);
+    setOrderToSendContractNumber(order_number);
+    setIsSendContractModalOpen(true);
+  }
+
+  function openConfirmSignatureModal(id_order: string, order_number: string) {
+    setOrderToConfirmSignature(id_order);
+    setOrderToConfirmSignatureNumber(order_number);
+    setIsConfirmSignatureModalOpen(true);
+  }
+
   async function handleDelete() {
     if (orderToDelete) {
       setIsDeleting(true);
@@ -152,34 +191,27 @@ export default function OrdersPage() {
 
   async function generatePDFInNewTab(id_order: string) {
     const id = id_order;
-    window.open(`/pdf/${id}`, "_blank");
+    window.open(`/pdf/order/${id}`, "_blank");
   }
 
   async function handleSendEmail() {
     setIsSending(true);
-    const id = orderToSendPdf;
-    const order_number = orderToSendPdfNumber;
-    const idData = {
-      id_order: id,
-      order_number: order_number,
+
+    const payload = {
+      id_order: orderToSendPdf,
+      order_number: orderToSendPdfNumber,
     };
     try {
-      const response = await fetch(`/api/send`, {
+      const response = await fetch(`/api/send-email/pdf-order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(idData),
+        body: JSON.stringify(payload),
       });
-      await response.json();
 
-      if (id !== null) {
-        await updateStatus({
-          id_order: id,
-          id_status_order: 2,
-        });
-
-        toast.success(`Orçamento ${order_number} enviado com sucesso!`);
+      if (response.status === 200) {
+        toast.success(`Orçamento ${orderToSendPdfNumber} enviado com sucesso!`);
       } else {
         toast.error("ID do pedido inválido para atualizar o status.");
       }
@@ -204,24 +236,21 @@ export default function OrdersPage() {
   }
 
   async function handleClientApproved(status: number) {
-    const id = orderToClientApproved;
+    const id_order = orderToClientApproved;
     const order_number = orderToClientApprovedNumber;
 
-    if (id !== null) {
-      await updateStatus({
-        id_order: id,
-        id_status_order: status,
-      });
-
+    if (id_order) {
+      await updateStatus(id_order, status);
       mutate();
-      if (status === 3) {
-        toast.success(`Orçamento ${order_number} aprovado com sucesso!`);
-      } else {
-        toast.warning(`Orçamento ${order_number} rejeitado com sucesso!`);
-      }
       setIsClientApprovedModalOpen(false);
       setOrderToClientApproved(null);
       setOrderToClientApprovedNumber(null);
+    }
+
+    if (status === 3) {
+      toast.success(`Orçamento ${order_number} aprovado com sucesso!`);
+    } else {
+      toast.warning(`Orçamento ${order_number} rejeitado com sucesso!`);
     }
   }
 
@@ -231,7 +260,7 @@ export default function OrdersPage() {
     const order_number = orderToRegisterLinkNumber;
 
     try {
-      const response = await fetch(`/api/send/register`, {
+      const response = await fetch(`/api/send-email/register-link`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -240,15 +269,10 @@ export default function OrdersPage() {
       });
       await response.json();
 
-      if (id !== null) {
-        await updateStatus({
-          id_order: id,
-          id_status_order: 5,
-        });
-
+      if (response.status === 200) {
         toast.success(`Link de cadastro ${order_number} enviado com sucesso!`);
       } else {
-        toast.error("ID do pedido inválido para atualizar o status.");
+        toast.error("Erro ao enviar o link de cadastro!");
       }
     } catch (error) {
       console.log(error);
@@ -268,41 +292,122 @@ export default function OrdersPage() {
     mutate();
   }
 
+  // Abre o modal para analisar documentos de um orçamento com status 6
   function openDocumentModal(id_order: string, order_number: string) {
     setOrderToDocument(id_order);
     setOrderToDocumentNumber(order_number);
     setIsDocumentModalOpen(true);
   }
 
-  async function handleVerifyDocs() {
+  // Valida os documentos e altera o status do orçamento para "documentos validados" (status 7)
+  async function handleVerifyDocs(id_cond_pag: string) {
     setIsSending(true);
+    const id_order = orderToDocument;
 
-    const id = orderToDocument;
-    if (id !== null) {
+    if (id_order !== null) {
+      await approveOrderDocumentation(id_order, id_cond_pag);
+
+      mutate();
+      setIsDocumentModalOpen(false);
+      setOrderToDocument(null);
+      setOrderToDocumentNumber(null);
+    }
+
+    setIsSending(false);
+  }
+
+  async function handleInvalidateDocs() {
+    setIsInvalidatingDocs(true);
+    const id_order = orderToDocument;
+
+    if (id_order !== null) {
       try {
-        await updateStatus({
-          id_order: id,
-          id_status_order: 8,
-        });
+        await invalidateOrderDocumentation(id_order);
 
         mutate();
-        toast.success(
-          `Documentos do orçamento ${orderToDocumentNumber} validados com sucesso!`,
-        );
         setIsDocumentModalOpen(false);
         setOrderToDocument(null);
         setOrderToDocumentNumber(null);
       } catch (error) {
         console.log(error);
-        toast.error("Erro ao verificar documentos!");
+        toast.error("Erro ao invalidar documentos!");
       } finally {
-        setIsSending(false);
+        setIsInvalidatingDocs(false);
+      }
+    }
+  }
+
+  async function handleSendContract(link: string) {
+    setIsSendingContract(true);
+    const id_order = orderToSendContract;
+
+    if (id_order !== null) {
+      const status = await sendContract(id_order, link);
+      if (status === 200) {
+        await sendEmailReceiptAndContract();
+      }
+
+      mutate();
+      setIsSendContractModalOpen(false);
+      setOrderToSendContract(null);
+      setOrderToSendContractNumber(null);
+      setIsSendingContract(false);
+    }
+  }
+
+  async function sendEmailReceiptAndContract() {
+    const payload = {
+      id_order: orderToSendContract,
+      order_number: orderToSendContractNumber,
+    };
+
+    const response = await fetch(`/api/send-email/receipt-and-contract`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.status === 200) {
+      toast.success(
+        `Recibo e contrato do orçamento ${orderToSendContractNumber} enviado com sucesso!`,
+      );
+    } else {
+      toast.error("Erro ao enviar o recibo e contrato!");
+    }
+
+    return response.status;
+  }
+
+  async function handleConfirmSignature() {
+    setIsConfirmingSignature(true);
+    const id_order = orderToConfirmSignature;
+    const order_number = orderToConfirmSignatureNumber;
+
+    if (id_order !== null) {
+      try {
+        await updateStatus(id_order, 10);
+
+        toast.success(
+          `Assinatura do orçamento ${order_number} confirmada com sucesso!`,
+        );
+
+        mutate();
+        setIsConfirmSignatureModalOpen(false);
+        setOrderToConfirmSignature(null);
+        setOrderToConfirmSignatureNumber(null);
+      } catch (error) {
+        console.log(error);
+        toast.error("Erro ao confirmar assinatura!");
+      } finally {
+        setIsConfirmingSignature(false);
       }
     }
   }
 
   return (
-    <div className="sm:ml-17 p-4 min-h-screen bg-sky-100">
+    <div className="p-4 min-h-screen bg-sky-100 sm:ml-17 sm:-mt-11">
       <Sidebar />
       <h1 className="text-2xl font-bold mb-4">Orçamentos</h1>
 
@@ -388,7 +493,6 @@ export default function OrdersPage() {
                           <FileCheck2 className="h-4 w-4 text-green-500" />
                         </Button>
                       )}
-
                       <Button
                         variant="ghost"
                         onClick={() => generatePDFInNewTab(order.id_order)}
@@ -397,34 +501,48 @@ export default function OrdersPage() {
                       >
                         <FileArchive className="h-4 w-4" />
                       </Button>
-                      {order.status.id_status_order === 1 && (
+                      {order.status.id_status_order === 1 ||
+                      order.status.id_status_order === 2 ? (
                         <Button
                           variant="ghost"
                           onClick={() =>
                             openSendPdfModal(order.id_order, order.order_number)
                           }
-                          title="Enviar orçamento"
-                          className="cursor-pointer"
-                        >
-                          <Send className="h-4 w-4" />
-                        </Button>
-                      )}
-
-                      {order.status.id_status_order === 3 && (
-                        <Button
-                          variant="ghost"
-                          onClick={() =>
-                            openRegisterLinkModal(
-                              order.id_order,
-                              order.order_number,
-                            )
+                          title={
+                            order.status.id_status_order === 1
+                              ? "Enviar orçamento"
+                              : "Reenviar orçamento"
                           }
-                          title="Enviar cadastro"
                           className="cursor-pointer"
                         >
-                          <BookUp2 className="h-4 w-4" />
+                          {order.status.id_status_order === 1 ? (
+                            <Send className="h-4 w-4" />
+                          ) : (
+                            <Mails className="h-4 w-4" />
+                          )}
                         </Button>
-                      )}
+                      ) : null}
+
+                      {order.status.id_status_order === 3 ||
+                        (order.status.id_status_order === 5 && (
+                          <Button
+                            variant="ghost"
+                            onClick={() =>
+                              openRegisterLinkModal(
+                                order.id_order,
+                                order.order_number,
+                              )
+                            }
+                            title={
+                              order.status.id_status_order === 3
+                                ? "Enviar cadastro"
+                                : "Reenviar cadastro"
+                            }
+                            className="cursor-pointer"
+                          >
+                            <BookUp2 className="h-4 w-4" />
+                          </Button>
+                        ))}
 
                       {order.status.id_status_order === 6 && (
                         <Button
@@ -442,14 +560,47 @@ export default function OrdersPage() {
                         </Button>
                       )}
 
-                      <Button
-                        variant="ghost"
-                        onClick={() => openDeleteModal(order.id_order)}
-                        title="Excluir"
-                        className="cursor-pointer"
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
+                      {order.status.id_status_order === 8 && (
+                        <Button
+                          variant="ghost"
+                          onClick={() =>
+                            openSendContractModal(
+                              order.id_order,
+                              order.order_number,
+                            )
+                          }
+                          title="Enviar contrato e recibo"
+                          className="cursor-pointer"
+                        >
+                          <Mail className="h-4 w-4" />
+                        </Button>
+                      )}
+
+                      {order.status.id_status_order === 9 && (
+                        <Button
+                          variant="ghost"
+                          onClick={() =>
+                            openConfirmSignatureModal(
+                              order.id_order,
+                              order.order_number,
+                            )
+                          }
+                          title="Confirmar assinatura"
+                          className="cursor-pointer"
+                        >
+                          <Signature className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {order.status.id_status_order !== 10 && (
+                        <Button
+                          variant="ghost"
+                          onClick={() => openDeleteModal(order.id_order)}
+                          title="Excluir"
+                          className="cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -515,9 +666,27 @@ export default function OrdersPage() {
         isOpen={isDocumentModalOpen}
         onClose={() => setIsDocumentModalOpen(false)}
         onConfirm={handleVerifyDocs}
+        onInvalidate={handleInvalidateDocs}
         idOrder={orderToDocument || ""}
         orderNumber={orderToDocumentNumber || ""}
         sendLoading={isSending}
+        invalidateLoading={isInvalidatingDocs}
+      />
+
+      <SendContractModal
+        isOpen={isSendContractModalOpen}
+        onClose={() => setIsSendContractModalOpen(false)}
+        onConfirm={handleSendContract}
+        orderNumber={orderToSendContractNumber || ""}
+        isLoading={isSendingContract}
+      />
+
+      <ConfirmSignatureModal
+        isOpen={isConfirmSignatureModalOpen}
+        onClose={() => setIsConfirmSignatureModalOpen(false)}
+        onConfirm={handleConfirmSignature}
+        orderNumber={orderToConfirmSignatureNumber || ""}
+        isLoading={isConfirmingSignature}
       />
     </div>
   );

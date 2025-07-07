@@ -14,6 +14,7 @@ import { api } from "@/services/api";
 interface User {
   name: string;
   email: string;
+  id_user: string;
 }
 
 interface AuthContextType {

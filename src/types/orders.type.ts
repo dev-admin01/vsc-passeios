@@ -49,7 +49,8 @@ export interface EmailOrderProps {
   order_number: string;
   pre_name?: string;
   pre_email?: string;
-  costumer?: Costumer | undefined;
+  customer?: Costumer | undefined;
+  link_signature?: string;
 }
 
 export interface OrdersResponse {
@@ -91,11 +92,4 @@ export interface CondicaoPagamentoPDFProps {
   discount: string;
   created_at?: string;
   updated_at?: string;
-}
-
-export interface PDFData {
-  pdfData: {
-    order: OrderPDFProps;
-    condPag: CondicaoPagamentoPDFProps;
-  };
 }

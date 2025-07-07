@@ -5,6 +5,9 @@ import user from "@/models/user";
 import customer from "@/models/customer";
 
 import { faker } from "@faker-js/faker";
+import midia from "@/models/midia";
+import coupon from "@/models/coupon";
+import service from "@/models/service";
 
 async function waitForAllServices() {
   await waitForWebServices();
@@ -52,7 +55,6 @@ async function createUser(userData: any) {
 }
 
 async function createCustomer(customerData: any) {
-  // Gerar email único se não fornecido
   const uniqueEmail =
     customerData.email || `customer-${Date.now()}-${Math.random()}@example.com`;
 
@@ -69,12 +71,41 @@ async function createCustomer(customerData: any) {
   });
 }
 
+async function createMidia(midiaData: any) {
+  return await midia.create({
+    description: midiaData.description || faker.lorem.sentence(),
+  });
+}
+
+async function createCoupon(couponData: any) {
+  return await coupon.create({
+    coupon:
+      couponData.coupon ||
+      faker.word.adjective({ length: { min: 1, max: 15 } }),
+    discount: couponData.discount || "10",
+    id_midia: couponData.id_midia || null,
+  });
+}
+
+async function createService(serviceData: any) {
+  return await service.create({
+    description: serviceData.description || faker.lorem.sentence(),
+    type: serviceData.type || "0",
+    price: serviceData.price || "10000",
+    observation: serviceData.observation || faker.lorem.sentence(),
+    time: serviceData.time || '["12:00","12:30","13:00","13:30","14:00"]',
+  });
+}
+
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
   runPendingMigrations,
   createUser,
   createCustomer,
+  createMidia,
+  createService,
+  createCoupon,
 };
 
 export default orchestrator;

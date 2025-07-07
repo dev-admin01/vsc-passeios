@@ -1,16 +1,17 @@
 "use client";
 
+import { useAuthContext } from "@/app/contexts/authContext";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CreateOrderPayload } from "@/app/hooks/orders/useCreateOrders";
+import { OrderInputValues } from "@/models/order";
 import {
   ServicesSelector,
   ServiceSelection,
 } from "@/components/servicesSelection";
-import { useCreateOrder } from "@/app/hooks/orders/useCreateOrders";
+import { useOrder } from "@/app/hooks/orders/useOrder";
 import { Sidebar } from "@/components/sidebar";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
@@ -24,23 +25,31 @@ import { useGetCoupons } from "@/app/hooks/orders/useGetCoupons";
 import { useCondicaoPagamento } from "@/app/hooks/condicaoPagamento/useCondicaoPagamento";
 import { useRouter } from "next/navigation";
 import { CondicaoPagamento } from "@/types/condicao-pagamento.types";
+import { useCustomer } from "@/app/hooks/costumer/useCostumer";
 
 export default function NewOrders() {
+  const { user, loading } = useAuthContext();
+  const { useCustomers } = useCustomer();
   const [idUser, setIdUser] = useState<string>("");
+  const [isClientNotFound, setIsClientNotFound] = useState(false);
+  const [id_customer, setIdCustomer] = useState<string>("");
   const [price, setPrice] = useState(0);
   const [services, setServices] = useState<ServiceSelection[]>([]);
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
+  const [cpfCnpj, setCpfCnpj] = useState<string>("");
   const [ddi, setDdi] = useState<string>("");
   const [ddd, setDdd] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
-  const [loadingUser, setLoadingUser] = useState(true);
-  const { createOrder } = useCreateOrder();
-  const [selectedCoupon, setSelectedCoupon] = useState<string>("");
+  const [loadingUser, setLoadingUser] = useState(false);
+  const { createOrder } = useOrder();
+  const [createOrderLoading, setCreateOrderLoading] = useState(false);
+  const [selectedCoupon, setSelectedCoupon] = useState<string>("none");
   const { coupons, loading: loadingCoupons } = useGetCoupons();
   const { data: condicoesPagamento, isLoading: loadingCondPag } =
     useCondicaoPagamento();
-  const [selectedCondPag, setSelectedCondPag] = useState<string>("");
+  const [selectedCondPag, setSelectedCondPag] = useState<string>("none");
+  const { data, mutate } = useCustomers(1, 1, cpfCnpj);
   const router = useRouter();
 
   function formatCurrency(value: number): string {
@@ -68,7 +77,7 @@ export default function NewOrders() {
     const numbers = value.replace(/\D/g, "");
 
     // Limita a 11 dígitos
-    const limitedNumbers = numbers.slice(0, 11);
+    const limitedNumbers = numbers.slice(0, 9);
 
     // Aplica a máscara (9 99999-9999)
     if (limitedNumbers.length <= 1) {
@@ -85,14 +94,60 @@ export default function NewOrders() {
     return value.replace(/\D/g, "");
   }
 
+  // Função para formatar CPF/CNPJ
+  function formatCpfCnpj(value: string): string {
+    // Remove tudo que não é número
+    const numbers = value.replace(/\D/g, "");
+
+    // Limita a 14 dígitos (CNPJ)
+    const limitedNumbers = numbers.slice(0, 14);
+
+    // Aplica a máscara baseada no tamanho
+    // if (limitedNumbers.length <= 11) {
+    // Formato CPF: 000.000.000-00
+    if (limitedNumbers.length <= 3) {
+      return limitedNumbers;
+    } else if (limitedNumbers.length <= 6) {
+      return `${limitedNumbers.slice(0, 3)}.${limitedNumbers.slice(3)}`;
+    } else if (limitedNumbers.length <= 9) {
+      return `${limitedNumbers.slice(0, 3)}.${limitedNumbers.slice(3, 6)}.${limitedNumbers.slice(6)}`;
+    } else {
+      return `${limitedNumbers.slice(0, 3)}.${limitedNumbers.slice(3, 6)}.${limitedNumbers.slice(6, 9)}-${limitedNumbers.slice(9)}`;
+    }
+    // }
+    // } else {
+    //   // Formato CNPJ: 00.000.000/0000-00
+    //   if (limitedNumbers.length <= 2) {
+    //     return limitedNumbers;
+    //   } else if (limitedNumbers.length <= 5) {
+    //     return `${limitedNumbers.slice(0, 2)}.${limitedNumbers.slice(2)}`;
+    //   } else if (limitedNumbers.length <= 8) {
+    //     return `${limitedNumbers.slice(0, 2)}.${limitedNumbers.slice(2, 5)}.${limitedNumbers.slice(5)}`;
+    //   } else if (limitedNumbers.length <= 12) {
+    //     return `${limitedNumbers.slice(0, 2)}.${limitedNumbers.slice(2, 5)}.${limitedNumbers.slice(5, 8)}/${limitedNumbers.slice(8)}`;
+    //   } else {
+    //     return `${limitedNumbers.slice(0, 2)}.${limitedNumbers.slice(2, 5)}.${limitedNumbers.slice(5, 8)}/${limitedNumbers.slice(8, 12)}-${limitedNumbers.slice(12)}`;
+    //   }
+    // }
+  }
+
+  // Função para remover a máscara do CPF/CNPJ
+  function removeCpfCnpjMask(value: string): string {
+    return value.replace(/\D/g, "");
+  }
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
+
   useEffect(() => {
     const fetchUserId = async () => {
-      setIdUser("1");
-      setLoadingUser(false);
+      setIdUser(user?.id_user || "");
     };
-
     fetchUserId();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const total = services.reduce((acc, service) => {
@@ -111,8 +166,8 @@ export default function NewOrders() {
 
     // Aplica desconto do cupom se houver um selecionado
     let finalPrice = total;
-    if (selectedCoupon) {
-      const coupon = coupons.find((c) => c.id_coupons === selectedCoupon);
+    if (selectedCoupon && selectedCoupon !== "none") {
+      const coupon = coupons.find((c: any) => c.id_coupons === selectedCoupon);
       if (coupon) {
         finalPrice = total - total * (Number(coupon.discount) / 100);
       }
@@ -123,23 +178,104 @@ export default function NewOrders() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loadingUser || !idUser) {
+    setCreateOrderLoading(true);
+    if (!idUser) {
+      setCreateOrderLoading(false);
       toast.error(
         "Aguardando carregamento do usuário. Por favor, tente novamente em instantes.",
       );
       return;
     }
 
-    const newOrder: CreateOrderPayload = {
+    if (cpfCnpj.length !== 11) {
+      setCreateOrderLoading(false);
+      toast.error("CPF/CNPJ inválido");
+      return;
+    }
+
+    if (!email || email.length === 0) {
+      setCreateOrderLoading(false);
+      toast.error("Informe um email válido");
+      return;
+    }
+
+    if (!name || name.length === 0) {
+      setCreateOrderLoading(false);
+      toast.error("Informe um nome válido");
+      return;
+    }
+
+    if (!phone || phone.length !== 9) {
+      setCreateOrderLoading(false);
+      toast.error("Informe um telefone válido");
+      return;
+    }
+
+    if (selectedCondPag === "none") {
+      setCreateOrderLoading(false);
+      toast.error("Selecione uma condição de pagamento.");
+      return;
+    }
+
+    for (const service of services) {
+      if (service.id_service === undefined) {
+        setCreateOrderLoading(false);
+        toast.error("Verifique a lista de serviços.");
+        return;
+      }
+      if (
+        service.price === undefined ||
+        service.price === null ||
+        service.price === ""
+      ) {
+        setCreateOrderLoading(false);
+        toast.error("Verifique os preços dos serviços.");
+        return;
+      }
+      if (
+        service.quantity === undefined ||
+        service.quantity === null ||
+        service.quantity === 0
+      ) {
+        setCreateOrderLoading(false);
+        toast.error("Verifique as quantidades dos serviços.");
+        return;
+      }
+      if (
+        service.suggestedDate === undefined ||
+        service.suggestedDate === null ||
+        service.suggestedDate === ""
+      ) {
+        setCreateOrderLoading(false);
+        toast.error("Verifique as datas dos serviços.");
+        return;
+      }
+      if (
+        service.time === undefined ||
+        service.time === null ||
+        service.time.length === 0 ||
+        service.time.length > 1
+      ) {
+        setCreateOrderLoading(false);
+        toast.error("Verifique os horários dos serviços.");
+        return;
+      }
+    }
+
+    const newOrder: OrderInputValues = {
       id_user: idUser,
       pre_name: name,
       pre_email: email,
+      pre_cpf_cnpj: cpfCnpj || undefined,
       pre_ddi: ddi,
       pre_ddd: ddd,
       pre_phone: phone,
-      price: price.toString(),
-      id_cond_pag: selectedCondPag ? selectedCondPag : "",
-      id_coupons: selectedCoupon ? selectedCoupon : "",
+      id_customer: id_customer,
+      price: price.toString().replace(".", ","),
+      id_cond_pag:
+        selectedCondPag && selectedCondPag !== "none" ? selectedCondPag : null,
+      id_coupons:
+        selectedCoupon && selectedCoupon !== "none" ? selectedCoupon : null,
       services: services
         .filter((service) => service.id_service !== undefined)
         .map((service) => ({
@@ -148,50 +284,96 @@ export default function NewOrders() {
           quantity: service.quantity ?? 1,
           discount: service.discount ?? 0,
           suggested_date: service.suggestedDate
-            ? new Date(service.suggestedDate).toISOString()
+            ? new Date(service.suggestedDate + "T00:00:00.000Z").toISOString()
             : undefined,
-          time: service.time?.[0] || undefined,
+          time:
+            service.time && service.time.length > 0
+              ? JSON.stringify(service.time)
+              : undefined,
         })),
     };
 
-    try {
-      console.log("newOrder", newOrder);
-      const response = await createOrder(newOrder);
-      localStorage.setItem(
-        "orderSuccessMessage",
-        response.message || "Orçamento criado com sucesso!",
-      );
+    const response = await createOrder(newOrder);
+    if (response.status === 201) {
+      setCreateOrderLoading(false);
       router.push("/orders");
-    } catch (error) {
-      console.log(error);
-      toast.error("Erro ao criar orçamento");
+    } else {
+      setCreateOrderLoading(false);
     }
   };
 
+  async function verifyClient(cpfCnpj: string) {
+    setLoadingUser(true);
+    mutate();
+    if (data?.customers.length === 1) {
+      setName(data.customers[0].nome || "");
+      setEmail(data.customers[0].email || "");
+      setCpfCnpj(data.customers[0].cpf_cnpj || cpfCnpj);
+      setDdi(data.customers[0].ddi || "");
+      setDdd(data.customers[0].ddd || "");
+      setPhone(removePhoneMask(data.customers[0].telefone || ""));
+      setIdCustomer(data.customers[0].id_customer || "");
+      setIsClientNotFound(false);
+      setLoadingUser(false);
+      return;
+    }
+
+    setIsClientNotFound(true);
+    setLoadingUser(false);
+    return;
+  }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen p-4 bg-sky-100 flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin" />
+      </main>
+    );
+  }
+  if (!user) {
+    return null;
+  }
+
   return (
-    <div className="sm:ml-17 p-4 min-h-screen bg-sky-100">
+    <div className=" p-4 min-h-screen bg-sky-100 sm:ml-17 sm:-mt-11">
       <Sidebar />
       <div className="flex justify-between mb-4">
         <h1 className="text-2xl font-bold">Novo Orçamento</h1>
-        <Button className="cursor-pointer">
-          <Link href="/orders" title="Voltar">
+        <Link href="/orders" title="Voltar">
+          <Button className="cursor-pointer">
             <ArrowLeft />
-          </Link>
-        </Button>
+          </Button>
+        </Link>
       </div>
 
       <div className="bg-white p-4 rounded shadow-md">
         <form onSubmit={handleSubmit} className="flex flex-wrap">
-          <div className="flex flex-wrap">
-            <div className="w-1/2 p-2">
-              <label className="font-semibold">Nome:</label>
+          <div className="flex flex-wrap w-full">
+            <div className="w-full sm:w-1/2 p-2">
+              <label className="font-semibold flex items-center">
+                CPF:
+                {loadingUser ? (
+                  <span className="ml-2 text-red-500">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  </span>
+                ) : (
+                  <>
+                    <span className="ml-2">
+                      {isClientNotFound ? "Cliente não cadastrado" : ""}
+                    </span>
+                  </>
+                )}
+              </label>
               <Input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={formatCpfCnpj(cpfCnpj)}
+                onChange={(e) => setCpfCnpj(removeCpfCnpjMask(e.target.value))}
+                onBlur={() => verifyClient(cpfCnpj)}
+                placeholder="000.000.000-00"
+                maxLength={14}
               />
             </div>
-            <div className="w-1/2 p-2">
+            <div className="w-full sm:w-1/2 p-2">
               <label className="font-semibold">Email:</label>
               <Input
                 type="email"
@@ -199,7 +381,15 @@ export default function NewOrders() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div className="w-1/8 p-2">
+            <div className="w-full sm:w-1/2 p-2">
+              <label className="font-semibold">Nome:</label>
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div className="w-1/2 sm:w-1/8 p-2">
               <label className="font-semibold">DDI:</label>
               <Input
                 type="text"
@@ -207,7 +397,7 @@ export default function NewOrders() {
                 onChange={(e) => setDdi(e.target.value)}
               />
             </div>
-            <div className="w-1/8 p-2">
+            <div className="w-1/2 sm:w-1/8 p-2">
               <label className="font-semibold">DDD:</label>
               <Input
                 type="text"
@@ -215,7 +405,7 @@ export default function NewOrders() {
                 onChange={(e) => setDdd(e.target.value)}
               />
             </div>
-            <div className="w-1/4 p-2">
+            <div className="w-full sm:w-1/4 p-2">
               <label className="font-semibold">Telefone:</label>
               <Input
                 type="text"
@@ -226,7 +416,7 @@ export default function NewOrders() {
             </div>
           </div>
           <div className="flex flex-wrap w-full">
-            <div className="w-1/3 p-2">
+            <div className="w-full sm:w-1/3 p-2">
               <label className="font-semibold ">Cupom de Desconto:</label>
               <Select value={selectedCoupon} onValueChange={setSelectedCoupon}>
                 <SelectTrigger className="w-full">
@@ -239,7 +429,7 @@ export default function NewOrders() {
                       Carregando cupons...
                     </SelectItem>
                   ) : (
-                    coupons.map((coupon) => (
+                    coupons.map((coupon: any) => (
                       <SelectItem
                         key={coupon.id_coupons}
                         value={coupon.id_coupons}
@@ -251,7 +441,7 @@ export default function NewOrders() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="w-1/3 p-2">
+            <div className="w-full sm:w-1/3 p-2">
               <label className="font-semibold ">Condição de Pagamento:</label>
               <Select
                 value={selectedCondPag}
@@ -292,7 +482,7 @@ export default function NewOrders() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="w-1/3 p-2">
+            <div className="w-full sm:w-1/3 p-2">
               <label className="font-semibold">Preço Total (R$):</label>
               <Input type="text" value={formatCurrency(price)} readOnly />
             </div>
@@ -310,7 +500,13 @@ export default function NewOrders() {
             >
               Cancelar
             </Button>
-            <Button type="submit">Criar</Button>
+            <Button type="submit" className="cursor-pointer">
+              {createOrderLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Criar"
+              )}
+            </Button>
           </div>
         </form>
       </div>

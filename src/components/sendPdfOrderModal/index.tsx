@@ -25,13 +25,19 @@ export function SendPdfOrderModal({
         <h3 className="text-lg font-bold mb-2">Enviar Orçamento</h3>
         <p>Deseja enviar o orçamento {orderNumber}?</p>
         <div className="flex justify-end gap-2 mt-4">
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isLoading}
+            className="cursor-pointer"
+          >
             Cancelar
           </Button>
           <Button
             variant="destructive"
             onClick={onConfirm}
             disabled={isLoading}
+            className="cursor-pointer"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />

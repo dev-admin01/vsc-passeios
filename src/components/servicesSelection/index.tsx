@@ -29,20 +29,26 @@ export interface ServiceSelection {
 
 interface ServicesSelectorProps {
   onChange: (services: ServiceSelection[]) => void;
+  initialServices?: ServiceSelection[];
 }
 
-export function ServicesSelector({ onChange }: ServicesSelectorProps) {
+export function ServicesSelector({
+  onChange,
+  initialServices,
+}: ServicesSelectorProps) {
   const [availableServices, setAvailableServices] = useState<Services[]>([]);
-  const [selectedServices, setSelectedServices] = useState<ServiceSelection[]>([
-    {
-      id_service: undefined,
-      price: undefined,
-      discount: 0,
-      quantity: 1,
-      suggestedDate: "",
-      time: [],
-    },
-  ]);
+  const [selectedServices, setSelectedServices] = useState<ServiceSelection[]>(
+    initialServices || [
+      {
+        id_service: undefined,
+        price: undefined,
+        discount: 0,
+        quantity: 1,
+        suggestedDate: "",
+        time: [],
+      },
+    ],
+  );
   const [hoursModalIsOpen, setHoursModalIsOpen] = useState<number | null>(null);
   const [availableHours, setAvailableHours] = useState<string[]>([]);
 
@@ -60,8 +66,9 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
     return hours;
   }
 
-  const hours = generateTimeSlots();
-  console.log(hours);
+  // const hours =
+  generateTimeSlots();
+  // console.log(hours);
 
   useEffect(() => {
     async function fetchServices() {
@@ -70,6 +77,13 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
     }
     fetchServices();
   }, [selectServices]);
+
+  // Atualizar selectedServices quando initialServices mudar
+  useEffect(() => {
+    if (initialServices && initialServices.length > 0) {
+      setSelectedServices(initialServices);
+    }
+  }, [initialServices]);
 
   // Propaga alterações para o componente pai
   useEffect(() => {
@@ -105,7 +119,9 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
   };
 
   const toggleHour = (index: number, hour: string) => {
+    console.log(hour);
     const updated = [...selectedServices];
+    console.log(updated[index].time);
     if (updated[index].time?.includes(hour)) {
       updated[index] = {
         ...updated[index],
@@ -152,7 +168,6 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
     }
     setHoursModalIsOpen(index);
   };
-
   return (
     <div className="space-y-4">
       {selectedServices.map((service, index) => (
@@ -194,6 +209,7 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
                   handleChange(index, "price", value);
                 }}
                 placeholder="0,00"
+                readOnly={true}
               />
             </div>
             {/* <div>
@@ -288,6 +304,7 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
               <Button
                 type="button"
                 variant="destructive"
+                className="cursor-pointer"
                 onClick={() => removeServiceRow(index)}
               >
                 Remover
@@ -296,7 +313,7 @@ export function ServicesSelector({ onChange }: ServicesSelectorProps) {
           </div>
         </div>
       ))}
-      <Button type="button" onClick={addServiceRow}>
+      <Button type="button" onClick={addServiceRow} className="cursor-pointer">
         Adicionar Serviço
       </Button>
     </div>

@@ -44,6 +44,7 @@ export function ClientApprovedModal({
             variant="destructive"
             onClick={onRejected}
             disabled={isLoading}
+            className="cursor-pointer"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -52,7 +53,7 @@ export function ClientApprovedModal({
             )}
           </Button>
           <Button
-            className="bg-green-500 hover:bg-green-600"
+            className="bg-green-500 hover:bg-green-600 cursor-pointer"
             onClick={onApproved}
             disabled={isLoading}
           >

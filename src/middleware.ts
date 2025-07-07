@@ -3,7 +3,7 @@ import { getCookieServer } from "./lib/cookieServer";
 import authentication from "./models/authentication";
 
 export async function middleware(req: NextRequest) {
-  if (process.env.TESTING_MODE) {
+  if (process.env.TESTING_MODE || process.env.NODE_ENV === "development") {
     return NextResponse.next();
   }
   if (
@@ -13,7 +13,12 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname.startsWith("/favicon.ico") ||
     req.nextUrl.pathname.startsWith("/api/sessions") ||
     req.nextUrl.pathname.startsWith("/api/status") ||
-    req.nextUrl.pathname.startsWith("/api/migrations")
+    req.nextUrl.pathname.startsWith("/api/migrations") ||
+    req.nextUrl.pathname.startsWith("/api/orders/public") ||
+    req.nextUrl.pathname.startsWith("/api/pdf") ||
+    req.nextUrl.pathname.startsWith("/api/orders") ||
+    req.nextUrl.pathname.startsWith("/api/receipt") ||
+    req.nextUrl.pathname.startsWith("/pdf/receipt")
   ) {
     return NextResponse.next();
   }

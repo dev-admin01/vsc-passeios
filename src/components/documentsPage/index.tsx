@@ -2,10 +2,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { usePostDocsCostumer } from "@/app/hooks/costumer/useDocsCostumer";
+import { useOrder } from "@/app/hooks/orders/useOrder";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 interface Service {
@@ -25,7 +24,7 @@ interface Costumer {
   nome: string;
   email: string;
   cpf_cnpj: string;
-  passaporte: string;
+  rg: string;
   razao_social: string | null;
   nome_fantasia: string | null;
   ddi: string;
@@ -47,6 +46,8 @@ interface ClientOrderDocumentationProps {
       pre_ddd: string;
       pre_phone: string;
       created_at: string;
+      id_status_order: number;
+      pre_cpf_cnpj: string;
       orders_service: Array<{
         id_order_service: number;
         id_service: number;
@@ -70,7 +71,7 @@ interface ClientOrderDocumentationProps {
         coupon: string;
         discount: string;
       };
-      costumer?: Costumer;
+      customer?: Costumer;
     };
     status_code: number;
   };
@@ -94,28 +95,28 @@ function formatCPF(value: string) {
   }
 }
 
-// Função para formatar Passaporte
-function formatPassport(value: string) {
-  // Converte para maiúsculas e remove caracteres especiais
-  const cleanValue = value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+// Função para formatar RG
+function formatRG(value: string) {
+  // Remove tudo que não é número
+  const numbers = value.replace(/\D/g, "");
 
-  // Separa letras e números
-  const letters = cleanValue.match(/[A-Za-z]+/)?.[0] || "";
-  const numbers = cleanValue.match(/[0-9]+/)?.[0] || "";
-
-  // Limita a 2 letras e 6 números
-  const formattedLetters = letters.slice(0, 2);
-  const formattedNumbers = numbers.slice(0, 6);
-
-  // Retorna o formato AA000000
-  return `${formattedLetters}${formattedNumbers}`;
+  // Aplica a máscara de RG (XX.XXX.XXX-X)
+  if (numbers.length <= 2) {
+    return numbers;
+  } else if (numbers.length <= 5) {
+    return `${numbers.slice(0, 2)}.${numbers.slice(2)}`;
+  } else if (numbers.length <= 8) {
+    return `${numbers.slice(0, 2)}.${numbers.slice(2, 5)}.${numbers.slice(5)}`;
+  } else {
+    return `${numbers.slice(0, 2)}.${numbers.slice(2, 5)}.${numbers.slice(5, 8)}-${numbers.slice(8, 9)}`;
+  }
 }
 
 export default function ClientOrderDocumentation({
   orderData,
   initialOrderNumber,
 }: ClientOrderDocumentationProps) {
-  const { postDoc } = usePostDocsCostumer();
+  const { orderDocumentation } = useOrder();
   const router = useRouter();
   const [idOrder, setIdOrder] = useState("");
   const [orderNumber, setOrderNumber] = useState(initialOrderNumber);
@@ -132,7 +133,7 @@ export default function ClientOrderDocumentation({
 
   // Campos que serão salvos no banco
   const [cpfCnpj, setCpfCnpj] = useState("");
-  const [passaport, setPassaporte] = useState("");
+  const [rg, setRg] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [ddi, setDdi] = useState("");
@@ -172,8 +173,8 @@ export default function ClientOrderDocumentation({
   useEffect(() => {
     if (orderData?.order) {
       const o = orderData.order;
-
       setIdOrder(o.id_order);
+      setCpfCnpj(o.pre_cpf_cnpj || "");
       setOrderNumber(o.order_number);
       setPreName(o.pre_name ?? "");
       setPreEmail(o.pre_email ?? "");
@@ -181,22 +182,22 @@ export default function ClientOrderDocumentation({
       setPreDdd(o.pre_ddd ?? "");
       setPrePhone(o.pre_phone ?? "");
       setPrice(o.price || "");
-      setIdCostumer(o.costumer?.id_costumer || "");
-      setCostumer(o.costumer || null);
+      setIdCostumer(o.customer?.id_costumer || "");
+      setCostumer(o.customer || null);
 
       // Carregando dados do cliente nos inputs
-      if (o.costumer) {
-        setCpfCnpj(o.costumer.cpf_cnpj || "");
-        setPassaporte(o.costumer.passaporte || "");
-        setName(o.costumer.nome || "");
-        setEmail(o.costumer.email || "");
-        setDdi(o.costumer.ddi || "");
-        setDdd(o.costumer.ddd || "");
-        setPhone(o.costumer.telefone || "");
+      if (o.customer) {
+        setCpfCnpj(o.customer.cpf_cnpj || "");
+        setRg(o.customer.rg || "");
+        setName(o.customer.nome || "");
+        setEmail(o.customer.email || "");
+        setDdi(o.customer.ddi || "");
+        setDdd(o.customer.ddd || "");
+        setPhone(o.customer.telefone || "");
       } else {
         // Se não houver cliente, carrega os dados do pré-cadastro
         setCpfCnpj("");
-        setPassaporte("");
+        setRg("");
         setName(o.pre_name || "");
         setEmail(o.pre_email || "");
         setDdi(o.pre_ddi || "");
@@ -206,7 +207,7 @@ export default function ClientOrderDocumentation({
       }
 
       if (o.orders_service) {
-        const mapped = o.orders_service.map((srv) => {
+        const mapped = o.orders_service.map((srv: any) => {
           return {
             id_order_service: srv.id_order_service,
             id_service: srv.id_service,
@@ -251,29 +252,24 @@ export default function ClientOrderDocumentation({
       const payload = {
         id_order: idOrder,
         cpf_cnpj: cpfCnpj,
-        passaport: passaport,
+        rg,
         name,
         email,
         ddi,
         ddd,
-        phone,
+        phone: phone.replace(/\D/g, ""),
         hotel,
-        hotelCheckin,
-        hotelCheckout,
+        hotelCheckin: new Date(hotelCheckin + "T00:00:00.000Z").toISOString(),
+        hotelCheckout: new Date(hotelCheckout + "T00:00:00.000Z").toISOString(),
         compPag,
         cnh,
       };
 
-      const response = await postDoc(payload);
+      const response = await orderDocumentation(payload);
 
-      console.log("1232312", response);
-
-      if (response.status_code === 200) {
-        toast.success("Documentos enviados com sucesso!");
+      if (response.status === 200) {
         router.refresh();
         setIsSaving(false);
-      } else {
-        toast.error(response.message);
       }
     } catch (error) {
       console.error("Erro ao enviar documentos:", error);
@@ -391,16 +387,16 @@ export default function ClientOrderDocumentation({
                 />
               </div>
               <div className="w-1/2 p-2">
-                <label className="font-semibold">Passaporte:</label>
+                <label className="font-semibold">RG:</label>
                 <Input
                   type="text"
-                  value={passaport}
+                  value={rg}
                   onChange={(e) => {
-                    const formattedValue = formatPassport(e.target.value);
-                    setPassaporte(formattedValue);
+                    const formattedValue = formatRG(e.target.value);
+                    setRg(formattedValue);
                   }}
-                  maxLength={8}
-                  placeholder="AA000000"
+                  maxLength={12}
+                  placeholder="00.000.000-0"
                 />
               </div>
               <div className="w-1/2 p-2">

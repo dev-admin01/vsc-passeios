@@ -3,8 +3,18 @@
 import Image from "next/image";
 import { useDocumentation } from "@/app/hooks/documentation/useDocumentation";
 import { Button } from "@/components/ui/button";
-import { Loader2, FileText, Image as ImageIcon, Eye } from "lucide-react";
+import { Loader2, FileText, Image as ImageIcon, Eye, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useCondicaoPagamento } from "@/app/hooks/condicaoPagamento/useCondicaoPagamento";
+import { CondicaoPagamento } from "@/types/condicao-pagamento.types";
+import { toast } from "sonner";
 
 interface Document {
   id_order_documentation: number;
@@ -15,22 +25,29 @@ interface Document {
 interface VerifyDocsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (selectedCondPag: string) => void;
+  onInvalidate: () => void;
   idOrder: string;
   orderNumber: string;
   sendLoading?: boolean;
+  invalidateLoading?: boolean;
 }
 
 export function VerifyDocsModal({
   isOpen,
   onClose,
   onConfirm,
+  onInvalidate,
   idOrder,
   orderNumber,
   sendLoading = false,
+  invalidateLoading = false,
 }: VerifyDocsModalProps) {
   const { data, error, isLoading, mutate } = useDocumentation(idOrder);
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+  const { data: condicoesPagamento, isLoading: loadingCondPag } =
+    useCondicaoPagamento();
+  const [selectedCondPag, setSelectedCondPag] = useState<string>("none");
 
   const handleViewDocument = (doc: Document) => {
     setSelectedDoc(doc);
@@ -58,9 +75,14 @@ export function VerifyDocsModal({
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
       <div className="bg-white p-4 rounded shadow-md max-w-md w-full">
-        <h3 className="text-lg font-bold mb-2">
-          Verificar Documentos do orçamento {orderNumber}
-        </h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-bold mb-2">
+            Verificar Documentos do orçamento {orderNumber}
+          </h3>
+          <Button variant="ghost" onClick={onClose} className="cursor-pointer">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
         {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
         {error && <p>Erro ao carregar documentos</p>}
         {data && data.docsValidation.length > 0 && (
@@ -92,23 +114,76 @@ export function VerifyDocsModal({
             </div>
           </div>
         )}
-        <div className="flex justify-end gap-2 mt-4">
-          <Button variant="destructive" onClick={onClose}>
-            Fechar
-          </Button>
-          {data && data.docsValidation.length > 0 && (
-            <Button
-              variant="outline"
-              onClick={onConfirm}
-              disabled={sendLoading}
-            >
-              {sendLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+
+        <div className="mt-4">
+          <label className="font-semibold">Condição de Pagamento:</label>
+          <Select value={selectedCondPag} onValueChange={setSelectedCondPag}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione uma condição de pagamento" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Nenhuma condição</SelectItem>
+              {loadingCondPag ? (
+                <SelectItem value="loading" disabled>
+                  Carregando condições de pagamento...
+                </SelectItem>
               ) : (
-                "Validar Documentos"
+                condicoesPagamento?.condicoesPagamento.map(
+                  (condPag: CondicaoPagamento) => {
+                    return (
+                      <SelectItem
+                        key={condPag.id_cond_pag}
+                        value={condPag.id_cond_pag.toString()}
+                      >
+                        {condPag.description} - {condPag.installments}{" "}
+                        {Number(condPag.installments) > 1
+                          ? "parcelas"
+                          : "parcela"}
+                      </SelectItem>
+                    );
+                  },
+                )
               )}
-            </Button>
-          )}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex justify-between gap-2 mt-4">
+          <Button
+            onClick={onInvalidate}
+            disabled={invalidateLoading}
+            className="bg-red-500 hover:bg-red-600 text-white cursor-pointer"
+          >
+            {invalidateLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Invalidar Documentos"
+            )}
+          </Button>
+
+          <div className="flex gap-2">
+            {data && data.docsValidation.length > 0 && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (selectedCondPag === "none") {
+                    toast.error(
+                      "Por favor, selecione uma condição de pagamento",
+                    );
+                  } else {
+                    onConfirm(selectedCondPag);
+                  }
+                }}
+                disabled={sendLoading}
+              >
+                {sendLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Validar Documentos"
+                )}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 

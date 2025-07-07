@@ -1,39 +1,33 @@
-import { useState, useEffect } from "react";
-import { api } from "@/services/api";
-import { getCookieclient } from "@/lib/cookieClient";
+"use client";
 
-interface Coupon {
-  id_coupons: string;
-  coupon: string;
-  discount: string;
-  id_midia: number;
+import useSWR from "swr";
+import { api } from "@/services/api";
+import { Coupon } from "@/types/coupon.types";
+
+export interface GetCouponResponse {
+  coupons: Coupon[];
+  page: number;
+  perpage: number;
+  totalCount: number;
+  lastPage: number;
 }
 
+const fetchCoupons = async () => {
+  const response = await api.get<GetCouponResponse>("/api/coupons", {
+    params: { page: 1, perpage: 100 }, // Buscar todos os cupons
+  });
+  return response.data;
+};
+
 export function useGetCoupons() {
-  const [coupons, setCoupons] = useState<Coupon[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, error, isLoading } = useSWR<GetCouponResponse>(
+    "get-coupons-all",
+    fetchCoupons,
+  );
 
-  useEffect(() => {
-    const fetchCoupons = async () => {
-      try {
-        const token = await getCookieclient();
-        const response = await api.get("/api/coupons", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setCoupons(response.data.coupons);
-        setLoading(false);
-      } catch (err) {
-        console.log(err);
-        setError("Erro ao carregar cupons");
-        setLoading(false);
-      }
-    };
-
-    fetchCoupons();
-  }, []);
-
-  return { coupons, loading, error };
+  return {
+    coupons: data?.coupons || [],
+    loading: isLoading,
+    error,
+  };
 }

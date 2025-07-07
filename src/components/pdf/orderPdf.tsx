@@ -8,8 +8,6 @@ import {
   Image,
 } from "@react-pdf/renderer";
 
-import { PDFData } from "@/types/orders.type";
-
 function toTitleCase(str: string) {
   return str.replace(
     /\w\S*/g,
@@ -40,9 +38,10 @@ function formatCurrency(value: string | number | undefined) {
   });
 }
 
-export default function OrderPDF({ pdfData }: PDFData) {
-  const { order, condPag } = pdfData;
-  console.log("order", order);
+export default function OrderPDF({ pdfData }: any) {
+  const { orderPdfData, condPagData } = pdfData;
+  console.log("pdfData no orderPdf", pdfData);
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -57,21 +56,21 @@ export default function OrderPDF({ pdfData }: PDFData) {
           <View>
             <Image
               style={styles.image}
-              src={`${process.env.NEXT_PUBLIC_LOCAL_BASE_URL}/logo.png`}
+              src={`${process.env.NEXT_PUBLIC_BASE_URL}/logo.png`}
             />
           </View>
         </View>
 
         <Text style={styles.title}>Dados do Orçamento</Text>
 
-        <Text style={styles.text}>Orçamento: {order.order_number}</Text>
+        <Text style={styles.text}>Orçamento: {orderPdfData.order_number}</Text>
         <Text style={styles.text}>
-          {order.pre_name ? toTitleCase(order.pre_name) : ""}
+          {orderPdfData.pre_name ? toTitleCase(orderPdfData.pre_name) : ""}
         </Text>
-        <Text style={styles.text}>Email: {order.pre_email}</Text>
+        <Text style={styles.text}>Email: {orderPdfData.pre_email}</Text>
         <Text style={styles.text}>
-          Telefone: +{order.pre_ddi} {order.pre_ddd}{" "}
-          {formatPhone(order.pre_phone || "")}
+          Telefone: +{orderPdfData.pre_ddi} {orderPdfData.pre_ddd}{" "}
+          {formatPhone(orderPdfData.pre_phone || "")}
         </Text>
 
         <View style={styles.line}></View>
@@ -85,7 +84,7 @@ export default function OrderPDF({ pdfData }: PDFData) {
             <Text style={styles.serviceDiscount}>Horário</Text>
             <Text style={styles.serviceDate}>Data sugerida</Text>
           </View>
-          {order.orders_service.map((service, index) => (
+          {orderPdfData.orders_service.map((service: any, index: number) => (
             <View key={index} style={styles.serviceRow}>
               <Text style={styles.serviceDescription}>
                 {service.service.description}
@@ -95,11 +94,14 @@ export default function OrderPDF({ pdfData }: PDFData) {
                 {formatCurrency(service.price)}
               </Text>
               <Text style={styles.serviceDiscount}>
-                {order.orders_service[index].time}
+                {orderPdfData.orders_service[index].time.replace(
+                  /["\[\]]/g,
+                  "",
+                )}
               </Text>
               <Text style={styles.serviceDate}>
                 {new Date(
-                  order.orders_service[index].suggested_date,
+                  orderPdfData.orders_service[index].suggested_date,
                 ).toLocaleDateString("pt-BR")}
               </Text>
             </View>
@@ -108,56 +110,51 @@ export default function OrderPDF({ pdfData }: PDFData) {
 
         <View style={styles.footer}>
           <View style={styles.line}></View>
-
-          {order.coupons ? (
+          {orderPdfData.coupons ? (
             <View>
               <Text style={styles.textCondPag}>
-                Cupom de desconto aplicado: {order.coupons.coupon} -{" "}
-                {order.coupons.discount}%
+                Cupom de desconto aplicado: {orderPdfData.coupons.coupon} -{" "}
+                {orderPdfData.coupons.discount}%
               </Text>
               <Text style={styles.total}>
-                Total: {formatCurrency(order.price)}
+                Total: {formatCurrency(orderPdfData.price)}
               </Text>
             </View>
           ) : (
             <Text style={styles.total}>
-              Total: {formatCurrency(order.price)}
+              Total: {formatCurrency(orderPdfData.price)}
             </Text>
           )}
-
-          {condPag.installments === "1" ? (
-            condPag.description === "Pix" ? (
-              order.coupons ? (
-                <Text key={condPag.description} style={styles.textCondPag}>
-                  Á vista no {condPag.description}.
-                </Text>
-              ) : (
-                <Text key={condPag.description} style={styles.textCondPag}>
-                  À vista no {condPag.description} com {condPag.discount}% de
-                  desconto por{" "}
-                  {formatCurrency(
-                    parseFloat(order.price?.replace(",", ".") || "0") *
-                      (1 - parseFloat(condPag.discount) / 100),
-                  )}
-                </Text>
-              )
-            ) : (
-              <Text key={condPag.description} style={styles.textCondPag}>
-                À vista no {condPag.description}.
-              </Text>
-            )
+          if
+          {orderPdfData.coupons ? (
+            <Text
+              key={orderPdfData.cond_pag.description}
+              style={styles.textCondPag}
+            >
+              Á vista no {condPagData[0].description}
+            </Text>
           ) : (
-            <Text key={condPag.description} style={styles.textCondPag}>
-              Em até {condPag.installments}x no {condPag.description}
+            <Text
+              key={orderPdfData.cond_pag.description}
+              style={styles.textCondPag}
+            >
+              Á vista no {condPagData[0].description} com{" "}
+              {condPagData[0].discount}% de desconto por{" "}
+              {formatCurrency(
+                parseFloat(orderPdfData.price?.replace(",", ".") || "0") *
+                  (1 - parseFloat(condPagData[0].discount) / 100),
+              )}
             </Text>
           )}
-          {order.cond_pag ? (
-            <Text key={order.cond_pag.description} style={styles.textCondPag}>
-              Em até {order.cond_pag.installments}x no{" "}
-              {order.cond_pag.description}
+          {orderPdfData.cond_pag ? (
+            <Text
+              key={orderPdfData.cond_pag.description}
+              style={styles.textCondPag}
+            >
+              Em até {orderPdfData.cond_pag.installments}x no{" "}
+              {orderPdfData.cond_pag.description}
             </Text>
           ) : null}
-
           <View style={styles.line}></View>
           <View style={styles.borda}></View>
         </View>
