@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Sidebar } from "@/components/sidebar";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -85,128 +86,131 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="sm:ml-17 p-4 min-h-screen bg-sky-100">
-      <Sidebar />
-      <h1 className="text-2xl font-bold mb-4">Usuários</h1>
+    <ProtectedRoute>
+      <div className="sm:ml-17 p-4 min-h-screen bg-sky-100">
+        <Sidebar />
+        <h1 className="text-2xl font-bold mb-4">Usuários</h1>
 
-      {/* Busca + Botão Criar */}
-      <div className="flex items-center gap-2 mb-4">
-        <Input
-          type="text"
-          placeholder="Buscar usuários..."
-          value={search}
-          onChange={handleSearchChange}
-          className="bg-amber-50"
-        />
-        <Link href="/users/new">
-          <Button className="cursor-pointer">
-            <UserPlus className="h-4 w-4 mr-2" />
-            Novo usuário
-          </Button>
-        </Link>
-      </div>
-
-      {/* Tabela */}
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableCell>Nome</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Telefone</TableCell>
-            <TableCell>Criado em</TableCell>
-            <TableCell>Ações</TableCell>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading && (
-            <TableRow>
-              <TableCell colSpan={5}>Carregando...</TableCell>
-            </TableRow>
-          )}
-          {error && (
-            <TableRow>
-              <TableCell colSpan={5}>Erro ao carregar usuários.</TableCell>
-            </TableRow>
-          )}
-          {!isLoading && data?.users?.length
-            ? data.users.map((user: User) => (
-                <TableRow key={user.id_user}>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    {formatPhone(user.ddi, user.ddd, user.phone)}
-                  </TableCell>
-                  <TableCell>
-                    {user.created_at
-                      ? new Date(user.created_at).toLocaleDateString("pt-BR")
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Link href={`/users/${user.id_user}`}>
-                        <Button
-                          variant="ghost"
-                          title="Visualizar"
-                          className="cursor-pointer"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </Link>
-
-                      <Link href={`/users/update/${user.id_user}`}>
-                        <Button
-                          variant="ghost"
-                          title="Editar"
-                          className="cursor-pointer"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </Link>
-
-                      <Button
-                        variant="ghost"
-                        onClick={() => openDeleteModal(user)}
-                        title="Excluir"
-                        className="cursor-pointer"
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            : !isLoading &&
-              !error && (
-                <TableRow>
-                  <TableCell colSpan={5}>Nenhum usuário encontrado.</TableCell>
-                </TableRow>
-              )}
-        </TableBody>
-      </Table>
-
-      {/* Paginação */}
-      {data && (
-        <div className="flex items-center justify-center gap-4 mt-4">
-          <Button onClick={previousPage} disabled={page <= 1}>
-            Anterior
-          </Button>
-          <span>
-            Página {data.page || page} de {data.lastPage || 1}
-          </span>
-          <Button onClick={nextPage} disabled={page >= (data.lastPage || 1)}>
-            Próxima
-          </Button>
+        {/* Busca + Botão Criar */}
+        <div className="flex items-center gap-2 mb-4">
+          <Input
+            type="text"
+            placeholder="Buscar usuários..."
+            value={search}
+            onChange={handleSearchChange}
+            className="bg-amber-50"
+          />
+          <Link href="/users/new">
+            <Button className="cursor-pointer">
+              <UserPlus className="h-4 w-4 mr-2" />
+              Novo usuário
+            </Button>
+          </Link>
         </div>
-      )}
 
-      {/* Modal de confirmação */}
-      <DeleteUserModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleDelete}
-        isLoading={isDeleting}
-        userName={userToDelete?.name}
-      />
-    </div>
+        {/* Tabela */}
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableCell>Nome</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Telefone</TableCell>
+              <TableCell>Criado em</TableCell>
+              <TableCell>Ações</TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading && (
+              <TableRow>
+                <TableCell colSpan={5}>Carregando...</TableCell>
+              </TableRow>
+            )}
+            {error && (
+              <TableRow>
+                <TableCell colSpan={5}>Erro ao carregar usuários.</TableCell>
+              </TableRow>
+            )}
+            {!isLoading && data?.users?.length
+              ? data.users.map((user: User) => (
+                  <TableRow key={user.id_user}>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      {formatPhone(user.ddi, user.ddd, user.phone)}
+                    </TableCell>
+                    <TableCell>
+                      {user.created_at
+                        ? new Date(user.created_at).toLocaleDateString("pt-BR")
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Link href={`/users/${user.id_user}`}>
+                          <Button
+                            variant="ghost"
+                            title="Visualizar"
+                            className="cursor-pointer"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </Link>
+
+                        <Link href={`/users/update/${user.id_user}`}>
+                          <Button
+                            variant="ghost"
+                            title="Editar"
+                            className="cursor-pointer"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </Link>
+
+                        <Button
+                          variant="ghost"
+                          onClick={() => openDeleteModal(user)}
+                          title="Excluir"
+                          className="cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              : !isLoading &&
+                !error && (
+                  <TableRow>
+                    <TableCell colSpan={5}>
+                      Nenhum usuário encontrado.
+                    </TableCell>
+                  </TableRow>
+                )}
+          </TableBody>
+        </Table>
+
+        {/* Paginação */}
+        {data && (
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <Button onClick={previousPage} disabled={page <= 1}>
+              Anterior
+            </Button>
+            <span>
+              Página {data.page || page} de {data.lastPage || 1}
+            </span>
+            <Button onClick={nextPage} disabled={page >= (data.lastPage || 1)}>
+              Próxima
+            </Button>
+          </div>
+        )}
+
+        {/* Modal de Exclusão */}
+        <DeleteUserModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={handleDelete}
+          isLoading={isDeleting}
+        />
+      </div>
+    </ProtectedRoute>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-
+import { useAuthContext } from "@/app/contexts/authContext";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Sidebar } from "@/components/sidebar";
@@ -36,6 +36,7 @@ import { RegisterLinkModal } from "@/components/registerLinkModal";
 import { VerifyDocsModal } from "@/components/verifyDocsModal";
 import { SendContractModal } from "@/components/sendContractModal";
 import { ConfirmSignatureModal } from "@/components/confirmSignatureModal";
+import { redirect } from "next/navigation";
 
 function formatCurrency(value: string | number) {
   if (!value) return "0,00";
@@ -55,6 +56,8 @@ export default function OrdersPage() {
   const [perpage] = useState(10);
   const [search, setSearch] = useState("");
 
+  const { user } = useAuthContext();
+
   const {
     useOrders,
     deleteOrder,
@@ -63,6 +66,10 @@ export default function OrdersPage() {
     sendContract,
     invalidateOrderDocumentation,
   } = useOrder();
+  if (user?.id_position === 4) {
+    redirect("/dashboard");
+  }
+
   const { data, error, isLoading, mutate } = useOrders(page, perpage, search);
 
   // Modals
@@ -442,12 +449,12 @@ export default function OrdersPage() {
         <TableBody>
           {isLoading && (
             <TableRow>
-              <TableCell colSpan={7}>Carregando...</TableCell>
+              <TableCell colSpan={7}>Carregando orçamentos...</TableCell>
             </TableRow>
           )}
           {error && (
             <TableRow>
-              <TableCell colSpan={7}>Erro ao carregar orders.</TableCell>
+              <TableCell colSpan={7}>Erro ao carregar orçamentos.</TableCell>
             </TableRow>
           )}
           {!isLoading && data?.orders?.length
@@ -608,7 +615,9 @@ export default function OrdersPage() {
             : !isLoading &&
               !error && (
                 <TableRow>
-                  <TableCell colSpan={7}>Nenhum order encontrado.</TableCell>
+                  <TableCell colSpan={7}>
+                    Nenhum orçamento encontrado.
+                  </TableCell>
                 </TableRow>
               )}
         </TableBody>

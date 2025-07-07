@@ -16,6 +16,7 @@ import {
   Users,
 } from "lucide-react";
 import { useAuthContext } from "@/app/contexts/authContext";
+import { hasNavigationPermission } from "@/lib/permissions";
 
 import {
   TooltipContent,
@@ -25,7 +26,66 @@ import {
 } from "../ui/tooltip";
 
 export function Sidebar() {
-  const { logout } = useAuthContext();
+  const { logout, user } = useAuthContext();
+
+  const position = user?.id_position;
+
+  // Array com as características dos botões de navegação
+  const navigationButtons = [
+    {
+      key: "dashboard",
+      href: "/dashboard",
+      icon: <Home className="h-7 w-7 text-white" />,
+      iconMobile: <Home className="h-5 w-5 transition-all" />,
+      label: "Inicio",
+      srOnly: "incio",
+    },
+    {
+      key: "orders",
+      href: "/orders",
+      icon: <ShoppingBag className="h-7 w-7 text-white" />,
+      iconMobile: <ShoppingBag className="h-5 w-5 transition-all" />,
+      label: "Orçamentos",
+      srOnly: "Orçamentos",
+    },
+    {
+      key: "services",
+      href: "/services",
+      icon: <Sailboat className="h-7 w-7 text-white" />,
+      iconMobile: <Sailboat className="h-5 w-5 transition-all" />,
+      label: "Passeios",
+      srOnly: "Passeios",
+    },
+    {
+      key: "customers",
+      href: "/customers",
+      icon: <Users className="h-7 w-7 text-white" />,
+      iconMobile: <Users className="h-5 w-5 transition-all" />,
+      label: "Clientes",
+      srOnly: "Clientes",
+    },
+    {
+      key: "coupons",
+      href: "/coupons",
+      icon: <TicketPercent className="h-7 w-7 text-white" />,
+      iconMobile: <TicketPercent className="h-5 w-5 transition-all" />,
+      label: "Cupons",
+      srOnly: "Cupons",
+    },
+    {
+      key: "settings",
+      href: "/settings",
+      icon: <Settings className="h-7 w-7 text-white" />,
+      iconMobile: <Settings className="h-5 w-5 transition-all" />,
+      label: "Configurações",
+      srOnly: "Configurações",
+    },
+  ];
+
+  // Função para verificar se o usuário tem permissão para ver um item de navegação
+  const hasPermission = (navigationKey: string) => {
+    return hasNavigationPermission(position || 1, navigationKey);
+  };
 
   return (
     <div className="flex w-full flex-col bg-muted/40">
@@ -45,78 +105,24 @@ export function Sidebar() {
               />
               <span className="sr-only">Dashboard avatar</span>
             </Link>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href="/dashboard"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <Home className="h-7 w-7 text-white" />
-                  <span className="sr-only">incio</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Inicio</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href="/orders"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <ShoppingBag className="h-7 w-7 text-white" />
-                  <span className="sr-only">Orçamentos</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Orçamentos</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href="/services"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <Sailboat className="h-7 w-7 text-white" />
-                  <span className="sr-only">Passeios</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Passeios</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href="/customers"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <Users className="h-7 w-7 text-white" />
-                  <span className="sr-only">Clientes</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Clientes</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href="/coupons"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <TicketPercent className="h-7 w-7 text-white" />
-                  <span className="sr-only">Cupons</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Cupons</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href="/settings"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <Settings className="h-7 w-7 text-white" />
-                  <span className="sr-only">Configurações</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Configurações</TooltipContent>
-            </Tooltip>
+            {navigationButtons.map((button) => {
+              const isVisible = hasPermission(button.key);
+
+              return isVisible ? (
+                <Tooltip key={button.key}>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href={button.href}
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {button.icon}
+                      <span className="sr-only">{button.srOnly}</span>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">{button.label}</TooltipContent>
+                </Tooltip>
+              ) : null;
+            })}
           </TooltipProvider>
         </nav>
 
@@ -126,7 +132,7 @@ export function Sidebar() {
               <TooltipTrigger asChild>
                 <button
                   onClick={logout}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 >
                   <LogOut className="h-7 w-7 text-red-500" />
                   <span className="sr-only">Sair</span>
@@ -166,60 +172,25 @@ export function Sidebar() {
                   <span className="sr-only">Logo do projeto</span>
                 </Link>
 
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                  prefetch={false}
-                >
-                  <Home className="h-5 w-5 transition-all" />
-                  Inicio
-                </Link>
+                {navigationButtons.map((button) => {
+                  const isVisible = hasPermission(button.key);
 
-                <Link
-                  href="/orders"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                  prefetch={false}
-                >
-                  <ShoppingBag className="h-5 w-5 transition-all" />
-                  Orçamentos
-                </Link>
-                <Link
-                  href="/services"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                  prefetch={false}
-                >
-                  <Sailboat className="h-5 w-5 transition-all" />
-                  Passeios
-                </Link>
-                <Link
-                  href="/customers"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                  prefetch={false}
-                >
-                  <Users className="h-5 w-5 transition-all" />
-                  Clientes
-                </Link>
-                <Link
-                  href="/coupons"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                  prefetch={false}
-                >
-                  <TicketPercent className="h-5 w-5 transition-all" />
-                  Cupons
-                </Link>
-
-                <Link
-                  href="/settings"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                  prefetch={false}
-                >
-                  <Settings className="h-5 w-5 transition-all" />
-                  Configurações
-                </Link>
+                  return isVisible ? (
+                    <Link
+                      key={button.key}
+                      href={button.href}
+                      className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                      prefetch={false}
+                    >
+                      {button.iconMobile}
+                      {button.label}
+                    </Link>
+                  ) : null;
+                })}
 
                 <button
                   onClick={logout}
-                  className="flex items-center gap-4 px-2.5 text-red-500 hover:text-red-600 transition-colors duration-200"
+                  className="flex items-center gap-4 px-2.5 text-red-500 hover:text-red-600 transition-colors duration-200 cursor-pointer"
                 >
                   <LogOut className="h-5 w-5 transition-all" />
                   Sair

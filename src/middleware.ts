@@ -3,9 +3,9 @@ import { getCookieServer } from "./lib/cookieServer";
 import authentication from "./models/authentication";
 
 export async function middleware(req: NextRequest) {
-  if (process.env.TESTING_MODE || process.env.NODE_ENV === "development") {
-    return NextResponse.next();
-  }
+  // if (process.env.TESTING_MODE || process.env.NODE_ENV === "development") {
+  //   return NextResponse.next();
+  // }
   if (
     req.nextUrl.pathname.startsWith("/login") ||
     req.nextUrl.pathname.startsWith("/_next") ||
@@ -29,19 +29,26 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  const isValid = await validateToken(token);
+  const userId = await validateToken(token);
 
-  if (!isValid) {
+  if (!userId) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
+  // Remover verificação de posição do middleware
+  // A verificação de permissões será feita nas páginas individuais
   return NextResponse.next();
 }
 
-async function validateToken(token: string) {
+async function validateToken(token: string): Promise<string | false> {
   try {
-    const isValid = await authentication.validateToken(token);
-    return isValid;
+    const userId = await authentication.validateToken(token);
+
+    if (!userId) {
+      return false;
+    }
+
+    return userId as string;
   } catch (error) {
     console.error("Error validating token:", error);
     return false;

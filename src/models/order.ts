@@ -1,7 +1,10 @@
 import prismaClient from "@/prisma";
 import { ValidationError, NotFoundError } from "@/errors/errors";
 import { ConvertCurrency } from "@/lib/shared/currencyConverter";
+import { getCookieServer } from "@/lib/cookieServer";
 import customer from "./customer";
+import authentication from "./authentication";
+import user from "./user";
 
 export interface OrderInputValues {
   id_user: string;
@@ -12,7 +15,7 @@ export interface OrderInputValues {
   pre_phone?: string;
   pre_cpf_cnpj?: string;
   price?: string;
-  id_customer?: string;
+  id_customer?: string | null;
   id_cond_pag?: string | null;
   id_coupons?: string | null;
   hotel?: string;
@@ -193,8 +196,29 @@ async function findAllWithPagination({
 }) {
   const offset = (page - 1) * perpage;
 
+  let id_user = null;
+  let jwtToken = null;
+  let userPosition = null;
+
+  jwtToken = await getCookieServer();
+
+  if (jwtToken) {
+    id_user = await authentication.validateToken(jwtToken);
+
+    if (id_user) {
+      const userStored = await user.findOneById(id_user as string);
+      userPosition = userStored?.id_position;
+    }
+  }
+
+  const baseWhere =
+    userPosition !== 1 && userPosition !== 2
+      ? { id_user: id_user as string }
+      : {};
+
   const whereClause = search
     ? {
+        ...baseWhere,
         OR: [
           { id_order: { contains: search, mode: "insensitive" as const } },
           { order_number: { contains: search, mode: "insensitive" as const } },
@@ -210,7 +234,7 @@ async function findAllWithPagination({
           },
         ],
       }
-    : {};
+    : baseWhere;
 
   const [orders, totalCount] = await Promise.all([
     prismaClient.order.findMany({

@@ -32,7 +32,7 @@ export default function NewOrders() {
   const { useCustomers } = useCustomer();
   const [idUser, setIdUser] = useState<string>("");
   const [isClientNotFound, setIsClientNotFound] = useState(false);
-  const [id_customer, setIdCustomer] = useState<string>("");
+  const [id_customer, setIdCustomer] = useState<string | null>(null);
   const [price, setPrice] = useState(0);
   const [services, setServices] = useState<ServiceSelection[]>([]);
   const [name, setName] = useState<string>("");

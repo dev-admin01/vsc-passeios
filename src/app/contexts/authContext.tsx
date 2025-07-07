@@ -15,6 +15,7 @@ interface User {
   name: string;
   email: string;
   id_user: string;
+  id_position: number;
 }
 
 interface AuthContextType {

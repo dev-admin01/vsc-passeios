@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Sidebar } from "@/components/sidebar";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useMidia } from "../hooks/midia/useMidia";
 import { Edit, Trash2, Plus } from "lucide-react";
 import { EditMidiaModal } from "../../components/editMidiaModal";
@@ -54,105 +55,107 @@ export default function MidiaPage() {
   };
 
   return (
-    <div className="sm:ml-17 p-4 min-h-screen bg-sky-100">
-      <Sidebar />
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Mídias</h1>
-        <div className="flex gap-4">
-          <Input
-            placeholder="Buscar mídias..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="bg-amber-50 w-64"
-          />
-          <Button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="cursor-pointer flex items-center justify-center sm:justify-center"
-          >
-            <Plus className="w-4 h-4 sm:mr-2" />
-            <span className="hidden sm:block">Nova Mídia</span>
-          </Button>
+    <ProtectedRoute>
+      <div className="sm:ml-17 p-4 min-h-screen bg-sky-100">
+        <Sidebar />
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Mídias</h1>
+          <div className="flex gap-4">
+            <Input
+              placeholder="Buscar mídias..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="bg-amber-50 w-64"
+            />
+            <Button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="cursor-pointer flex items-center justify-center sm:justify-center"
+            >
+              <Plus className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:block">Nova Mídia</span>
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Descrição</TableHead>
-              <TableHead>Data de Criação</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={3} className="text-center">
-                  Carregando...
-                </TableCell>
+                <TableHead>Descrição</TableHead>
+                <TableHead>Data de Criação</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
               </TableRow>
-            ) : !data?.midias || data.midias.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={3} className="text-center">
-                  Nenhuma mídia cadastrada
-                </TableCell>
-              </TableRow>
-            ) : (
-              data.midias.map((midia) => (
-                <TableRow key={midia.id_midia}>
-                  <TableCell>{midia.description}</TableCell>
-                  <TableCell>
-                    {midia.created_at
-                      ? new Date(midia.created_at).toLocaleDateString()
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(midia)}
-                      className="cursor-pointer"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(midia)}
-                      className="cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-500" />
-                    </Button>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center">
+                    Carregando...
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : !data?.midias || data.midias.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center">
+                    Nenhuma mídia cadastrada
+                  </TableCell>
+                </TableRow>
+              ) : (
+                data.midias.map((midia) => (
+                  <TableRow key={midia.id_midia}>
+                    <TableCell>{midia.description}</TableCell>
+                    <TableCell>
+                      {midia.created_at
+                        ? new Date(midia.created_at).toLocaleDateString()
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(midia)}
+                        className="cursor-pointer"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(midia)}
+                        className="cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {selectedMidia && (
+          <>
+            <EditMidiaModal
+              midia={selectedMidia}
+              isOpen={isEditModalOpen}
+              onClose={() => setIsEditModalOpen(false)}
+              onSuccess={() => {}}
+            />
+            <DeleteMidiaModal
+              isOpen={isDeleteModalOpen}
+              onClose={() => setIsDeleteModalOpen(false)}
+              onConfirm={handleDeleteConfirm}
+              isLoading={isDeleteLoading}
+            />
+          </>
+        )}
+
+        <CreateMidiaModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSuccess={() => {}}
+        />
       </div>
-
-      {selectedMidia && (
-        <>
-          <EditMidiaModal
-            midia={selectedMidia}
-            isOpen={isEditModalOpen}
-            onClose={() => setIsEditModalOpen(false)}
-            onSuccess={() => {}}
-          />
-          <DeleteMidiaModal
-            isOpen={isDeleteModalOpen}
-            onClose={() => setIsDeleteModalOpen(false)}
-            onConfirm={handleDeleteConfirm}
-            isLoading={isDeleteLoading}
-          />
-        </>
-      )}
-
-      <CreateMidiaModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={() => {}}
-      />
-    </div>
+    </ProtectedRoute>
   );
 }
