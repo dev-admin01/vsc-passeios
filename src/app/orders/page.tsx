@@ -37,19 +37,7 @@ import { VerifyDocsModal } from "@/components/verifyDocsModal";
 import { SendContractModal } from "@/components/sendContractModal";
 import { ConfirmSignatureModal } from "@/components/confirmSignatureModal";
 import { redirect } from "next/navigation";
-
-function formatCurrency(value: string | number) {
-  if (!value) return "0,00";
-
-  const numericValue =
-    typeof value === "string"
-      ? parseFloat(value.replace(/[^\d,-]/g, "").replace(",", "."))
-      : value;
-  return numericValue.toLocaleString("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
+import { ConvertCurrency } from "@/lib/shared/currencyConverter";
 
 export default function OrdersPage() {
   const [page, setPage] = useState(1);
@@ -95,7 +83,7 @@ export default function OrdersPage() {
 
   const [isRegisterLinkModalOpen, setIsRegisterLinkModalOpen] = useState(false);
   const [orderToRegisterLink, setOrderToRegisterLink] = useState<string | null>(
-    null,
+    null
   );
   const [orderToRegisterLinkNumber, setOrderToRegisterLinkNumber] = useState<
     string | null
@@ -110,7 +98,7 @@ export default function OrdersPage() {
 
   const [isSendContractModalOpen, setIsSendContractModalOpen] = useState(false);
   const [orderToSendContract, setOrderToSendContract] = useState<string | null>(
-    null,
+    null
   );
   const [orderToSendContractNumber, setOrderToSendContractNumber] = useState<
     string | null
@@ -378,7 +366,7 @@ export default function OrdersPage() {
 
     if (response.status === 200) {
       toast.success(
-        `Recibo e contrato do orçamento ${orderToSendContractNumber} enviado com sucesso!`,
+        `Recibo e contrato do orçamento ${orderToSendContractNumber} enviado com sucesso!`
       );
     } else {
       toast.error("Erro ao enviar o recibo e contrato!");
@@ -397,7 +385,7 @@ export default function OrdersPage() {
         await updateStatus(id_order, 10);
 
         toast.success(
-          `Assinatura do orçamento ${order_number} confirmada com sucesso!`,
+          `Assinatura do orçamento ${order_number} confirmada com sucesso!`
         );
 
         mutate();
@@ -412,6 +400,7 @@ export default function OrdersPage() {
       }
     }
   }
+  console.log("data", data?.orders);
 
   return (
     <div className="p-4 min-h-screen bg-sky-100 sm:ml-17 sm:-mt-11">
@@ -465,7 +454,9 @@ export default function OrdersPage() {
                     {order.costumer ? order.costumer.nome : order.pre_name}
                   </TableCell>
                   <TableCell>{order.user?.name || "N/A"}</TableCell>
-                  <TableCell>{formatCurrency(order.price)}</TableCell>
+                  <TableCell>
+                    {ConvertCurrency.formatCurrency(order.price)}
+                  </TableCell>
 
                   <TableCell>
                     {new Date(order.created_at).toLocaleDateString("pt-BR")}
@@ -491,7 +482,7 @@ export default function OrdersPage() {
                           onClick={() =>
                             openClientApprovedModal(
                               order.id_order,
-                              order.order_number,
+                              order.order_number
                             )
                           }
                           title="Aprovar orçamento"
@@ -530,26 +521,25 @@ export default function OrdersPage() {
                         </Button>
                       ) : null}
 
-                      {order.status.id_status_order === 3 ||
-                        (order.status.id_status_order === 5 && (
-                          <Button
-                            variant="ghost"
-                            onClick={() =>
-                              openRegisterLinkModal(
-                                order.id_order,
-                                order.order_number,
-                              )
-                            }
-                            title={
-                              order.status.id_status_order === 3
-                                ? "Enviar cadastro"
-                                : "Reenviar cadastro"
-                            }
-                            className="cursor-pointer"
-                          >
-                            <BookUp2 className="h-4 w-4" />
-                          </Button>
-                        ))}
+                      {order.status.id_status_order === 3 && (
+                        <Button
+                          variant="ghost"
+                          onClick={() =>
+                            openRegisterLinkModal(
+                              order.id_order,
+                              order.order_number
+                            )
+                          }
+                          title={
+                            order.status.id_status_order === 3
+                              ? "Enviar cadastro"
+                              : "Reenviar cadastro"
+                          }
+                          className="cursor-pointer"
+                        >
+                          <BookUp2 className="h-4 w-4" />
+                        </Button>
+                      )}
 
                       {order.status.id_status_order === 6 && (
                         <Button
@@ -557,7 +547,7 @@ export default function OrdersPage() {
                           onClick={() =>
                             openDocumentModal(
                               order.id_order,
-                              order.order_number,
+                              order.order_number
                             )
                           }
                           title="Analisar documentos"
@@ -573,7 +563,7 @@ export default function OrdersPage() {
                           onClick={() =>
                             openSendContractModal(
                               order.id_order,
-                              order.order_number,
+                              order.order_number
                             )
                           }
                           title="Enviar contrato e recibo"
@@ -589,7 +579,7 @@ export default function OrdersPage() {
                           onClick={() =>
                             openConfirmSignatureModal(
                               order.id_order,
-                              order.order_number,
+                              order.order_number
                             )
                           }
                           title="Confirmar assinatura"

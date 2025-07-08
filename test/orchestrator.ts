@@ -91,7 +91,7 @@ async function createService(serviceData: any) {
   return await service.create({
     description: serviceData.description || faker.lorem.sentence(),
     type: serviceData.type || "0",
-    price: serviceData.price || "10000",
+    price: serviceData.price || "799.99",
     observation: serviceData.observation || faker.lorem.sentence(),
     time: serviceData.time || '["12:00","12:30","13:00","13:30","14:00"]',
   });

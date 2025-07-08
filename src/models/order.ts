@@ -44,7 +44,7 @@ export interface OrderUpdateValues {
   pre_cpf_cnpj?: string;
   price?: string;
   time?: string;
-  id_customer?: string;
+  id_customer?: string | null;
   id_cond_pag?: string;
   id_coupons?: string;
   hotel?: string;
@@ -70,7 +70,7 @@ async function create(orderInputValues: OrderInputValues) {
   // Converter preço para centavos se fornecido
   if (orderInputValues.price) {
     orderInputValues.price = ConvertCurrency.realToCents(
-      orderInputValues.price,
+      orderInputValues.price
     );
   }
 
@@ -106,7 +106,17 @@ async function create(orderInputValues: OrderInputValues) {
         created_at: true,
         updated_at: true,
         orders_service: true,
-        user: true,
+        user: {
+          select: {
+            id_user: true,
+            name: true,
+            email: true,
+            id_position: true,
+            ddi: true,
+            ddd: true,
+            phone: true,
+          },
+        },
       },
     });
 
@@ -116,7 +126,7 @@ async function create(orderInputValues: OrderInputValues) {
 
 async function updateById(
   id: string,
-  orderInputValues: OrderUpdateValues,
+  orderInputValues: OrderUpdateValues
 ): Promise<any> {
   await findOneById(id);
 
@@ -130,8 +140,13 @@ async function updateById(
   // Converter preço para centavos se fornecido
   if (orderInputValues.price) {
     orderInputValues.price = ConvertCurrency.realToCents(
-      orderInputValues.price,
+      orderInputValues.price
     );
+  }
+  if (orderInputValues.services) {
+    orderInputValues.services.forEach((service) => {
+      service.price = ConvertCurrency.realToCents(service.price);
+    });
   }
 
   const updateData = {
@@ -181,6 +196,12 @@ async function updateById(
       updatedOrder.price = ConvertCurrency.centsToReal(updatedOrder.price);
     }
 
+    updatedOrder.orders_service.forEach((service) => {
+      if (service.price) {
+        service.price = ConvertCurrency.centsToReal(service.price);
+      }
+    });
+
     return updatedOrder;
   }
 }
@@ -211,11 +232,13 @@ async function findAllWithPagination({
     }
   }
 
-  const baseWhere =
-    userPosition !== 1 && userPosition !== 2
-      ? { id_user: id_user as string }
-      : {};
+  let baseWhere = {};
 
+  if (userPosition && userPosition > 2) {
+    baseWhere = { id_user: id_user as string };
+  }
+
+  console.log("baseWhere", baseWhere);
   const whereClause = search
     ? {
         ...baseWhere,
@@ -329,6 +352,12 @@ async function findOneById(id: string) {
       order.price = ConvertCurrency.centsToReal(order.price);
     }
 
+    order.orders_service.forEach((service) => {
+      if (service.price) {
+        service.price = ConvertCurrency.centsToReal(service.price);
+      }
+    });
+
     return order;
   }
 }
@@ -410,7 +439,7 @@ async function updateDocumentation(payload: any) {
   if (storedOrder.customer) {
     storedCustomer = await customer.updateById(
       storedOrder.customer.id_customer,
-      customerData,
+      customerData
     );
   } else {
     storedCustomer = await customer.create(customerData);
@@ -448,7 +477,7 @@ async function approveDocumentation(payload: any) {
 
   const appliedPrice = await checkAppliedCoupon(
     storedOrder,
-    payload.id_cond_pag,
+    payload.id_cond_pag
   );
 
   const updatedOrder = await prismaClient.order.update({
@@ -470,7 +499,10 @@ async function approveDocumentation(payload: any) {
   return updatedOrder;
 }
 
-async function checkAppliedCoupon(storedOrder: any, id_cond_pag: string) {
+export async function checkAppliedCoupon(
+  storedOrder: any,
+  id_cond_pag: string
+) {
   const storedCondPag = await prismaClient.condicaoPagamento.findUnique({
     where: { id_cond_pag },
   });
@@ -486,23 +518,19 @@ async function checkAppliedCoupon(storedOrder: any, id_cond_pag: string) {
     !storedOrder.id_coupons &&
     storedCondPag?.description.toLowerCase() === "pix"
   ) {
-    // Converte o preço de string real para centavos
     const priceInCents = ConvertCurrency.realToCents(storedOrder.price);
 
-    // Converte o desconto de string para número
     const discountPercentage = parseFloat(storedCondPag.discount) / 100;
 
-    // Calcula o valor do desconto em centavos
     const discountInCents = Math.round(
-      parseInt(priceInCents, 10) * discountPercentage,
+      parseInt(priceInCents, 10) * discountPercentage
     );
 
-    // Aplica o desconto
     const finalPriceInCents = parseInt(priceInCents, 10) - discountInCents;
 
     console.log(
       "finalPrice",
-      ConvertCurrency.centsToReal(finalPriceInCents.toString()),
+      ConvertCurrency.centsToReal(finalPriceInCents.toString())
     );
 
     return finalPriceInCents.toString();

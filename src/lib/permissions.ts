@@ -6,12 +6,13 @@ const adminOnlyRoutes = [
   "/midia",
   "/settings",
   "/condicao-pagamento",
+  "/suppliers",
 ];
 
 // Função para verificar se o usuário tem permissão para acessar uma rota
 export function hasPermissionForRoute(
   userPosition: number,
-  pathname: string,
+  pathname: string
 ): boolean {
   // Managers (1) e Admins (2) têm acesso total
   if (userPosition === 1 || userPosition === 2) {
@@ -30,7 +31,7 @@ export function hasPermissionForRoute(
 // Função para verificar se o usuário pode ver um item de navegação
 export function hasNavigationPermission(
   userPosition: number,
-  navigationKey: string,
+  navigationKey: string
 ): boolean {
   // Managers (1) e Admins (2) podem ver tudo
   if (userPosition === 1 || userPosition === 2) {

@@ -50,7 +50,7 @@ export default function UpdateOrderPage({
   const [updateOrderLoading, setUpdateOrderLoading] = useState(false);
   const [originalCouponId, setOriginalCouponId] = useState<string | null>(null);
   const [originalCondPagId, setOriginalCondPagId] = useState<string | null>(
-    null,
+    null
   );
   const { getOrder, updateOrder } = useOrder();
   const { coupons, loading: loadingCoupons } = useGetCoupons();
@@ -72,7 +72,6 @@ export default function UpdateOrderPage({
     const reaisFormatados = reais.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     return `${reaisFormatados},${centavos}`;
   }
-
   // Função para formatar telefone
   function formatPhone(value: string): string {
     const numbers = value.replace(/\D/g, "");
@@ -107,19 +106,6 @@ export default function UpdateOrderPage({
     } else {
       return `${limitedNumbers.slice(0, 3)}.${limitedNumbers.slice(3, 6)}.${limitedNumbers.slice(6, 9)}-${limitedNumbers.slice(9)}`;
     }
-    // } else {
-    //   // Formato CNPJ: 00.000.000/0000-00
-    //   if (limitedNumbers.length <= 2) {
-    //     return limitedNumbers;
-    //   } else if (limitedNumbers.length <= 5) {
-    //     return `${limitedNumbers.slice(0, 2)}.${limitedNumbers.slice(2)}`;
-    //   } else if (limitedNumbers.length <= 8) {
-    //     return `${limitedNumbers.slice(0, 2)}.${limitedNumbers.slice(2, 5)}.${limitedNumbers.slice(5)}`;
-    //   } else if (limitedNumbers.length <= 12) {
-    //     return `${limitedNumbers.slice(0, 2)}.${limitedNumbers.slice(2, 5)}.${limitedNumbers.slice(5, 8)}/${limitedNumbers.slice(8)}`;
-    //   } else {
-    //     return `${limitedNumbers.slice(0, 2)}.${limitedNumbers.slice(2, 5)}.${limitedNumbers.slice(5, 8)}/${limitedNumbers.slice(8, 12)}-${limitedNumbers.slice(12)}`;
-    //   }
   }
 
   // Função para remover a máscara do CPF/CNPJ
@@ -191,7 +177,7 @@ export default function UpdateOrderPage({
   useEffect(() => {
     if (!loadingCoupons && coupons.length > 0 && originalCouponId) {
       const couponExists = coupons.some(
-        (c) => c.id_coupons === originalCouponId,
+        (c) => c.id_coupons === originalCouponId
       );
       if (couponExists) {
         setSelectedCoupon(originalCouponId);
@@ -211,7 +197,7 @@ export default function UpdateOrderPage({
       originalCondPagId
     ) {
       const condPagExists = condicoesPagamento.condicoesPagamento.some(
-        (c) => c.id_cond_pag.toString() === originalCondPagId,
+        (c) => c.id_cond_pag.toString() === originalCondPagId
       );
       if (condPagExists) {
         setSelectedCondPag(originalCondPagId);
@@ -253,7 +239,7 @@ export default function UpdateOrderPage({
     setUpdateOrderLoading(true);
     if (!idUser) {
       toast.error(
-        "Aguardando carregamento do usuário. Por favor, tente novamente em instantes.",
+        "Aguardando carregamento do usuário. Por favor, tente novamente em instantes."
       );
       return;
     }
@@ -321,6 +307,7 @@ export default function UpdateOrderPage({
         toast.error("Verifique as datas dos serviços.");
         return;
       }
+      console.log("service", service.time);
       if (
         service.time === undefined ||
         service.time === null ||
@@ -335,7 +322,7 @@ export default function UpdateOrderPage({
 
     const updatedOrder: OrderUpdateValues = {
       id_user: idUser,
-      id_customer: idCustomer,
+      id_customer: idCustomer || null,
       pre_name: name,
       pre_email: email,
       pre_cpf_cnpj: cpfCnpj || undefined,
@@ -355,7 +342,7 @@ export default function UpdateOrderPage({
         .filter((service) => service.id_service !== undefined)
         .map((service) => ({
           id_service: service.id_service!,
-          price: service.price?.toString() || "0",
+          price: service.price?.toString().replace(".", ",") || "0",
           quantity: service.quantity ?? 1,
           discount: service.discount ?? 0,
           suggested_date: service.suggestedDate
@@ -367,7 +354,7 @@ export default function UpdateOrderPage({
               : undefined,
         })),
     };
-
+    console.log("updatedOrder", updatedOrder);
     const response = await updateOrder(orderId, updatedOrder);
     if (response) {
       router.push("/orders");
@@ -531,7 +518,7 @@ export default function UpdateOrderPage({
                         (cond) =>
                           cond.description !== "Pix" &&
                           cond.description !== "pix" &&
-                          cond.description !== "PIX",
+                          cond.description !== "PIX"
                       )
                       ?.map((cond) => (
                         <SelectItem
