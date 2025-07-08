@@ -6,6 +6,10 @@ export async function middleware(req: NextRequest) {
   // if (process.env.TESTING_MODE || process.env.NODE_ENV === "development") {
   //   return NextResponse.next();
   // }
+  console.log("middleware");
+  console.log(req.nextUrl.pathname);
+  console.log(process.env.NODE_ENV);
+
   if (
     req.nextUrl.pathname.startsWith("/login") ||
     req.nextUrl.pathname.startsWith("/_next") ||
@@ -23,13 +27,23 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = await getCookieServer();
+  let token = null;
+
+  token = await getCookieServer();
+
+  let response: NextResponse | null = null;
+
+  if (!token) {
+    const mobileResult = await mobileToken(req);
+    token = mobileResult.token;
+    response = mobileResult.response;
+  }
 
   if (!token) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
-
-  const userId = await validateToken(token);
+  console.log("token-middleware", token);
+  const userId = await validateToken(token as string);
 
   if (!userId) {
     return NextResponse.redirect(new URL("/login", req.url));
@@ -40,15 +54,32 @@ export async function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
+async function mobileToken(req: NextRequest) {
+  const bearerToken = req.headers.get("Authorization");
+  const token = bearerToken?.split(" ")[1] || null;
+
+  if (!token) {
+    return { token: null, response: null };
+  }
+
+  console.log("token-mobile", token);
+  console.log(typeof token);
+
+  const response = NextResponse.next();
+  response.cookies.set("vsc-session", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24,
+    path: "/",
+  });
+
+  return { token, response };
+}
+
 async function validateToken(token: string): Promise<string | false> {
   try {
     const userId = await authentication.validateToken(token);
-
-    if (!userId) {
-      return false;
-    }
-
-    return userId as string;
+    return userId ? (userId as string) : false;
   } catch (error) {
     console.error("Error validating token:", error);
     return false;

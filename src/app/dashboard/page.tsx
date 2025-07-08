@@ -18,11 +18,14 @@ import {
   ShoppingBagIcon,
 } from "lucide-react";
 import { useAuthContext } from "../contexts/authContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDashboard } from "../hooks/dashboard/useDashboard";
 
 export default function Dashboard() {
   const { user, loading } = useAuthContext();
+  const { data, isLoading, error, mutate } = useDashboard();
+
   const router = useRouter();
 
   useEffect(() => {
@@ -42,6 +45,8 @@ export default function Dashboard() {
   if (!user) {
     return null;
   }
+
+  console.log("data", data);
 
   return (
     <main className="sm:ml-17 min-h-screen  p-4 bg-sky-100">
