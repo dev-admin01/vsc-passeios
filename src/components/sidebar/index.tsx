@@ -14,6 +14,7 @@ import {
   ShoppingBag,
   TicketPercent,
   Users,
+  Truck,
 } from "lucide-react";
 import { useAuthContext } from "@/app/contexts/authContext";
 import { hasNavigationPermission } from "@/lib/permissions";
@@ -71,6 +72,14 @@ export function Sidebar() {
       iconMobile: <TicketPercent className="h-5 w-5 transition-all" />,
       label: "Cupons",
       srOnly: "Cupons",
+    },
+    {
+      key: "suppliers",
+      href: "/suppliers",
+      icon: <Truck className="h-7 w-7 text-white" />,
+      iconMobile: <Truck className="h-5 w-5 transition-all" />,
+      label: "Fornecedores",
+      srOnly: "Fornecedores",
     },
     {
       key: "settings",

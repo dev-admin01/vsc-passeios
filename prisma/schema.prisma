@@ -60,6 +60,7 @@ model Session {
   @@map("services")
   
   orders_service OrderService[]
+  service_supplier ServiceSupplier[]
 }
 
 model Customer {
@@ -228,4 +229,54 @@ model CondicaoPagamento {
   orders Order[]
 
   @@map("condicoes_pagamentos")
+}
+
+enum Jurisdicao {
+  BRASIL
+  SAN_ANDRES  
+}
+
+model Supplier {
+  id_supplier        String      @id @default(uuid())
+  nome_fantasia      String
+  jurisdicao         Jurisdicao
+
+  // BRASIL
+  cnpj               String?     @unique
+  razao_social       String?
+  inscricao_estadual String?  
+
+  // SAN_ANDRES
+  tax_id             String?     @unique  // Nome mais genérico
+  registro_san       String?     @unique
+  license_number     String?
+  tipo_atividade     String?
+
+  // Campos comuns
+  email              String?
+  telefone           String?
+  endereco           String?
+  data_cadastro      DateTime    @default(now())
+
+  @@index([jurisdicao])
+  @@index([cnpj])
+  @@index([registro_san])
+
+  service_supplier ServiceSupplier[]
+  @@map("suppliers")
+}
+
+model ServiceSupplier {
+  id_service_supplier Int @id @default(autoincrement())
+
+  id_service Int
+  service Service @relation(fields: [id_service], references: [id_service])
+
+  id_supplier String
+  supplier Supplier @relation(fields: [id_supplier], references: [id_supplier])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@map("services_suppliers")
 }
