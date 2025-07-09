@@ -27,10 +27,25 @@ function changeCurrency(event: React.ChangeEvent<HTMLInputElement>) {
   event.target.value = value;
 }
 
+// "9719,99" to "9.719,99"
+export function formatCurrency(value: string | number) {
+  if (!value) return "0,00";
+
+  const numericValue =
+    typeof value === "string"
+      ? parseFloat(value.replace(/[^\d,-]/g, "").replace(",", "."))
+      : value;
+  return numericValue.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 const ConvertCurrency = {
   realToCents,
   centsToReal,
   changeCurrency,
+  formatCurrency,
 };
 
 export { ConvertCurrency };

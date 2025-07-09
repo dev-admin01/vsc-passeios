@@ -6,6 +6,7 @@ import { useOrder } from "@/app/hooks/orders/useOrder";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { ConvertCurrency } from "@/lib/shared/currencyConverter";
 
 interface Service {
   id_order_service: number;
@@ -146,16 +147,18 @@ export default function ClientOrderDocumentation({
   const [cnh, setCnh] = useState<string>("");
 
   // Estados para a autorização visual
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(true);
   const [typedOrderNumber, setTypedOrderNumber] = useState("");
   const [authError, setAuthError] = useState("");
 
   const [isSaving, setIsSaving] = useState(false);
 
+  console.log("orderData", orderData);
+
   // Ao selecionar arquivos, geramos o base64
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    setValue: React.Dispatch<React.SetStateAction<string>>,
+    setValue: React.Dispatch<React.SetStateAction<string>>
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -277,20 +280,6 @@ export default function ClientOrderDocumentation({
     }
   };
 
-  function formatCurrency(value: string | number) {
-    if (!value) return "0,00";
-
-    const numericValue =
-      typeof value === "string"
-        ? parseFloat(value.replace(/[^\d,-]/g, "").replace(",", "."))
-        : value;
-
-    return numericValue.toLocaleString("pt-BR", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  }
-
   if (orderData === null) return <div>Carregando...</div>;
   if (orderData?.status_code !== 200)
     return <div>Erro ao carregar a ordem.</div>;
@@ -364,7 +353,7 @@ export default function ClientOrderDocumentation({
                 )}
                 <div>
                   <span className="font-semibold me-2">Preço: </span> R${" "}
-                  {formatCurrency(price)}
+                  {ConvertCurrency.formatCurrency(price)}
                 </div>
               </div>
             </div>
@@ -510,14 +499,18 @@ export default function ClientOrderDocumentation({
                     {service.type === "1" && (
                       <p className="text-red-500">Necessário CNH</p>
                     )}
-                    <p>Preço: R$ {formatCurrency(service.price)}</p>
+                    <p>
+                      Preço: R$ {ConvertCurrency.formatCurrency(service.price)}
+                    </p>
                     <p>
                       Data Sugerida:{" "}
                       {new Date(service.suggestedDate).toLocaleDateString(
-                        "pt-BR",
+                        "pt-BR"
                       )}
                     </p>
-                    {service.time && <p>Horário: {service.time}</p>}
+                    {service.time && (
+                      <p>Horário: {service.time.replace(/["\[\]]/g, "")}</p>
+                    )}
                     <p>{service.observation}</p>
                   </div>
                 ))}

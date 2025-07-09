@@ -6,9 +6,6 @@ export async function middleware(req: NextRequest) {
   // if (process.env.TESTING_MODE || process.env.NODE_ENV === "development") {
   //   return NextResponse.next();
   // }
-  console.log("middleware");
-  console.log(req.nextUrl.pathname);
-  console.log(process.env.NODE_ENV);
 
   if (
     req.nextUrl.pathname.startsWith("/login") ||
@@ -22,7 +19,8 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname.startsWith("/api/pdf") ||
     req.nextUrl.pathname.startsWith("/api/orders") ||
     req.nextUrl.pathname.startsWith("/api/receipt") ||
-    req.nextUrl.pathname.startsWith("/pdf/receipt")
+    req.nextUrl.pathname.startsWith("/pdf/receipt") ||
+    req.nextUrl.pathname.startsWith("/public")
   ) {
     return NextResponse.next();
   }
@@ -40,9 +38,11 @@ export async function middleware(req: NextRequest) {
   }
 
   if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    const mobileResult = await mobileToken(req);
+    token = mobileResult.token;
+    response = mobileResult.response;
   }
-  console.log("token-middleware", token);
+
   const userId = await validateToken(token as string);
 
   if (!userId) {
@@ -61,9 +61,6 @@ async function mobileToken(req: NextRequest) {
   if (!token) {
     return { token: null, response: null };
   }
-
-  console.log("token-mobile", token);
-  console.log(typeof token);
 
   const response = NextResponse.next();
   response.cookies.set("vsc-session", token, {

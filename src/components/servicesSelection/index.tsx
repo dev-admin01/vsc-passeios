@@ -47,7 +47,7 @@ export function ServicesSelector({
         suggestedDate: "",
         time: [],
       },
-    ],
+    ]
   );
   const [hoursModalIsOpen, setHoursModalIsOpen] = useState<number | null>(null);
   const [availableHours, setAvailableHours] = useState<string[]>([]);
@@ -68,7 +68,6 @@ export function ServicesSelector({
 
   // const hours =
   generateTimeSlots();
-  // console.log(hours);
 
   useEffect(() => {
     async function fetchServices() {
@@ -93,7 +92,7 @@ export function ServicesSelector({
   const handleChange = (
     index: number,
     field: keyof ServiceSelection,
-    value: any,
+    value: any
   ) => {
     const updated = [...selectedServices];
     updated[index] = { ...updated[index], [field]: value };
@@ -103,7 +102,7 @@ export function ServicesSelector({
   const handleServiceSelect = (index: number, value: string) => {
     const serviceId = Number(value);
     const selectedService = availableServices.find(
-      (s) => s.id_service === serviceId,
+      (s) => s.id_service === serviceId
     );
     const price = selectedService ? selectedService.price : undefined;
     // const time = selectedService?.time ? JSON.parse(selectedService.time) : [];
@@ -119,9 +118,7 @@ export function ServicesSelector({
   };
 
   const toggleHour = (index: number, hour: string) => {
-    console.log(hour);
     const updated = [...selectedServices];
-    console.log(updated[index].time);
     if (updated[index].time?.includes(hour)) {
       updated[index] = {
         ...updated[index],
@@ -160,7 +157,7 @@ export function ServicesSelector({
     const service = selectedServices[index];
     if (service.id_service) {
       const selectedService = availableServices.find(
-        (s) => s.id_service === service.id_service,
+        (s) => s.id_service === service.id_service
       );
       if (selectedService?.time) {
         setAvailableHours(JSON.parse(selectedService.time as string));
@@ -282,7 +279,7 @@ export function ServicesSelector({
                           className={cn(
                             "h-10",
                             service.time?.includes(hour) &&
-                              "border-2 border-sky-500 text-primary font-semibold",
+                              "border-2 border-sky-500 text-primary font-semibold"
                           )}
                           onClick={() => toggleHour(index, hour)}
                         >

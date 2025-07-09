@@ -37,19 +37,7 @@ import { VerifyDocsModal } from "@/components/verifyDocsModal";
 import { SendContractModal } from "@/components/sendContractModal";
 import { ConfirmSignatureModal } from "@/components/confirmSignatureModal";
 import { redirect } from "next/navigation";
-
-function formatCurrency(value: string | number) {
-  if (!value) return "0,00";
-
-  const numericValue =
-    typeof value === "string"
-      ? parseFloat(value.replace(/[^\d,-]/g, "").replace(",", "."))
-      : value;
-  return numericValue.toLocaleString("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
+import { ConvertCurrency } from "@/lib/shared/currencyConverter";
 
 export default function OrdersPage() {
   const [page, setPage] = useState(1);
@@ -412,6 +400,7 @@ export default function OrdersPage() {
       }
     }
   }
+  console.log("data", data?.orders);
 
   return (
     <div className="p-4 min-h-screen bg-sky-100 sm:ml-17 sm:-mt-11">
@@ -465,7 +454,9 @@ export default function OrdersPage() {
                     {order.costumer ? order.costumer.nome : order.pre_name}
                   </TableCell>
                   <TableCell>{order.user?.name || "N/A"}</TableCell>
-                  <TableCell>{formatCurrency(order.price)}</TableCell>
+                  <TableCell>
+                    {ConvertCurrency.formatCurrency(order.price)}
+                  </TableCell>
 
                   <TableCell>
                     {new Date(order.created_at).toLocaleDateString("pt-BR")}
