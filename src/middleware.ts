@@ -38,7 +38,9 @@ export async function middleware(req: NextRequest) {
   }
 
   if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    const mobileResult = await mobileToken(req);
+    token = mobileResult.token;
+    response = mobileResult.response;
   }
 
   const userId = await validateToken(token as string);

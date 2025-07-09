@@ -82,6 +82,14 @@ export function Sidebar() {
     //   srOnly: "Fornecedores",
     // },
     {
+      key: "suppliers",
+      href: "/suppliers",
+      icon: <Truck className="h-7 w-7 text-white" />,
+      iconMobile: <Truck className="h-5 w-5 transition-all" />,
+      label: "Fornecedores",
+      srOnly: "Fornecedores",
+    },
+    {
       key: "settings",
       href: "/settings",
       icon: <Settings className="h-7 w-7 text-white" />,
