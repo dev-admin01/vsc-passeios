@@ -15,9 +15,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useSuppliers } from "@/app/hooks/suppliers/useSuppliers";
-import { useServices } from "@/app/hooks/suppliers/useServices";
 import { CreateSupplierRequest, Jurisdicao } from "@/types/supplier.types";
-import { useAuthContext } from "@/app/contexts/authContext";
 import { SupplierServicesSelection } from "@/components/supplierServicesSelection";
 
 const formSchema = z
@@ -74,7 +72,6 @@ const formSchema = z
 type FormValues = z.infer<typeof formSchema>;
 
 export default function NewSupplierPage() {
-  const { user } = useAuthContext();
   const router = useRouter();
   const { createSupplier } = useSuppliers();
 
@@ -200,7 +197,7 @@ export default function NewSupplierPage() {
                       name="jurisdicao"
                       value="BRASIL"
                       checked={watchedJurisdicao === "BRASIL"}
-                      onChange={(e) => {
+                      onChange={() => {
                         form.setValue("jurisdicao", "BRASIL");
                         // Limpar campos da outra jurisdição
                         form.setValue("tax_id", "");
@@ -219,7 +216,7 @@ export default function NewSupplierPage() {
                       name="jurisdicao"
                       value="SAN_ANDRES"
                       checked={watchedJurisdicao === "SAN_ANDRES"}
-                      onChange={(e) => {
+                      onChange={() => {
                         form.setValue("jurisdicao", "SAN_ANDRES");
                         // Limpar campos da outra jurisdição
                         form.setValue("cnpj", "");

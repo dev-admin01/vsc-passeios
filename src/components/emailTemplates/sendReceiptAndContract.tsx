@@ -18,7 +18,10 @@ export const sendPDFOrderEmail = ({
   pre_name,
   customer,
   link_signature,
-}: EmailOrderProps) => {
+  pdfLinks,
+}: EmailOrderProps & {
+  pdfLinks?: Array<{ nome: string; url: string; fileName: string }>;
+}) => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   const urlPDF = `${baseUrl}/pdf/receipt/${id_order}`;
@@ -60,6 +63,25 @@ export const sendPDFOrderEmail = ({
             <br />
             <br />
             <Link href={`${urlPDF}`}>Recibo de pagamento</Link>
+
+            {pdfLinks && pdfLinks.length > 0 && (
+              <>
+                <br />
+                <br />
+                <Text className="text-black text-[16px] font-semibold mb-2">
+                  Documentos adicionais:
+                </Text>
+                {pdfLinks.map((link, index) => (
+                  <div key={index} className="mb-2">
+                    <Link href={link.url} className="text-blue-600 underline">
+                      📄 {link.nome}
+                    </Link>
+                    <br />
+                  </div>
+                ))}
+              </>
+            )}
+
             <Text>
               Estamos super animados para fazer parte dessa jornada e ajudar a
               transformar seus sonhos em realidade. Se surgir qualquer dúvida ou

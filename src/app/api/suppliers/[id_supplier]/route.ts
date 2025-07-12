@@ -6,7 +6,7 @@ const unsupportedMethodHandler = () => controller.errorHandlers.onNoMatch();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id_supplier: string }> }
+  { params }: { params: Promise<{ id_supplier: string }> },
 ) {
   try {
     const { id_supplier } = await params;
@@ -23,7 +23,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id_supplier: string }> }
+  { params }: { params: Promise<{ id_supplier: string }> },
 ) {
   try {
     const { id_supplier } = await params;
@@ -31,7 +31,7 @@ export async function PATCH(
 
     const updatedSupplier = await supplier.updateById(
       id_supplier,
-      supplierInputValues
+      supplierInputValues,
     );
 
     return NextResponse.json(updatedSupplier, { status: 200 });
@@ -45,7 +45,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id_supplier: string }> }
+  { params }: { params: Promise<{ id_supplier: string }> },
 ) {
   try {
     const { id_supplier } = await params;

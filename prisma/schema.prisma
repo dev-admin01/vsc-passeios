@@ -280,3 +280,15 @@ model ServiceSupplier {
 
   @@map("services_suppliers")
 }
+
+model DocumentosPDF {
+  id String @id @default(uuid())
+  nome String
+  arquivo_1_base64 String @db.Text
+  arquivo_2_base64 String? @db.Text
+  arquivo_3_base64 String? @db.Text
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("documentos_pdf")
+}

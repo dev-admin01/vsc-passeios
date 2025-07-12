@@ -7,7 +7,6 @@ import { toast } from "sonner";
 
 import {
   SuppliersResponse,
-  Supplier,
   CreateSupplierRequest,
   UpdateSupplierRequest,
 } from "@/types/supplier.types";
@@ -16,7 +15,7 @@ import {
 const fetchSuppliers = async (
   page: number,
   perpage: number,
-  search: string
+  search: string,
 ) => {
   const response = await api.get<SuppliersResponse>("/api/suppliers", {
     params: {
@@ -38,7 +37,7 @@ export const useSuppliers = () => {
   const useSuppliersData = (page: number, perpage: number, search: string) => {
     const { data, error, isLoading, mutate } = useSWR<SuppliersResponse>(
       ["get-suppliers", page, perpage, search],
-      () => fetchSuppliers(page, perpage, search)
+      () => fetchSuppliers(page, perpage, search),
     );
 
     return {
@@ -70,7 +69,7 @@ export const useSuppliers = () => {
           `Fornecedor ${response.data.nome_fantasia} criado com sucesso!`,
           {
             closeButton: true,
-          }
+          },
         );
 
         return response;
@@ -81,7 +80,7 @@ export const useSuppliers = () => {
         return false;
       }
     },
-    []
+    [],
   );
 
   // Atualizar supplier
@@ -105,7 +104,7 @@ export const useSuppliers = () => {
           `Fornecedor ${response.data.nome_fantasia} atualizado com sucesso!`,
           {
             closeButton: true,
-          }
+          },
         );
 
         return response.data;
@@ -116,7 +115,7 @@ export const useSuppliers = () => {
         return false;
       }
     },
-    []
+    [],
   );
 
   // Deletar supplier
@@ -143,7 +142,7 @@ export const useSuppliers = () => {
         error.response?.data?.message || "Erro ao deletar fornecedor",
         {
           closeButton: true,
-        }
+        },
       );
       return false;
     }
@@ -169,7 +168,7 @@ export const useSuppliers = () => {
         error.response?.data?.message || "Erro ao buscar fornecedor",
         {
           closeButton: true,
-        }
+        },
       );
       return null;
     }
