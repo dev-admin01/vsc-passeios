@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { Settings, Image, CreditCard, Users } from "lucide-react";
+import { Settings, Image, CreditCard, Users, FileText } from "lucide-react";
 import { Sidebar } from "@/components/sidebar";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
@@ -27,6 +27,12 @@ export default function SettingsPage() {
       description: "Configure as condições de pagamento",
       icon: <CreditCard className="w-6 h-6" />,
       path: "/condicao-pagamento",
+    },
+    {
+      title: "Anexos Padrão",
+      description: "Gerencie documentos PDF padrão",
+      icon: <FileText className="w-6 h-6" />,
+      path: "/anexos-padrao",
     },
   ];
 

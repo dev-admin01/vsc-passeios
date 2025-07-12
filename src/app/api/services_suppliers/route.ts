@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
         totalCount,
         lastPage,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     if (error.message?.includes("Token")) {
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     if (!id_supplier || !id_service) {
       return NextResponse.json(
         { message: "ID do fornecedor e ID do serviço são obrigatórios" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     if (existingAssociation) {
       return NextResponse.json(
         { message: "Esta associação já existe" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 

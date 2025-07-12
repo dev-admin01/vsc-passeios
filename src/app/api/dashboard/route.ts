@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import controller from "@/errors/controller";
-import { getCookieServer } from "@/lib/cookieServer";
-import { cookies } from "next/headers";
-
+import dashboard from "@/models/dashboard";
 export async function GET(request: NextRequest) {
   try {
-    const token = request.cookies.get("vsc-session")?.value;
-    console.log("token na api", token);
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    return NextResponse.json({ message: "Dashboard" });
+    const id_user = request.headers.get("x-user-id");
+    const id_position = request.headers.get("x-user-position");
+
+    const dashboardData = await dashboard.getDashboard(
+      id_user as string,
+      Number(id_position),
+    );
+
+    return NextResponse.json(dashboardData);
   } catch (error: any) {
     return controller.errorHandlers.onError(error);
   }

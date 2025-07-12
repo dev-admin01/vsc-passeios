@@ -30,7 +30,7 @@ export default function SuppliersPage() {
   const { data, error, isLoading, mutate } = useSuppliersData(
     page,
     perpage,
-    search
+    search,
   );
 
   const [supplierToDelete, setSupplierToDelete] = useState<string | null>(null);
@@ -193,7 +193,7 @@ export default function SuppliersPage() {
                     <TableCell>{formatPhone(supplier.telefone)}</TableCell>
                     <TableCell>
                       {new Date(supplier.data_cadastro).toLocaleDateString(
-                        "pt-BR"
+                        "pt-BR",
                       )}
                     </TableCell>
                     <TableCell className="text-right">

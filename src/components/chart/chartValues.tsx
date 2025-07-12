@@ -1,6 +1,6 @@
 "use client";
 
-import { ShoppingBag } from "lucide-react";
+import { DollarSign } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -21,17 +21,17 @@ import {
   Tooltip,
 } from "recharts";
 
-interface MonthlyOrderData {
+interface MonthlyValueData {
   month: string;
   total: number;
   invoiced: number;
 }
 
-interface ChartOverviewProps {
-  data?: MonthlyOrderData[];
+interface ChartValuesProps {
+  data?: MonthlyValueData[];
 }
 
-export function ChartOverview({ data }: ChartOverviewProps) {
+export function ChartValues({ data }: ChartValuesProps) {
   const chartData = data || [
     { month: "January", total: 0, invoiced: 0 },
     { month: "February", total: 0, invoiced: 0 },
@@ -43,14 +43,32 @@ export function ChartOverview({ data }: ChartOverviewProps) {
 
   const chartConfig = {
     total: {
-      label: "Total de Pedidos",
-      color: "#2563eb",
+      label: "Valor Total",
+      color: "#16a34a",
     },
     invoiced: {
-      label: "Pedidos Faturados",
-      color: "#60a5fa",
+      label: "Valor Faturado",
+      color: "#84cc16",
     },
   } satisfies ChartConfig;
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
+
+  const formatCurrencyShort = (value: number) => {
+    if (value >= 1000000) {
+      return `R$ ${(value / 1000000).toFixed(1)}M`;
+    } else if (value >= 1000) {
+      return `R$ ${(value / 1000).toFixed(1)}k`;
+    }
+    return `R$ ${value}`;
+  };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -59,8 +77,7 @@ export function ChartOverview({ data }: ChartOverviewProps) {
           <p className="font-semibold text-gray-800 mb-2">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {entry.value}{" "}
-              {entry.value === 1 ? "pedido" : "pedidos"}
+              {entry.name}: {formatCurrency(entry.value)}
             </p>
           ))}
         </div>
@@ -76,13 +93,13 @@ export function ChartOverview({ data }: ChartOverviewProps) {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg font-semibold">
-                Quantidade de Pedidos por Mês
+                Valores Financeiros por Mês
               </CardTitle>
               <CardDescription className="text-sm text-gray-600 mt-1">
-                Comparativo entre total de pedidos criados e pedidos faturados
+                Comparativo entre valores totais e valores faturados em R$
               </CardDescription>
             </div>
-            <ShoppingBag className="w-5 h-5 text-gray-500" />
+            <DollarSign className="w-5 h-5 text-gray-500" />
           </div>
         </CardHeader>
         <CardContent>
@@ -103,7 +120,7 @@ export function ChartOverview({ data }: ChartOverviewProps) {
                 <YAxis
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `${value}`}
+                  tickFormatter={(value) => formatCurrencyShort(value)}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend
@@ -126,13 +143,13 @@ export function ChartOverview({ data }: ChartOverviewProps) {
                   dataKey="total"
                   fill="var(--color-total)"
                   radius={[2, 2, 0, 0]}
-                  name="Total de Pedidos"
+                  name="Valor Total"
                 />
                 <Bar
                   dataKey="invoiced"
                   fill="var(--color-invoiced)"
                   radius={[2, 2, 0, 0]}
-                  name="Pedidos Faturados"
+                  name="Valor Faturado"
                 />
               </BarChart>
             </ResponsiveContainer>

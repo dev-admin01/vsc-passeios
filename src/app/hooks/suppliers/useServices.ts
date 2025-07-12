@@ -21,7 +21,7 @@ const fetchServicesSuppliers = async (
   page: number,
   perpage: number,
   supplier_id?: string,
-  service_id?: string
+  service_id?: string,
 ) => {
   const params: any = { page, perpage };
   if (supplier_id) params.supplier_id = supplier_id;
@@ -43,7 +43,7 @@ export const useServices = () => {
   const useServicesData = () => {
     const { data, error, isLoading, mutate } = useSWR(
       "get-services",
-      fetchServices
+      fetchServices,
     );
 
     return {
@@ -59,11 +59,11 @@ export const useServices = () => {
     page: number,
     perpage: number,
     supplier_id?: string,
-    service_id?: string
+    service_id?: string,
   ) => {
     const { data, error, isLoading, mutate } = useSWR(
       ["get-services-suppliers", page, perpage, supplier_id, service_id],
-      () => fetchServicesSuppliers(page, perpage, supplier_id, service_id)
+      () => fetchServicesSuppliers(page, perpage, supplier_id, service_id),
     );
 
     return {
@@ -103,7 +103,7 @@ export const useServices = () => {
         return false;
       }
     },
-    []
+    [],
   );
 
   // Deletar service_supplier
@@ -130,7 +130,7 @@ export const useServices = () => {
         error.response?.data?.message || "Erro ao remover associação",
         {
           closeButton: true,
-        }
+        },
       );
       return false;
     }

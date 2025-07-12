@@ -83,7 +83,7 @@ export default function OrdersPage() {
 
   const [isRegisterLinkModalOpen, setIsRegisterLinkModalOpen] = useState(false);
   const [orderToRegisterLink, setOrderToRegisterLink] = useState<string | null>(
-    null
+    null,
   );
   const [orderToRegisterLinkNumber, setOrderToRegisterLinkNumber] = useState<
     string | null
@@ -98,7 +98,7 @@ export default function OrdersPage() {
 
   const [isSendContractModalOpen, setIsSendContractModalOpen] = useState(false);
   const [orderToSendContract, setOrderToSendContract] = useState<string | null>(
-    null
+    null,
   );
   const [orderToSendContractNumber, setOrderToSendContractNumber] = useState<
     string | null
@@ -366,7 +366,7 @@ export default function OrdersPage() {
 
     if (response.status === 200) {
       toast.success(
-        `Recibo e contrato do orçamento ${orderToSendContractNumber} enviado com sucesso!`
+        `Recibo e contrato do orçamento ${orderToSendContractNumber} enviado com sucesso!`,
       );
     } else {
       toast.error("Erro ao enviar o recibo e contrato!");
@@ -385,7 +385,7 @@ export default function OrdersPage() {
         await updateStatus(id_order, 10);
 
         toast.success(
-          `Assinatura do orçamento ${order_number} confirmada com sucesso!`
+          `Assinatura do orçamento ${order_number} confirmada com sucesso!`,
         );
 
         mutate();
@@ -482,7 +482,7 @@ export default function OrdersPage() {
                           onClick={() =>
                             openClientApprovedModal(
                               order.id_order,
-                              order.order_number
+                              order.order_number,
                             )
                           }
                           title="Aprovar orçamento"
@@ -527,7 +527,7 @@ export default function OrdersPage() {
                           onClick={() =>
                             openRegisterLinkModal(
                               order.id_order,
-                              order.order_number
+                              order.order_number,
                             )
                           }
                           title={
@@ -547,7 +547,7 @@ export default function OrdersPage() {
                           onClick={() =>
                             openDocumentModal(
                               order.id_order,
-                              order.order_number
+                              order.order_number,
                             )
                           }
                           title="Analisar documentos"
@@ -563,7 +563,7 @@ export default function OrdersPage() {
                           onClick={() =>
                             openSendContractModal(
                               order.id_order,
-                              order.order_number
+                              order.order_number,
                             )
                           }
                           title="Enviar contrato e recibo"
@@ -579,7 +579,7 @@ export default function OrdersPage() {
                           onClick={() =>
                             openConfirmSignatureModal(
                               order.id_order,
-                              order.order_number
+                              order.order_number,
                             )
                           }
                           title="Confirmar assinatura"

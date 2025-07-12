@@ -6,7 +6,7 @@ const unsupportedMethodHandler = () => controller.errorHandlers.onNoMatch();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id_service_supplier: string }> }
+  { params }: { params: Promise<{ id_service_supplier: string }> },
 ) {
   try {
     const { id_service_supplier } = await params;
@@ -21,7 +21,7 @@ export async function GET(
     if (!serviceSupplier) {
       return NextResponse.json(
         { message: "Associação não encontrada" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -36,7 +36,7 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id_service_supplier: string }> }
+  { params }: { params: Promise<{ id_service_supplier: string }> },
 ) {
   try {
     const { id_service_supplier } = await params;
@@ -48,7 +48,7 @@ export async function DELETE(
     if (!serviceSupplier) {
       return NextResponse.json(
         { message: "Associação não encontrada" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -58,7 +58,7 @@ export async function DELETE(
 
     return NextResponse.json(
       { message: "Associação removida com sucesso" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     if (error.message?.includes("Token")) {

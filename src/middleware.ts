@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCookieServer } from "./lib/cookieServer";
+import { UnauthorizedError } from "@/errors/errors";
+
 import authentication from "./models/authentication";
 
 export async function middleware(req: NextRequest) {
-  // if (process.env.TESTING_MODE || process.env.NODE_ENV === "development") {
-  //   return NextResponse.next();
-  // }
+  if (process.env.TESTING_MODE) {
+    return NextResponse.next();
+  }
 
   if (
     req.nextUrl.pathname.startsWith("/login") ||
@@ -20,57 +22,36 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname.startsWith("/api/orders") ||
     req.nextUrl.pathname.startsWith("/api/receipt") ||
     req.nextUrl.pathname.startsWith("/pdf/receipt") ||
+    req.nextUrl.pathname.startsWith("/pdf/order") ||
+    req.nextUrl.pathname.startsWith("/api/documentos-pdf") ||
     req.nextUrl.pathname.startsWith("/public")
   ) {
     return NextResponse.next();
   }
 
-  let token = null;
-
-  token = await getCookieServer();
-
-  let response: NextResponse | null = null;
+  // Verifica token por Cookie OU por Bearer
+  let token = await getCookieServer();
 
   if (!token) {
-    const mobileResult = await mobileToken(req);
-    token = mobileResult.token;
-    response = mobileResult.response;
+    // Tenta pegar do header Authorization
+    const authHeader = req.headers.get("Authorization") || "";
+    token = authHeader.split(" ")[1] || null;
   }
 
   if (!token) {
-    const mobileResult = await mobileToken(req);
-    token = mobileResult.token;
-    response = mobileResult.response;
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  const userId = await validateToken(token as string);
+  const userId = await validateToken(token);
 
   if (!userId) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // Remover verificação de posição do middleware
-  // A verificação de permissões será feita nas páginas individuais
-  return NextResponse.next();
-}
-
-async function mobileToken(req: NextRequest) {
-  const bearerToken = req.headers.get("Authorization");
-  const token = bearerToken?.split(" ")[1] || null;
-
-  if (!token) {
-    return { token: null, response: null };
-  }
-
+  // Adiciona user ID aos headers para uso nas rotas
   const response = NextResponse.next();
-  response.cookies.set("vsc-session", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24,
-    path: "/",
-  });
-
-  return { token, response };
+  response.headers.set("x-user-id", userId);
+  return response;
 }
 
 async function validateToken(token: string): Promise<string | false> {
@@ -78,8 +59,11 @@ async function validateToken(token: string): Promise<string | false> {
     const userId = await authentication.validateToken(token);
     return userId ? (userId as string) : false;
   } catch (error) {
-    console.error("Error validating token:", error);
-    return false;
+    console.error("Erro ao validar token:", error);
+    throw new UnauthorizedError({
+      message: "É necessário iniciar uma sessão.",
+      action: "Efetue o login com suas credenciais.",
+    });
   }
 }
 

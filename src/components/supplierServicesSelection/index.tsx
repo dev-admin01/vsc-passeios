@@ -88,7 +88,7 @@ export function SupplierServicesSelection({
               onClick={() => {
                 if (!disabled && service.id_service) {
                   const isSelected = selectedServiceIds.includes(
-                    service.id_service
+                    service.id_service,
                   );
                   handleServiceToggle(service.id_service, !isSelected);
                 }
@@ -141,7 +141,7 @@ export function SupplierServicesSelection({
             <div className="flex flex-wrap gap-2">
               {selectedServiceIds.map((serviceId) => {
                 const service = availableServices.find(
-                  (s) => s.id_service === serviceId
+                  (s) => s.id_service === serviceId,
                 );
                 return service ? (
                   <span

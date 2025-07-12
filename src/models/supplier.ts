@@ -142,10 +142,10 @@ async function updateById(
     updateData: Omit<UpdateSupplierRequest, "service_ids">,
     service_ids?: number[]
   ) {
-    const updatedSupplier = await prismaClient.supplier.update({
-      where: { id_supplier: id },
-      data: updateData,
-    });
+    // const updatedSupplier = await prismaClient.supplier.update({
+    //   where: { id_supplier: id },
+    //   data: updateData,
+    // });
 
     // Atualizar serviços associados se fornecidos
     if (service_ids !== undefined) {
@@ -390,10 +390,12 @@ async function validateUniqueRegistroSan(registro_san: string) {
   }
 }
 
-export default {
+const supplierModel = {
   create,
   updateById,
   findAllWithPagination,
   deleteById,
   findOneById,
 };
+
+export default supplierModel;

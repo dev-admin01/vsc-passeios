@@ -50,7 +50,7 @@ export default function UpdateOrderPage({
   const [updateOrderLoading, setUpdateOrderLoading] = useState(false);
   const [originalCouponId, setOriginalCouponId] = useState<string | null>(null);
   const [originalCondPagId, setOriginalCondPagId] = useState<string | null>(
-    null
+    null,
   );
   const { getOrder, updateOrder } = useOrder();
   const { coupons, loading: loadingCoupons } = useGetCoupons();
@@ -177,7 +177,7 @@ export default function UpdateOrderPage({
   useEffect(() => {
     if (!loadingCoupons && coupons.length > 0 && originalCouponId) {
       const couponExists = coupons.some(
-        (c) => c.id_coupons === originalCouponId
+        (c) => c.id_coupons === originalCouponId,
       );
       if (couponExists) {
         setSelectedCoupon(originalCouponId);
@@ -197,7 +197,7 @@ export default function UpdateOrderPage({
       originalCondPagId
     ) {
       const condPagExists = condicoesPagamento.condicoesPagamento.some(
-        (c) => c.id_cond_pag.toString() === originalCondPagId
+        (c) => c.id_cond_pag.toString() === originalCondPagId,
       );
       if (condPagExists) {
         setSelectedCondPag(originalCondPagId);
@@ -239,7 +239,7 @@ export default function UpdateOrderPage({
     setUpdateOrderLoading(true);
     if (!idUser) {
       toast.error(
-        "Aguardando carregamento do usuário. Por favor, tente novamente em instantes."
+        "Aguardando carregamento do usuário. Por favor, tente novamente em instantes.",
       );
       return;
     }
@@ -518,7 +518,7 @@ export default function UpdateOrderPage({
                         (cond) =>
                           cond.description !== "Pix" &&
                           cond.description !== "pix" &&
-                          cond.description !== "PIX"
+                          cond.description !== "PIX",
                       )
                       ?.map((cond) => (
                         <SelectItem

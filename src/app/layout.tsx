@@ -33,7 +33,7 @@ export default function RootLayout({
         className={cn(
           "min-h-hscreen bg-background font-sans antialiased",
           geistSans,
-          geistMono
+          geistMono,
         )}
       >
         <AuthProvider>

@@ -58,7 +58,7 @@ const formSchema = z
     {
       message: "CNPJ é obrigatório para fornecedores do Brasil",
       path: ["cnpj"],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -70,7 +70,7 @@ const formSchema = z
     {
       message: "Tax ID é obrigatório para fornecedores de San Andres",
       path: ["tax_id"],
-    }
+    },
   );
 
 type FormValues = z.infer<typeof formSchema>;
@@ -138,7 +138,7 @@ export default function UpdateSupplierPage({
           // Carregar serviços selecionados
           if (supplierData.service_supplier) {
             const serviceIds = supplierData.service_supplier.map(
-              (ss: any) => ss.id_service
+              (ss: any) => ss.id_service,
             );
             setSelectedServices(serviceIds);
           }
@@ -211,7 +211,7 @@ export default function UpdateSupplierPage({
       await updateSupplier(supplierId, supplierData);
       localStorage.setItem(
         "SupplierSuccessMessage",
-        "Fornecedor atualizado com sucesso!"
+        "Fornecedor atualizado com sucesso!",
       );
       router.push("/suppliers");
     } catch (error) {
@@ -258,7 +258,7 @@ export default function UpdateSupplierPage({
                   onValueChange={(value) => {
                     form.setValue(
                       "jurisdicao",
-                      value as "BRASIL" | "SAN_ANDRES"
+                      value as "BRASIL" | "SAN_ANDRES",
                     );
                     // Limpar campos da outra jurisdição
                     if (value === "BRASIL") {

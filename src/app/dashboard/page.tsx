@@ -1,30 +1,28 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Sidebar } from "@/components/sidebar";
 
 import { ChartOverview } from "@/components/chart/index";
+import { ChartValues } from "@/components/chart/chartValues";
 import {
-  Brain,
   Clock10,
   DollarSign,
   Loader2,
   ShoppingBagIcon,
+  User,
 } from "lucide-react";
 import { useAuthContext } from "../contexts/authContext";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useDashboard } from "../hooks/dashboard/useDashboard";
+import DashboardCard from "@/components/dashboardCard";
 
 export default function Dashboard() {
   const { user, loading } = useAuthContext();
-  const { data, isLoading, error, mutate } = useDashboard();
+  const {
+    data,
+    // isLoading, error, mutate
+  } = useDashboard(user?.id_user || null, user?.id_position || null);
 
   const router = useRouter();
 
@@ -46,8 +44,6 @@ export default function Dashboard() {
     return null;
   }
 
-  console.log("data", data);
-
   return (
     <main className="sm:ml-17 min-h-screen  p-4 bg-sky-100">
       <Sidebar />
@@ -64,66 +60,38 @@ export default function Dashboard() {
         </div>
       </div>
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="bg-sky-200">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
-                Abertos
-              </CardTitle>
-              <ShoppingBagIcon className="ml-auto w-5 h-5" />
-            </div>
-            <CardDescription className="text-sm">
-              Pendente pagamento
-            </CardDescription>
-          </CardHeader>
-          <CardContent>10 Orçamentos</CardContent>
-        </Card>
-        <Card className="bg-sky-200">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
-                Atrasados
-              </CardTitle>
-              <Clock10 className="ml-auto w-5 h-5" />
-            </div>
-            <CardDescription className="text-sm">
-              Pagamento expirado
-            </CardDescription>
-          </CardHeader>
-          <CardContent>5 Orçamentos</CardContent>
-        </Card>
-        <Card className="bg-sky-200">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
-                Faturados
-              </CardTitle>
-              <DollarSign className="ml-auto w-5 h-5" />
-            </div>
-            <CardDescription className="text-sm">
-              Orçamentos pagos
-            </CardDescription>
-          </CardHeader>
-          <CardContent>18 Orçamentos</CardContent>
-        </Card>
-        <Card className="bg-sky-200">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg sm:text-xl text-gray-800 select-none">
-                Operador
-              </CardTitle>
-              <Brain className="ml-auto w-5 h-5" />
-            </div>
-            <CardDescription className="text-sm">
-              Aguardando operador
-            </CardDescription>
-          </CardHeader>
-          <CardContent>3 Orçamentos</CardContent>
-        </Card>
+        <DashboardCard
+          title="Abertos"
+          description="Pendente pagamento"
+          icon={<ShoppingBagIcon className="ml-auto w-5 h-5" />}
+          count={data?.openOrders || 0}
+          type="Orçamentos"
+        />
+        <DashboardCard
+          title="Atrasados"
+          description="Com mais de 2 dias sem atualização"
+          icon={<Clock10 className="ml-auto w-5 h-5" />}
+          count={data?.lateOrders || 0}
+          type="Orçamentos"
+        />
+        <DashboardCard
+          title="Faturados"
+          description="Orçamentos faturados"
+          icon={<DollarSign className="ml-auto w-5 h-5" />}
+          count={data?.invoicedOrders || 0}
+          type="Orçamentos"
+        />
+        <DashboardCard
+          title="Aguardando cliente"
+          description="Orçamentos aguardando status do cliente"
+          icon={<User className="ml-auto w-5 h-5" />}
+          count={data?.waitClientOrders || 0}
+          type="Orçamentos"
+        />
       </section>
-
-      <section className="mt-4 flex md:flex-row gap-4">
-        <ChartOverview />
+      <section className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ChartOverview data={data?.monthlyOrdersChart} />
+        <ChartValues data={data?.monthlyValuesChart} />
       </section>
     </main>
   );
