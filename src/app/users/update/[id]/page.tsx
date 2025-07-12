@@ -161,10 +161,10 @@ export default function UpdateUserPage({ params }: UpdateUserPageProps) {
   }
 
   return (
-    <div className="sm:ml-17 p-4 min-h-screen bg-sky-100">
+    <div className="sm:ml-17 p-4 min-h-screen bg-sky-100 w-full">
       <Sidebar />
 
-      <div className="mb-4">
+      <div className="mb-4 w-full">
         <Link href="/users">
           <Button variant="outline" className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -174,7 +174,7 @@ export default function UpdateUserPage({ params }: UpdateUserPageProps) {
         <h1 className="text-2xl font-bold">Editar usuário</h1>
       </div>
 
-      <Card className="max-w-2xl">
+      <Card className="min-w-auto">
         <CardHeader>
           <CardTitle>Dados do usuário</CardTitle>
         </CardHeader>

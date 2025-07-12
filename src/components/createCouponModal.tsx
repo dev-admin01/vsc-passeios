@@ -35,6 +35,7 @@ export function CreateCouponModal({
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState("");
   const [idMidia, setIdMidia] = useState("");
+  const [active, setActive] = useState(true);
   const { createCoupon } = useCoupon(1, 10, "");
   const { data: midiasData } = useMidia(1, 100, "");
   const [isLoading, setIsLoading] = useState(false);
@@ -54,12 +55,14 @@ export function CreateCouponModal({
       coupon,
       discount: discount,
       id_midia: Number(idMidia),
+      active,
     });
 
     if (success) {
       setCoupon("");
       setDiscount("");
       setIdMidia("");
+      setActive(true);
       onSuccess();
       onClose();
       setIsLoading(false);
@@ -117,6 +120,18 @@ export function CreateCouponModal({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="active"
+                checked={active}
+                onChange={(e) => setActive(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <Label htmlFor="active">Cupom ativo</Label>
+            </div>
           </div>
           <div className="flex justify-end gap-4">
             <Button

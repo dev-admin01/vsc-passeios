@@ -29,6 +29,7 @@ model User {
    phone            String? @db.VarChar(10)
    created_at       DateTime @default(now())
    updated_at       DateTime @default(now())
+   active           Boolean @default(true)
  
    @@map("users") 
    orders Order[]
@@ -206,6 +207,8 @@ model Coupon {
 
   id_midia Int
   midia Midia @relation(fields: [id_midia], references: [id_midia])
+
+  active Boolean @default(true)
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now())

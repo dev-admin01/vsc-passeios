@@ -38,6 +38,7 @@ export function EditCouponModal({
   const [couponCode, setCouponCode] = useState(coupon.coupon);
   const [discount, setDiscount] = useState(coupon.discount.toString());
   const [idMidia, setIdMidia] = useState(coupon.id_midia.toString());
+  const [active, setActive] = useState(coupon.active);
   const { updateCoupon } = useCoupon(1, 10, "");
   const { data: midiasData } = useMidia(1, 100, "");
   const [isLoading, setIsLoading] = useState(false);
@@ -46,6 +47,7 @@ export function EditCouponModal({
     setCouponCode(coupon.coupon);
     setDiscount(coupon.discount.toString());
     setIdMidia(coupon.id_midia.toString());
+    setActive(coupon.active);
   }, [coupon]);
 
   const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,6 +65,7 @@ export function EditCouponModal({
       coupon: couponCode,
       discount: discount,
       id_midia: Number(idMidia),
+      active,
     });
 
     if (success) {
@@ -121,6 +124,18 @@ export function EditCouponModal({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="active"
+                checked={active}
+                onChange={(e) => setActive(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <Label htmlFor="active">Cupom ativo</Label>
+            </div>
           </div>
           <div className="flex justify-end gap-4">
             <Button

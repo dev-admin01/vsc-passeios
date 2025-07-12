@@ -3,6 +3,7 @@ export interface Coupon {
   coupon: string;
   discount: string;
   id_midia: number;
+  active: boolean;
   created_at?: string | Date;
   updated_at?: string | Date;
   midia?: {
@@ -15,4 +16,5 @@ export interface CouponInputValues {
   coupon: string;
   discount: string;
   id_midia: number;
+  active?: boolean;
 }

@@ -14,7 +14,7 @@ import { Sidebar } from "@/components/sidebar";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useCoupon } from "../hooks/coupons/useCoupon";
 import { Coupon } from "@/types/coupon.types";
-import { Edit, Trash2, Plus } from "lucide-react";
+import { Edit, Trash2, Plus, ToggleLeft, ToggleRight } from "lucide-react";
 import { EditCouponModal } from "@/components/editCouponModal";
 import { DeleteCouponModal } from "@/components/deleteCouponModal";
 import { CreateCouponModal } from "@/components/createCouponModal";
@@ -26,12 +26,17 @@ export default function CouponsPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [isToggleLoading, setIsToggleLoading] = useState<string | null>(null);
   // const [page, setPage] = useState(1);
   const page = 1;
   const [search, setSearch] = useState("");
   const perPage = 10;
 
-  const { data, isLoading, deleteCoupon } = useCoupon(page, perPage, search);
+  const { data, isLoading, deleteCoupon, toggleActive } = useCoupon(
+    page,
+    perPage,
+    search,
+  );
 
   const handleEdit = (coupon: Coupon) => {
     setSelectedCoupon(coupon);
@@ -41,6 +46,12 @@ export default function CouponsPage() {
   const handleDelete = (coupon: Coupon) => {
     setSelectedCoupon(coupon);
     setIsDeleteModalOpen(true);
+  };
+
+  const handleToggleActive = async (coupon: Coupon) => {
+    setIsToggleLoading(coupon.id_coupons);
+    await toggleActive(coupon.id_coupons);
+    setIsToggleLoading(null);
   };
 
   const handleDeleteConfirm = async () => {
@@ -85,6 +96,7 @@ export default function CouponsPage() {
                 <TableHead>Cupom</TableHead>
                 <TableHead>Desconto (%)</TableHead>
                 <TableHead>Mídia</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Data de Criação</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
@@ -92,13 +104,13 @@ export default function CouponsPage() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
+                  <TableCell colSpan={6} className="text-center">
                     Carregando...
                   </TableCell>
                 </TableRow>
               ) : !data?.coupons || data.coupons.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
+                  <TableCell colSpan={6} className="text-center">
                     Nenhum cupom cadastrado
                   </TableCell>
                 </TableRow>
@@ -108,6 +120,17 @@ export default function CouponsPage() {
                     <TableCell>{coupon.coupon}</TableCell>
                     <TableCell>{coupon.discount}</TableCell>
                     <TableCell>{coupon.midia?.description}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          coupon.active
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {coupon.active ? "Ativo" : "Inativo"}
+                      </span>
+                    </TableCell>
                     <TableCell>
                       {coupon.created_at
                         ? new Date(coupon.created_at).toLocaleDateString()
@@ -121,6 +144,19 @@ export default function CouponsPage() {
                         className="cursor-pointer"
                       >
                         <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleToggleActive(coupon)}
+                        className="cursor-pointer"
+                        disabled={isToggleLoading === coupon.id_coupons}
+                      >
+                        {coupon.active ? (
+                          <ToggleRight className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <ToggleLeft className="w-4 h-4 text-red-500" />
+                        )}
                       </Button>
                       <Button
                         variant="ghost"

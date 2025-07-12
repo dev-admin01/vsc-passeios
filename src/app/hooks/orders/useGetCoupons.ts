@@ -26,7 +26,7 @@ export function useGetCoupons() {
   );
 
   return {
-    coupons: data?.coupons || [],
+    coupons: data?.coupons.filter((coupon) => coupon.active) || [],
     loading: isLoading,
     error,
   };

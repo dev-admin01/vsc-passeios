@@ -13,9 +13,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Edit, Trash2, Eye, UserPlus } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  Eye,
+  UserPlus,
+  ToggleLeft,
+  ToggleRight,
+} from "lucide-react";
 import { toast } from "sonner";
-import { useUsers, useDeleteUser } from "@/app/hooks/users/useUsers";
+import {
+  useUsers,
+  useDeleteUser,
+  useToggleUser,
+} from "@/app/hooks/users/useUsers";
 import { DeleteUserModal } from "@/components/deleteUserModal";
 import { User } from "@/types/user.types";
 
@@ -25,11 +36,14 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
 
   const { data, error, isLoading, mutate } = useUsers(page, perpage, search);
+  console.log("data no users page", data);
   const { deleteUser, isLoading: isDeleting } = useDeleteUser();
+  const { toggleUser } = useToggleUser();
 
   // Modal state
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isToggleLoading, setIsToggleLoading] = useState<string | null>(null);
 
   useEffect(() => {
     const successMessage = localStorage.getItem("userSuccessMessage");
@@ -47,6 +61,20 @@ export default function UsersPage() {
   function openDeleteModal(user: User) {
     setUserToDelete(user);
     setIsDeleteModalOpen(true);
+  }
+
+  async function handleToggleActive(user: User) {
+    if (!user.id_user) return;
+
+    setIsToggleLoading(user.id_user);
+    try {
+      await toggleUser(user.id_user);
+      mutate();
+    } catch (error) {
+      console.error("Erro ao alterar status do usuário:", error);
+    } finally {
+      setIsToggleLoading(null);
+    }
   }
 
   async function handleDelete() {
@@ -115,6 +143,7 @@ export default function UsersPage() {
               <TableCell>Nome</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Telefone</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell>Criado em</TableCell>
               <TableCell>Ações</TableCell>
             </TableRow>
@@ -122,12 +151,12 @@ export default function UsersPage() {
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={5}>Carregando...</TableCell>
+                <TableCell colSpan={6}>Carregando...</TableCell>
               </TableRow>
             )}
             {error && (
               <TableRow>
-                <TableCell colSpan={5}>Erro ao carregar usuários.</TableCell>
+                <TableCell colSpan={6}>Erro ao carregar usuários.</TableCell>
               </TableRow>
             )}
             {!isLoading && data?.users?.length
@@ -137,6 +166,17 @@ export default function UsersPage() {
                     <TableCell>{user.email}</TableCell>
                     <TableCell>
                       {formatPhone(user.ddi, user.ddd, user.phone)}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          user.active
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {user.active ? "Ativo" : "Inativo"}
+                      </span>
                     </TableCell>
                     <TableCell>
                       {user.created_at
@@ -167,6 +207,22 @@ export default function UsersPage() {
 
                         <Button
                           variant="ghost"
+                          onClick={() => handleToggleActive(user)}
+                          title={
+                            user.active ? "Desativar usuário" : "Ativar usuário"
+                          }
+                          className="cursor-pointer"
+                          disabled={isToggleLoading === user.id_user}
+                        >
+                          {user.active ? (
+                            <ToggleRight className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <ToggleLeft className="h-4 w-4 text-red-500" />
+                          )}
+                        </Button>
+
+                        <Button
+                          variant="ghost"
                           onClick={() => openDeleteModal(user)}
                           title="Excluir"
                           className="cursor-pointer"
@@ -180,7 +236,7 @@ export default function UsersPage() {
               : !isLoading &&
                 !error && (
                   <TableRow>
-                    <TableCell colSpan={5}>
+                    <TableCell colSpan={6}>
                       Nenhum usuário encontrado.
                     </TableCell>
                   </TableRow>

@@ -124,7 +124,6 @@ export function Sidebar() {
             </Link>
             {navigationButtons.map((button) => {
               const isVisible = hasPermission(button.key);
-
               return isVisible ? (
                 <Tooltip key={button.key}>
                   <TooltipTrigger asChild>
@@ -191,7 +190,6 @@ export function Sidebar() {
 
                 {navigationButtons.map((button) => {
                   const isVisible = hasPermission(button.key);
-
                   return isVisible ? (
                     <Link
                       key={button.key}

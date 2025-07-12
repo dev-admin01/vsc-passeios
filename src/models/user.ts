@@ -13,7 +13,10 @@ async function createUser(userInputValues: UserInputValues) {
     userInputValues.email = userInputValues.email.toLowerCase();
 
     const newUser = await prismaClient.user.create({
-      data: userInputValues,
+      data: {
+        ...userInputValues,
+        active: userInputValues.active ?? true,
+      },
     });
     return newUser;
   }
@@ -118,7 +121,6 @@ async function deleteUser(id_user: string) {
   const userFound = await findOneById(id_user);
 
   if (!userFound) {
-    console.log("not found");
     throw new NotFoundError({
       message: "O id não foi encontrado no sistema.",
       action: "Verifique se o id está correto.",
@@ -183,6 +185,7 @@ async function findAllWithPagination({
         ddi: true,
         ddd: true,
         phone: true,
+        active: true,
         created_at: true,
         updated_at: true,
         // Não retorna a senha por segurança
@@ -202,6 +205,31 @@ async function findAllWithPagination({
   };
 }
 
+async function toggleActive(id_user: string) {
+  const userFound = await findOneById(id_user);
+
+  if (userFound.id_position === 1) {
+    throw new ValidationError({
+      message: "Não é possível alterar o status desse usuário.",
+      action: "Utilize outro usuário para realizar esta operação.",
+    });
+  }
+
+  const updatedUser = await runToggleQuery(userFound);
+  return updatedUser;
+
+  async function runToggleQuery(userFound: any) {
+    const updatedUser = await prismaClient.user.update({
+      where: { id_user: userFound.id_user },
+      data: {
+        active: !userFound.active,
+      },
+    });
+
+    return updatedUser;
+  }
+}
+
 const user = {
   createUser,
   findOneById,
@@ -209,6 +237,7 @@ const user = {
   findAllWithPagination,
   update,
   delete: deleteUser,
+  toggleActive,
 };
 
 export default user;

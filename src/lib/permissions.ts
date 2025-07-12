@@ -1,8 +1,11 @@
 // Rotas que apenas managers (1) e admins (2) podem acessar
 const adminOnlyRoutes = [
   "/users",
+  "/users/new",
   "/services",
+  "/services/new",
   "/coupons",
+  "/coupons/new",
   "/midia",
   "/settings",
   "/condicao-pagamento",
@@ -22,6 +25,7 @@ export function hasPermissionForRoute(
 
   // Sellers (3) e Operators (4) não podem acessar rotas administrativas
   if (userPosition === 3 || userPosition === 4) {
+    console.log("pathname", pathname);
     return !adminOnlyRoutes.includes(pathname);
   }
 
@@ -34,6 +38,7 @@ export function hasNavigationPermission(
   userPosition: number,
   navigationKey: string,
 ): boolean {
+  console.log("navigationKey", navigationKey);
   // Managers (1) e Admins (2) podem ver tudo
   if (userPosition === 1 || userPosition === 2) {
     return true;
@@ -41,7 +46,9 @@ export function hasNavigationPermission(
 
   // Sellers (3) e Operators (4) não podem ver configurações
   if (userPosition === 3 || userPosition === 4) {
-    return navigationKey !== "settings";
+    console.log("navigationKey", navigationKey);
+    console.log(!adminOnlyRoutes.includes(navigationKey));
+    return !adminOnlyRoutes.includes(`/${navigationKey}`);
   }
 
   // Por padrão, negar acesso

@@ -13,11 +13,19 @@ async function getAuthenticatedUser(
 
     await validatePassword(providedPassword, storedUser?.password);
 
+    if (!storedUser?.active) {
+      throw new UnauthorizedError({
+        message: "Usuário não está ativo.",
+        action: "Verifique se o usuário está ativo.",
+      });
+    }
+
     const authenticatedUser = {
       id_user: storedUser?.id_user,
       name: storedUser?.name,
       email: storedUser?.email,
       id_position: storedUser?.id_position,
+      active: storedUser?.active,
     };
     return authenticatedUser;
   } catch (error) {
@@ -53,6 +61,7 @@ async function generateToken(authenticatedUser: AuthenticatedUser) {
     id_user: authenticatedUser.id_user,
     name: authenticatedUser.name,
     email: authenticatedUser.email,
+    active: authenticatedUser.active, // INCLUA O STATUS 'active' NO TOKEN
   })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(authenticatedUser.id_user!)
@@ -74,6 +83,15 @@ async function validateToken(token: string) {
 
   if (!payload || !payload.sub) {
     return false;
+  }
+
+  const storedUser = await user.findOneById(payload.id_user as string);
+
+  if (!storedUser?.active) {
+    throw new UnauthorizedError({
+      message: "Usuário não está ativo.",
+      action: "Verifique se o usuário está ativo.",
+    });
   }
 
   return payload.id_user;

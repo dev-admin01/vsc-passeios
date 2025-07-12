@@ -28,7 +28,7 @@ export const useDocumentosPDF = () => {
   // Hook para listar documentos PDF - moved to top level
   const { data, error, isLoading, mutate } = useSWR<DocumentosPDFResponse>(
     ["get-documentos-pdf"],
-    () => fetchDocumentosPDF()
+    () => fetchDocumentosPDF(),
   );
 
   const getDocumentosPDF = () => {
@@ -83,7 +83,7 @@ export const useDocumentosPDF = () => {
           response.data.message || "Erro ao atualizar documento PDF",
           {
             closeButton: true,
-          }
+          },
         );
         return false;
       }
@@ -92,7 +92,7 @@ export const useDocumentosPDF = () => {
         `Documento PDF ${response.data.nome} atualizado com sucesso!`,
         {
           closeButton: true,
-        }
+        },
       );
 
       return response.data;
@@ -128,7 +128,7 @@ export const useDocumentosPDF = () => {
         error.response?.data?.message || "Erro ao deletar documento PDF",
         {
           closeButton: true,
-        }
+        },
       );
       return false;
     }
@@ -154,7 +154,7 @@ export const useDocumentosPDF = () => {
         error.response?.data?.message || "Erro ao buscar documento PDF",
         {
           closeButton: true,
-        }
+        },
       );
       return null;
     }

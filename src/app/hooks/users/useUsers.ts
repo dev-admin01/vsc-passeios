@@ -114,3 +114,35 @@ export function useDeleteUser() {
 
   return { deleteUser, isLoading };
 }
+
+// Hook para toggle active/inactive do usuário
+export function useToggleUser() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const toggleUser = async (id: string) => {
+    setIsLoading(true);
+    try {
+      const response = await api.patch(`/api/users/${id}`);
+
+      if (response.status === 200) {
+        toast.success("Status do usuário alterado com sucesso!");
+        return response.data;
+      }
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        toast.error("Usuário não encontrado");
+      } else if (error.response?.status === 400) {
+        toast.error(
+          error.response.data.message || "Erro ao alterar status do usuário",
+        );
+      } else {
+        toast.error("Erro ao alterar status do usuário");
+      }
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { toggleUser, isLoading };
+}

@@ -76,16 +76,16 @@ export default function NewOrders() {
     // Remove tudo que não é número
     const numbers = value.replace(/\D/g, "");
 
-    // Limita a 11 dígitos
+    // Limita a 9 dígitos
     const limitedNumbers = numbers.slice(0, 9);
 
-    // Aplica a máscara (9 99999-9999)
+    // Aplica a máscara (9 9999-9999)
     if (limitedNumbers.length <= 1) {
       return limitedNumbers;
-    } else if (limitedNumbers.length <= 6) {
+    } else if (limitedNumbers.length <= 5) {
       return `${limitedNumbers.slice(0, 1)} ${limitedNumbers.slice(1)}`;
     } else {
-      return `${limitedNumbers.slice(0, 1)} ${limitedNumbers.slice(1, 6)}-${limitedNumbers.slice(6)}`;
+      return `${limitedNumbers.slice(0, 1)} ${limitedNumbers.slice(1, 5)}-${limitedNumbers.slice(5)}`;
     }
   }
 
@@ -204,7 +204,8 @@ export default function NewOrders() {
       toast.error("Informe um nome válido");
       return;
     }
-
+    console.log("phone", phone.length);
+    console.log("phone", phone);
     if (!phone || phone.length !== 9) {
       setCreateOrderLoading(false);
       toast.error("Informe um telefone válido");
@@ -395,6 +396,7 @@ export default function NewOrders() {
                 type="text"
                 value={ddi}
                 onChange={(e) => setDdi(e.target.value)}
+                maxLength={2}
               />
             </div>
             <div className="w-1/2 sm:w-1/8 p-2">
@@ -403,6 +405,7 @@ export default function NewOrders() {
                 type="text"
                 value={ddd}
                 onChange={(e) => setDdd(e.target.value)}
+                maxLength={2}
               />
             </div>
             <div className="w-full sm:w-1/4 p-2">

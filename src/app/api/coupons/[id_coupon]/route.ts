@@ -29,3 +29,16 @@ export const PATCH = async (
     return controller.errorHandlers.onError(error);
   }
 };
+
+export const PUT = async (
+  request: NextRequest,
+  { params }: { params: Promise<{ id_coupon: string }> },
+) => {
+  try {
+    const { id_coupon } = await params;
+    const toggledCoupon = await coupon.toggleActive(id_coupon);
+    return NextResponse.json(toggledCoupon);
+  } catch (error: any) {
+    return controller.errorHandlers.onError(error);
+  }
+};

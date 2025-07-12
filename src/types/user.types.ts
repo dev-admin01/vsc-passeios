@@ -7,6 +7,7 @@ export interface User {
   ddi?: string | null;
   ddd?: string | null;
   phone?: string | null;
+  active?: boolean;
   created_at?: Date;
   updated_at?: Date;
 }

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCookieServer } from "./lib/cookieServer";
 import { UnauthorizedError } from "@/errors/errors";
-
-import authentication from "./models/authentication";
+import { jwtVerify } from "jose";
 
 export async function middleware(req: NextRequest) {
   if (process.env.TESTING_MODE) {
@@ -42,7 +41,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  const userId = await validateToken(token);
+  const userId = await validateTokenWithoutPrisma(token);
 
   if (!userId) {
     return NextResponse.redirect(new URL("/login", req.url));
@@ -54,17 +53,41 @@ export async function middleware(req: NextRequest) {
   return response;
 }
 
-async function validateToken(token: string): Promise<string | false> {
+async function validateTokenWithoutPrisma(
+  token: string,
+): Promise<string | false> {
   try {
-    const userId = await authentication.validateToken(token);
-    return userId ? (userId as string) : false;
+    const secret = hexToUint8Array(process.env.JWT_SECRET!);
+    const { payload } = await jwtVerify(token, secret, {
+      algorithms: ["HS256"],
+    });
+
+    if (!payload || !payload.sub) {
+      return false;
+    }
+
+    // Verifica diretamente no payload se o usuário está ativo
+    if (payload.active !== true) {
+      return false;
+    }
+
+    return payload.sub as string;
   } catch (error) {
     console.error("Erro ao validar token:", error);
+
     throw new UnauthorizedError({
       message: "É necessário iniciar uma sessão.",
       action: "Efetue o login com suas credenciais.",
     });
   }
+}
+
+function hexToUint8Array(hexString: string) {
+  const byteArray = new Uint8Array(hexString.length / 2);
+  for (let i = 0; i < byteArray.length; i++) {
+    byteArray[i] = parseInt(hexString.substr(i * 2, 2), 16);
+  }
+  return byteArray;
 }
 
 export const config = {

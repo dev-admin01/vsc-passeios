@@ -54,7 +54,7 @@ const formSchema = z
     {
       message: "CNPJ é obrigatório para fornecedores do Brasil",
       path: ["cnpj"],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -66,7 +66,7 @@ const formSchema = z
     {
       message: "Tax ID é obrigatório para fornecedores de San Andres",
       path: ["tax_id"],
-    }
+    },
   );
 
 type FormValues = z.infer<typeof formSchema>;
@@ -142,7 +142,7 @@ export default function NewSupplierPage() {
       await createSupplier(supplierData);
       localStorage.setItem(
         "SupplierSuccessMessage",
-        "Fornecedor criado com sucesso!"
+        "Fornecedor criado com sucesso!",
       );
       router.push("/suppliers");
     } catch (error) {

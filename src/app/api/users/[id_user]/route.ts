@@ -52,5 +52,21 @@ export async function DELETE(
   }
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id_user: string }> },
+) {
+  try {
+    const { id_user } = await params;
+    const toggledUser = await user.toggleActive(id_user);
+
+    return NextResponse.json(toggledUser, { status: 200 });
+  } catch (error: any) {
+    if (error.message?.includes("Token")) {
+      return NextResponse.json({ message: error.message }, { status: 401 });
+    }
+    return controller.errorHandlers.onError(error);
+  }
+}
+
 export const POST = unsupportedMethodHandler;
-export const PATCH = unsupportedMethodHandler;

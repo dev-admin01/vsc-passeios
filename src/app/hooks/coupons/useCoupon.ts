@@ -39,6 +39,7 @@ export function useCoupon(
     coupon: string;
     discount: string;
     id_midia: number;
+    active?: boolean;
   }): Promise<any> => {
     const response = await api.post("/api/coupons", couponData);
 
@@ -58,6 +59,7 @@ export function useCoupon(
       coupon: string;
       discount: string;
       id_midia: number;
+      active?: boolean;
     },
   ): Promise<any> => {
     const response = await api.patch(`/api/coupons/${id}`, couponData);
@@ -70,6 +72,19 @@ export function useCoupon(
     toast.success("Cupom atualizado com sucesso!");
     mutate();
     return response.data;
+  };
+
+  const toggleActive = async (id: string): Promise<boolean> => {
+    const response = await api.put(`/api/coupons/${id}`);
+
+    if (response.status !== 200) {
+      toast.error(response.data.message);
+      return false;
+    }
+
+    toast.success("Status do cupom alterado com sucesso!");
+    mutate();
+    return true;
   };
 
   const deleteCoupon = async (id: string): Promise<boolean> => {
@@ -92,5 +107,6 @@ export function useCoupon(
     createCoupon,
     updateCoupon,
     deleteCoupon,
+    toggleActive,
   };
 }

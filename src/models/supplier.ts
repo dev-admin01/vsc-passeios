@@ -37,7 +37,7 @@ async function create(supplierInputValues: CreateSupplierRequest) {
 
   async function runInsertQuery(
     supplierData: Omit<CreateSupplierRequest, "service_ids">,
-    service_ids?: number[]
+    service_ids?: number[],
   ) {
     const newSupplier = await prismaClient.supplier.create({
       data: {
@@ -81,7 +81,7 @@ async function create(supplierInputValues: CreateSupplierRequest) {
 
 async function updateById(
   id: string,
-  supplierInputValues: UpdateSupplierRequest
+  supplierInputValues: UpdateSupplierRequest,
 ) {
   const currentSupplier = await findOneById(id);
 
@@ -140,7 +140,7 @@ async function updateById(
   async function runUpdateQuery(
     id: string,
     updateData: Omit<UpdateSupplierRequest, "service_ids">,
-    service_ids?: number[]
+    service_ids?: number[],
   ) {
     // const updatedSupplier = await prismaClient.supplier.update({
     //   where: { id_supplier: id },
@@ -286,7 +286,7 @@ async function findOneById(id: string) {
 }
 
 async function validateRequiredFields(
-  supplierInputValues: CreateSupplierRequest | UpdateSupplierRequest
+  supplierInputValues: CreateSupplierRequest | UpdateSupplierRequest,
 ) {
   if (!supplierInputValues.nome_fantasia) {
     throw new ValidationError({

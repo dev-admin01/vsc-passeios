@@ -16,7 +16,10 @@ async function create(couponInputValues: CouponInputValues) {
 
   async function runInsertQuery(couponInputValues: CouponInputValues) {
     const coupon = await prismaClient.coupon.create({
-      data: couponInputValues,
+      data: {
+        ...couponInputValues,
+        active: couponInputValues.active ?? true,
+      },
     });
     return coupon;
   }
@@ -158,7 +161,29 @@ async function updateById(id: string, couponInputValues: CouponInputValues) {
   async function runUpdateQuery(couponInDatabase: Coupon) {
     const coupon = await prismaClient.coupon.update({
       where: { id_coupons: couponInDatabase.id_coupons },
-      data: couponInputValues,
+      data: {
+        ...couponInputValues,
+        active: couponInputValues.active ?? couponInDatabase.active,
+      },
+    });
+
+    return coupon;
+  }
+}
+
+async function toggleActive(id: string) {
+  const couponInDatabase = await validateById(id);
+
+  const coupon = await runToggleQuery(couponInDatabase);
+
+  return coupon;
+
+  async function runToggleQuery(couponInDatabase: Coupon) {
+    const coupon = await prismaClient.coupon.update({
+      where: { id_coupons: couponInDatabase.id_coupons },
+      data: {
+        active: !couponInDatabase.active,
+      },
     });
 
     return coupon;
@@ -170,6 +195,7 @@ const coupon = {
   findAllWithPagination,
   deleteById,
   updateById,
+  toggleActive,
 };
 
 export default coupon;
