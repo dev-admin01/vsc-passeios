@@ -94,6 +94,7 @@ export function EditCouponModal({
               onChange={(e) => setCouponCode(e.target.value)}
               placeholder="Digite o código do cupom"
               required
+              maxLength={15}
             />
           </div>
           <div className="space-y-2">

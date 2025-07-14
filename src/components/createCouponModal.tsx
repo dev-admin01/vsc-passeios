@@ -88,6 +88,7 @@ export function CreateCouponModal({
               value={coupon}
               onChange={(e) => setCoupon(e.target.value)}
               placeholder="Digite o código do cupom"
+              maxLength={15}
               required
             />
           </div>
