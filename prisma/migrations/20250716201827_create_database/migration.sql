@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "Jurisdicao" AS ENUM ('BRASIL', 'SAN_ANDRES');
+
 -- CreateTable
 CREATE TABLE "positions" (
     "id_position" SERIAL NOT NULL,
@@ -20,6 +23,7 @@ CREATE TABLE "users" (
     "phone" VARCHAR(10),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "active" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id_user")
 );
@@ -73,6 +77,7 @@ CREATE TABLE "orders" (
     "order_number" TEXT,
     "link_signature" TEXT,
     "id_customer" TEXT,
+    "pre_cpf_cnpj" TEXT,
     "pre_name" TEXT,
     "pre_email" TEXT,
     "pre_ddi" TEXT,
@@ -80,7 +85,6 @@ CREATE TABLE "orders" (
     "pre_phone" TEXT,
     "id_user" TEXT NOT NULL,
     "price" TEXT,
-    "time" TEXT NOT NULL,
     "id_cond_pag" TEXT,
     "id_coupons" TEXT,
     "hotel" TEXT,
@@ -157,6 +161,7 @@ CREATE TABLE "coupons" (
     "coupon" VARCHAR(15) NOT NULL,
     "discount" TEXT NOT NULL,
     "id_midia" INTEGER NOT NULL,
+    "active" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -173,6 +178,50 @@ CREATE TABLE "condicoes_pagamentos" (
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "condicoes_pagamentos_pkey" PRIMARY KEY ("id_cond_pag")
+);
+
+-- CreateTable
+CREATE TABLE "suppliers" (
+    "id_supplier" TEXT NOT NULL,
+    "nome_fantasia" TEXT NOT NULL,
+    "jurisdicao" "Jurisdicao" NOT NULL,
+    "cnpj" TEXT,
+    "razao_social" TEXT,
+    "inscricao_estadual" TEXT,
+    "tax_id" TEXT,
+    "registro_san" TEXT,
+    "license_number" TEXT,
+    "tipo_atividade" TEXT,
+    "email" TEXT,
+    "telefone" TEXT,
+    "endereco" TEXT,
+    "data_cadastro" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "suppliers_pkey" PRIMARY KEY ("id_supplier")
+);
+
+-- CreateTable
+CREATE TABLE "services_suppliers" (
+    "id_service_supplier" SERIAL NOT NULL,
+    "id_service" INTEGER NOT NULL,
+    "id_supplier" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "services_suppliers_pkey" PRIMARY KEY ("id_service_supplier")
+);
+
+-- CreateTable
+CREATE TABLE "documentos_pdf" (
+    "id" TEXT NOT NULL,
+    "nome" TEXT NOT NULL,
+    "arquivo_1_base64" TEXT NOT NULL,
+    "arquivo_2_base64" TEXT,
+    "arquivo_3_base64" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "documentos_pdf_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -201,6 +250,24 @@ CREATE UNIQUE INDEX "coupons_coupon_key" ON "coupons"("coupon");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "condicoes_pagamentos_description_key" ON "condicoes_pagamentos"("description");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "suppliers_cnpj_key" ON "suppliers"("cnpj");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "suppliers_tax_id_key" ON "suppliers"("tax_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "suppliers_registro_san_key" ON "suppliers"("registro_san");
+
+-- CreateIndex
+CREATE INDEX "suppliers_jurisdicao_idx" ON "suppliers"("jurisdicao");
+
+-- CreateIndex
+CREATE INDEX "suppliers_cnpj_idx" ON "suppliers"("cnpj");
+
+-- CreateIndex
+CREATE INDEX "suppliers_registro_san_idx" ON "suppliers"("registro_san");
 
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_id_position_fkey" FOREIGN KEY ("id_position") REFERENCES "positions"("id_position") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -243,3 +310,9 @@ ALTER TABLE "orders_history" ADD CONSTRAINT "orders_history_id_status_order_fkey
 
 -- AddForeignKey
 ALTER TABLE "coupons" ADD CONSTRAINT "coupons_id_midia_fkey" FOREIGN KEY ("id_midia") REFERENCES "midias"("id_midia") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "services_suppliers" ADD CONSTRAINT "services_suppliers_id_service_fkey" FOREIGN KEY ("id_service") REFERENCES "services"("id_service") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "services_suppliers" ADD CONSTRAINT "services_suppliers_id_supplier_fkey" FOREIGN KEY ("id_supplier") REFERENCES "suppliers"("id_supplier") ON DELETE RESTRICT ON UPDATE CASCADE;
