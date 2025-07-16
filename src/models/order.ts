@@ -70,8 +70,12 @@ async function create(orderInputValues: OrderInputValues) {
   // Converter preço para centavos se fornecido
   if (orderInputValues.price) {
     orderInputValues.price = ConvertCurrency.realToCents(
-      orderInputValues.price,
+      orderInputValues.price
     );
+
+    orderInputValues.services.forEach((service) => {
+      service.price = ConvertCurrency.realToCents(service.price);
+    });
   }
 
   const orderNumber = await lastOrder();
@@ -126,7 +130,7 @@ async function create(orderInputValues: OrderInputValues) {
 
 async function updateById(
   id: string,
-  orderInputValues: OrderUpdateValues,
+  orderInputValues: OrderUpdateValues
 ): Promise<any> {
   await findOneById(id);
 
@@ -140,7 +144,7 @@ async function updateById(
   // Converter preço para centavos se fornecido
   if (orderInputValues.price) {
     orderInputValues.price = ConvertCurrency.realToCents(
-      orderInputValues.price,
+      orderInputValues.price
     );
   }
   if (orderInputValues.services) {
@@ -443,7 +447,7 @@ async function updateDocumentation(payload: any) {
   if (storedOrder.customer) {
     storedCustomer = await customer.updateById(
       storedOrder.customer.id_customer,
-      customerData,
+      customerData
     );
   } else {
     storedCustomer = await customer.create(customerData);
@@ -481,7 +485,7 @@ async function approveDocumentation(payload: any) {
 
   const appliedPrice = await checkAppliedCoupon(
     storedOrder,
-    payload.id_cond_pag,
+    payload.id_cond_pag
   );
 
   const updatedOrder = await prismaClient.order.update({
@@ -505,7 +509,7 @@ async function approveDocumentation(payload: any) {
 
 export async function checkAppliedCoupon(
   storedOrder: any,
-  id_cond_pag: string,
+  id_cond_pag: string
 ) {
   const storedCondPag = await prismaClient.condicaoPagamento.findUnique({
     where: { id_cond_pag },
@@ -527,15 +531,10 @@ export async function checkAppliedCoupon(
     const discountPercentage = parseFloat(storedCondPag.discount) / 100;
 
     const discountInCents = Math.round(
-      parseInt(priceInCents, 10) * discountPercentage,
+      parseInt(priceInCents, 10) * discountPercentage
     );
 
     const finalPriceInCents = parseInt(priceInCents, 10) - discountInCents;
-
-    console.log(
-      "finalPrice",
-      ConvertCurrency.centsToReal(finalPriceInCents.toString()),
-    );
 
     return finalPriceInCents.toString();
   }
@@ -544,9 +543,6 @@ export async function checkAppliedCoupon(
 }
 
 async function sendContract(id_order: string, link_signature: string) {
-  console.log("id_order", id_order);
-  console.log("link_signature", link_signature);
-
   const statusOrder = await prismaClient.order.update({
     where: { id_order },
     data: {

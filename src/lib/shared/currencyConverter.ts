@@ -15,6 +15,7 @@ function centsToReal(price: any) {
 
 // mascaras input valores
 function changeCurrency(event: React.ChangeEvent<HTMLInputElement>) {
+  console.log("event", event);
   let { value } = event.target;
   value = value.replace(/\D/g, "");
 
