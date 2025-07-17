@@ -54,6 +54,7 @@ const nextConfig = {
 
 ## Limites Definidos
 
+
 - **Arquivo individual**: 1.2MB
 - **Total em base64**: 4.5MB
 - **Timeout**: 60 segundos
@@ -62,8 +63,10 @@ const nextConfig = {
 ## Dicas para Usuários
 
 1. Use ferramentas online para compactar PDFs antes do upload
+
 2. Cada arquivo pode ter até 1.2MB (total de 4.5MB)
 3. Suporte para até 3 arquivos de 1.2MB cada
+
 4. Considere dividir documentos muito grandes em partes menores
 
 ## Monitoramento
@@ -76,8 +79,10 @@ const nextConfig = {
 
 Para testar a solução:
 
+
 1. Tente enviar um arquivo PDF maior que 1.2MB
 2. Tente enviar múltiplos arquivos que somem mais de 4.5MB
 3. Teste com 3 arquivos de 1.2MB cada (deve funcionar)
+ivos de 10MB cada (deve funcionar)
 4. Verifique se as mensagens de erro são exibidas corretamente
 5. Confirme que arquivos dentro dos limites funcionam normalmente

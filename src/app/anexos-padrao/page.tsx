@@ -54,7 +54,7 @@ export default function AnexosPadraoPage() {
 
   const handleFileUpload = (
     fileNumber: number,
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -83,6 +83,7 @@ export default function AnexosPadraoPage() {
         // 2MB em base64 (considerando overhead)
         toast.error(
           `Arquivo muito grande após conversão (${estimatedMB}MB). Tente um arquivo menor.`,
+
         );
         return;
       }
@@ -233,6 +234,7 @@ export default function AnexosPadraoPage() {
                 <li>• Tamanho máximo por arquivo: 1.2MB</li>
                 <li>• Tamanho máximo total: 4.5MB</li>
                 <li>• Suporta até 3 arquivos de 1.2MB cada</li>
+
                 <li>
                   • Para arquivos grandes, use ferramentas online para compactar
                   PDFs
