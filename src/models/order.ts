@@ -70,7 +70,7 @@ async function create(orderInputValues: OrderInputValues) {
   // Converter preço para centavos se fornecido
   if (orderInputValues.price) {
     orderInputValues.price = ConvertCurrency.realToCents(
-      orderInputValues.price
+      orderInputValues.price,
     );
 
     orderInputValues.services.forEach((service) => {
@@ -130,7 +130,7 @@ async function create(orderInputValues: OrderInputValues) {
 
 async function updateById(
   id: string,
-  orderInputValues: OrderUpdateValues
+  orderInputValues: OrderUpdateValues,
 ): Promise<any> {
   await findOneById(id);
 
@@ -144,7 +144,7 @@ async function updateById(
   // Converter preço para centavos se fornecido
   if (orderInputValues.price) {
     orderInputValues.price = ConvertCurrency.realToCents(
-      orderInputValues.price
+      orderInputValues.price,
     );
   }
   if (orderInputValues.services) {
@@ -447,7 +447,7 @@ async function updateDocumentation(payload: any) {
   if (storedOrder.customer) {
     storedCustomer = await customer.updateById(
       storedOrder.customer.id_customer,
-      customerData
+      customerData,
     );
   } else {
     storedCustomer = await customer.create(customerData);
@@ -485,7 +485,7 @@ async function approveDocumentation(payload: any) {
 
   const appliedPrice = await checkAppliedCoupon(
     storedOrder,
-    payload.id_cond_pag
+    payload.id_cond_pag,
   );
 
   const updatedOrder = await prismaClient.order.update({
@@ -509,7 +509,7 @@ async function approveDocumentation(payload: any) {
 
 export async function checkAppliedCoupon(
   storedOrder: any,
-  id_cond_pag: string
+  id_cond_pag: string,
 ) {
   const storedCondPag = await prismaClient.condicaoPagamento.findUnique({
     where: { id_cond_pag },
@@ -519,6 +519,8 @@ export async function checkAppliedCoupon(
     storedOrder.id_coupons &&
     storedCondPag?.description.toLowerCase() === "pix"
   ) {
+    console.log("storedOrder.price", storedOrder.price);
+    storedOrder.price = ConvertCurrency.realToCents(storedOrder.price);
     return storedOrder.price;
   }
 
@@ -527,11 +529,12 @@ export async function checkAppliedCoupon(
     storedCondPag?.description.toLowerCase() === "pix"
   ) {
     const priceInCents = ConvertCurrency.realToCents(storedOrder.price);
+    console.log("priceInCents", priceInCents);
 
     const discountPercentage = parseFloat(storedCondPag.discount) / 100;
 
     const discountInCents = Math.round(
-      parseInt(priceInCents, 10) * discountPercentage
+      parseInt(priceInCents, 10) * discountPercentage,
     );
 
     const finalPriceInCents = parseInt(priceInCents, 10) - discountInCents;

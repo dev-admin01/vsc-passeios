@@ -8,7 +8,7 @@ type NodeReadableWithDestroy = NodeJS.ReadableStream & {
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ id_order: string }> }
+  { params }: { params: Promise<{ id_order: string }> },
 ) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -16,7 +16,7 @@ export async function GET(
 
   const response = await fetch(
     `${baseUrl}/api/receipt/public/pdf/${id_order}`,
-    {}
+    {},
   );
 
   if (!response.ok) {
@@ -36,7 +36,7 @@ export async function GET(
   const docElement = <ReceiptPDF pdfData={pdfData} />;
 
   const nodeStream = (await renderToStream(
-    docElement
+    docElement,
   )) as NodeReadableWithDestroy;
 
   const webStream = new ReadableStream({

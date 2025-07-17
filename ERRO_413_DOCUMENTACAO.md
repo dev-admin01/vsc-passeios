@@ -18,12 +18,12 @@ O erro 413 (Request Entity Too Large) ocorre quando o payload das requisições 
 const nextConfig = {
   experimental: {
     serverActions: {
-      bodySizeLimit: "50mb", // Aumenta o limite para 50MB
+      bodySizeLimit: "4.5mb", // Limite para 4.5MB
     },
   },
   api: {
     bodyParser: {
-      sizeLimit: "50mb",
+      sizeLimit: "4.5mb",
     },
   },
 };
@@ -37,8 +37,8 @@ const nextConfig = {
 
 ### 3. Validação no Frontend (`src/app/anexos-padrao/page.tsx`)
 
-- Valida tamanho do arquivo original (máximo 10MB)
-- Valida tamanho do base64 após conversão (máximo 15MB por arquivo)
+- Valida tamanho do arquivo original (máximo 1.2MB)
+- Valida tamanho do base64 após conversão (máximo 2MB por arquivo)
 - Mostra feedback ao usuário sobre o tamanho do arquivo
 
 ### 4. Tratamento de Erro no Hook (`src/app/hooks/documentos-pdf/useDocumentosPDF.ts`)
@@ -54,16 +54,19 @@ const nextConfig = {
 
 ## Limites Definidos
 
-- **Arquivo individual**: 10MB
-- **Total em base64**: 50MB
+
+- **Arquivo individual**: 1.2MB
+- **Total em base64**: 4.5MB
 - **Timeout**: 60 segundos
-- **Suporte**: 3 arquivos de 10MB cada
+- **Suporte**: 3 arquivos de 1.2MB cada
 
 ## Dicas para Usuários
 
 1. Use ferramentas online para compactar PDFs antes do upload
-2. Cada arquivo pode ter até 10MB (total de 50MB)
-3. Suporte para até 3 arquivos de 10MB cada
+
+2. Cada arquivo pode ter até 1.2MB (total de 4.5MB)
+3. Suporte para até 3 arquivos de 1.2MB cada
+
 4. Considere dividir documentos muito grandes em partes menores
 
 ## Monitoramento
@@ -76,8 +79,10 @@ const nextConfig = {
 
 Para testar a solução:
 
-1. Tente enviar um arquivo PDF maior que 10MB
-2. Tente enviar múltiplos arquivos que somem mais de 50MB
-3. Teste com 3 arquivos de 10MB cada (deve funcionar)
+
+1. Tente enviar um arquivo PDF maior que 1.2MB
+2. Tente enviar múltiplos arquivos que somem mais de 4.5MB
+3. Teste com 3 arquivos de 1.2MB cada (deve funcionar)
+ivos de 10MB cada (deve funcionar)
 4. Verifique se as mensagens de erro são exibidas corretamente
 5. Confirme que arquivos dentro dos limites funcionam normalmente

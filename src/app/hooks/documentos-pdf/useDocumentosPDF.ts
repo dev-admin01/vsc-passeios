@@ -78,11 +78,11 @@ export const useDocumentosPDF = () => {
         // Sugestões adicionais para o usuário
         setTimeout(() => {
           toast.info(
-            "💡 Dica: Tente compactar os PDFs ou usar arquivos menores que 10MB",
+            "💡 Dica: Tente compactar os PDFs ou usar arquivos menores que 1.2MB",
             {
               closeButton: true,
               duration: 10000,
-            }
+            },
           );
         }, 1000);
 
@@ -140,14 +140,13 @@ export const useDocumentosPDF = () => {
         // Sugestões adicionais para o usuário
         setTimeout(() => {
           toast.info(
-            "💡 Dica: Tente compactar os PDFs ou usar arquivos menores que 10MB",
+            "💡 Dica: Tente compactar os PDFs ou usar arquivos menores que 1.2MB",
             {
               closeButton: true,
               duration: 10000,
-            }
+            },
           );
         }, 1000);
-
         return false;
       }
 

@@ -64,10 +64,10 @@ export default function AnexosPadraoPage() {
       return;
     }
 
-    // Validar tamanho do arquivo (máximo 10MB)
-    const maxSizeInBytes = 10 * 1024 * 1024; // 10MB
+    // Validar tamanho do arquivo (máximo 1.2MB)
+    const maxSizeInBytes = 1.2 * 1024 * 1024; // 1.2MB
     if (file.size > maxSizeInBytes) {
-      toast.error("Arquivo muito grande. Tamanho máximo permitido: 10MB");
+      toast.error("Arquivo muito grande. Tamanho máximo permitido: 1.2MB");
       return;
     }
 
@@ -79,10 +79,11 @@ export default function AnexosPadraoPage() {
       const base64Size = base64.length;
       const estimatedMB = (base64Size / 1024 / 1024).toFixed(2);
 
-      if (base64Size > 15 * 1024 * 1024) {
-        // 15MB em base64 (considerando overhead)
+      if (base64Size > 2 * 1024 * 1024) {
+        // 2MB em base64 (considerando overhead)
         toast.error(
-          `Arquivo muito grande após conversão (${estimatedMB}MB). Tente um arquivo menor.`
+          `Arquivo muito grande após conversão (${estimatedMB}MB). Tente um arquivo menor.`,
+
         );
         return;
       }
@@ -93,7 +94,7 @@ export default function AnexosPadraoPage() {
       }));
 
       toast.success(
-        `Arquivo ${fileNumber} carregado com sucesso (${estimatedMB}MB)`
+        `Arquivo ${fileNumber} carregado com sucesso (${estimatedMB}MB)`,
       );
     };
     reader.readAsDataURL(file);
@@ -122,10 +123,10 @@ export default function AnexosPadraoPage() {
 
       const totalMB = (totalSize / 1024 / 1024).toFixed(2);
 
-      if (totalSize > 50 * 1024 * 1024) {
-        // 50MB total
+      if (totalSize > 4.5 * 1024 * 1024) {
+        // 4.5MB total
         toast.error(
-          `Tamanho total dos arquivos muito grande (${totalMB}MB). Máximo permitido: 50MB`
+          `Tamanho total dos arquivos muito grande (${totalMB}MB). Máximo permitido: 4.5MB`,
         );
         return;
       }
@@ -230,9 +231,10 @@ export default function AnexosPadraoPage() {
               </h3>
               <ul className="text-sm text-blue-700 space-y-1">
                 <li>• Apenas arquivos PDF são aceitos</li>
-                <li>• Tamanho máximo por arquivo: 10MB</li>
-                <li>• Tamanho máximo total: 50MB</li>
-                <li>• Suporta até 3 arquivos de 10MB cada</li>
+                <li>• Tamanho máximo por arquivo: 1.2MB</li>
+                <li>• Tamanho máximo total: 4.5MB</li>
+                <li>• Suporta até 3 arquivos de 1.2MB cada</li>
+
                 <li>
                   • Para arquivos grandes, use ferramentas online para compactar
                   PDFs

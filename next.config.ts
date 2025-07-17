@@ -38,7 +38,7 @@
 const nextConfig = {
   experimental: {
     serverActions: {
-      bodySizeLimit: "50mb", // Aumenta o limite para 50MB (3 arquivos de 10MB + overhead base64)
+      bodySizeLimit: "4.5mb", // Limite para 4.5MB (3 arquivos de 1.2MB + overhead base64)
     },
   },
   images: {
@@ -49,7 +49,7 @@ const nextConfig = {
   // Configuração para API routes
   api: {
     bodyParser: {
-      sizeLimit: "50mb",
+      sizeLimit: "4.5mb",
     },
   },
 };

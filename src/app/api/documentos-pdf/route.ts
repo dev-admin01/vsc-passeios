@@ -31,14 +31,14 @@ export async function POST(request: NextRequest) {
   try {
     // Verificar se o request tem um body muito grande
     const contentLength = request.headers.get("content-length");
-    if (contentLength && parseInt(contentLength) > 50 * 1024 * 1024) {
-      // 50MB
+    if (contentLength && parseInt(contentLength) > 4.5 * 1024 * 1024) {
+      // 4.5MB
       return NextResponse.json(
         {
-          message: "Payload muito grande. Tamanho máximo permitido: 50MB",
+          message: "Payload muito grande. Tamanho máximo permitido: 4.5MB",
           error: "PAYLOAD_TOO_LARGE",
         },
-        { status: 413 }
+        { status: 413 },
       );
     }
 
@@ -50,14 +50,14 @@ export async function POST(request: NextRequest) {
       (documentoInputValues.arquivo_2_base64?.length || 0) +
       (documentoInputValues.arquivo_3_base64?.length || 0);
 
-    if (totalSize > 50 * 1024 * 1024) {
-      // 50MB total
+    if (totalSize > 4.5 * 1024 * 1024) {
+      // 4.5MB total
       return NextResponse.json(
         {
-          message: "Arquivos muito grandes. Tamanho total máximo: 50MB",
+          message: "Arquivos muito grandes. Tamanho total máximo: 4.5MB",
           error: "FILES_TOO_LARGE",
         },
-        { status: 413 }
+        { status: 413 },
       );
     }
 
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
             "Arquivo muito grande. Reduza o tamanho dos arquivos PDF e tente novamente.",
           error: "PAYLOAD_TOO_LARGE",
         },
-        { status: 413 }
+        { status: 413 },
       );
     }
 
