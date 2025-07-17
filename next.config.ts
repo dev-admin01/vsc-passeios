@@ -37,13 +37,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverActions: true,
+    serverActions: {
+      bodySizeLimit: "50mb", // Aumenta o limite para 50MB (3 arquivos de 10MB + overhead base64)
+    },
   },
   images: {
     domains: ["localhost"],
   },
   // Configuração para evitar o uso do Edge Runtime em rotas que usam Axios
   runtime: "nodejs",
+  // Configuração para API routes
+  api: {
+    bodyParser: {
+      sizeLimit: "50mb",
+    },
+  },
 };
 
 export default nextConfig;
