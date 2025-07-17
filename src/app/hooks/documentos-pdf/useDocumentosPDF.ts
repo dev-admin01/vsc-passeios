@@ -62,6 +62,33 @@ export const useDocumentosPDF = () => {
 
       return response.data;
     } catch (error: any) {
+      console.error("Erro ao criar documento PDF:", error);
+
+      // Tratamento específico para erro 413 (Request Entity Too Large)
+      if (error.response?.status === 413) {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Arquivos muito grandes. Reduza o tamanho dos PDFs e tente novamente.";
+
+        toast.error(errorMessage, {
+          closeButton: true,
+          duration: 8000, // 8 segundos para dar tempo de ler
+        });
+
+        // Sugestões adicionais para o usuário
+        setTimeout(() => {
+          toast.info(
+            "💡 Dica: Tente compactar os PDFs ou usar arquivos menores que 1.2MB",
+            {
+              closeButton: true,
+              duration: 10000,
+            },
+          );
+        }, 1000);
+
+        return false;
+      }
+
       const errorMessage =
         error.response?.data?.message || "Erro ao criar documento PDF";
       toast.error(errorMessage, { closeButton: true });
@@ -97,6 +124,33 @@ export const useDocumentosPDF = () => {
 
       return response.data;
     } catch (error: any) {
+      console.error("Erro ao atualizar documento PDF:", error);
+
+      // Tratamento específico para erro 413 (Request Entity Too Large)
+      if (error.response?.status === 413) {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Arquivos muito grandes. Reduza o tamanho dos PDFs e tente novamente.";
+
+        toast.error(errorMessage, {
+          closeButton: true,
+          duration: 8000, // 8 segundos para dar tempo de ler
+        });
+
+        // Sugestões adicionais para o usuário
+        setTimeout(() => {
+          toast.info(
+            "💡 Dica: Tente compactar os PDFs ou usar arquivos menores que 1.2MB",
+            {
+              closeButton: true,
+              duration: 10000,
+            },
+          );
+        }, 1000);
+
+        return false;
+      }
+
       const errorMessage =
         error.response?.data?.message || "Erro ao atualizar documento PDF";
       toast.error(errorMessage, { closeButton: true });

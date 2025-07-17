@@ -11,7 +11,7 @@ import {
 function toTitleCase(str: string) {
   return str.replace(
     /\w\S*/g,
-    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
   );
 }
 function formatPhone(phone: string) {
@@ -83,7 +83,7 @@ export default function ReceiptPDF({ pdfData }: any) {
             <Text style={styles.text}>
               Check-out:{" "}
               {new Date(orderPdfData.hotel_checkout).toLocaleDateString(
-                "pt-BR"
+                "pt-BR",
               )}
             </Text>
           </View>
@@ -117,12 +117,12 @@ export default function ReceiptPDF({ pdfData }: any) {
               <Text style={styles.serviceDiscount}>
                 {orderPdfData.orders_service[index].time.replace(
                   /["\[\]]/g,
-                  ""
+                  "",
                 )}
               </Text>
               <Text style={styles.serviceDate}>
                 {new Date(
-                  orderPdfData.orders_service[index].suggested_date
+                  orderPdfData.orders_service[index].suggested_date,
                 ).toLocaleDateString("pt-BR")}
               </Text>
             </View>

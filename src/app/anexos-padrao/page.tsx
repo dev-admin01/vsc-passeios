@@ -64,13 +64,37 @@ export default function AnexosPadraoPage() {
       return;
     }
 
+    // Validar tamanho do arquivo (máximo 1.2MB)
+    const maxSizeInBytes = 1.2 * 1024 * 1024; // 1.2MB
+    if (file.size > maxSizeInBytes) {
+      toast.error("Arquivo muito grande. Tamanho máximo permitido: 1.2MB");
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64 = e.target?.result as string;
+
+      // Validar tamanho do base64 (aproximadamente 1.33x maior que o arquivo original)
+      const base64Size = base64.length;
+      const estimatedMB = (base64Size / 1024 / 1024).toFixed(2);
+
+      if (base64Size > 2 * 1024 * 1024) {
+        // 2MB em base64 (considerando overhead)
+        toast.error(
+          `Arquivo muito grande após conversão (${estimatedMB}MB). Tente um arquivo menor.`,
+        );
+        return;
+      }
+
       setFormData((prev) => ({
         ...prev,
         [`arquivo_${fileNumber}_base64`]: base64,
       }));
+
+      toast.success(
+        `Arquivo ${fileNumber} carregado com sucesso (${estimatedMB}MB)`,
+      );
     };
     reader.readAsDataURL(file);
   };
@@ -89,6 +113,25 @@ export default function AnexosPadraoPage() {
         toast.error("Arquivo 1 é obrigatório");
         return;
       }
+
+      // Validar tamanho total dos arquivos base64 antes de enviar
+      const totalSize =
+        (formData.arquivo_1_base64?.length || 0) +
+        (formData.arquivo_2_base64?.length || 0) +
+        (formData.arquivo_3_base64?.length || 0);
+
+      const totalMB = (totalSize / 1024 / 1024).toFixed(2);
+
+      if (totalSize > 4.5 * 1024 * 1024) {
+        // 4.5MB total
+        toast.error(
+          `Tamanho total dos arquivos muito grande (${totalMB}MB). Máximo permitido: 4.5MB`,
+        );
+        return;
+      }
+
+      // Mostrar informação sobre o tamanho total
+      toast.info(`Enviando ${totalMB}MB de arquivos...`);
 
       if (documento && documento.id) {
         // Atualizar documento existente
@@ -179,6 +222,22 @@ export default function AnexosPadraoPage() {
                 }
                 required
               />
+            </div>
+
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="font-semibold text-blue-800 mb-2">
+                ℹ️ Informações sobre Upload de Arquivos
+              </h3>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Apenas arquivos PDF são aceitos</li>
+                <li>• Tamanho máximo por arquivo: 1.2MB</li>
+                <li>• Tamanho máximo total: 4.5MB</li>
+                <li>• Suporta até 3 arquivos de 1.2MB cada</li>
+                <li>
+                  • Para arquivos grandes, use ferramentas online para compactar
+                  PDFs
+                </li>
+              </ul>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
